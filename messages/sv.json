@@ -1,0 +1,251 @@
+{
+  "metadata": {
+    "title": "Mbody | Premium damaktivkläder",
+    "description": "Premium damaktivkläder designade för prestation. Handla nya släpp, exklusiva kollektioner och bästsäljare."
+  },
+  "nav": {
+    "shop": "Butik",
+    "shopAll": "Shoppa allt",
+    "newDrops": "Nya släpp",
+    "collections": "Kollektioner",
+    "about": "Om oss"
+  },
+  "utilityBar": {
+    "shipping": "Världsomspännande frakt",
+    "currency": "SEK",
+    "storeLocator": "Butiker",
+    "support": "Support"
+  },
+  "header": {
+    "currency": "EUR",
+    "aria": {
+      "search": "Sök",
+      "favorite": "Önskelista",
+      "person": "Konto",
+      "shopping_bag": "Varukorg",
+      "menu": "Öppna meny",
+      "close": "Stäng meny"
+    }
+  },
+  "footer": {
+    "tagline": "Banbrytande teknisk excellens för den moderna atleten. Designad för dig som rör dig med avsikt.",
+    "shop": "Butik",
+    "help": "Hjälp",
+    "connect": "Följ oss",
+    "links": {
+      "newDrops": "Nya släpp",
+      "shopAll": "Handla allt",
+      "collections": "Kollektioner",
+      "shippingReturns": "Frakt & returer",
+      "sizeGuide": "Storleksguide",
+      "faq": "FAQ",
+      "contact": "Kontakt",
+      "privacy": "Integritet",
+      "terms": "Villkor"
+    },
+    "copyright": "© 2026 Mbody. Alla rättigheter förbehållna."
+  },
+  "hero": {
+    "eyebrow": "Kinetic-serien",
+    "title": "Konstruerad för momentum",
+    "description": "Vår mest efterlängtade prestationskollektion lanseras snart. Premiumtyger, skulpterade siluetter och begränsad tillgång för medlemmar först.",
+    "shopNow": "Handla nu",
+    "viewNewDrops": "Se nya släpp",
+    "imageAlt": "Kvinnlig atlet i premium kolprestationskläder"
+  },
+  "home": {
+    "latestDrop": {
+      "title": "Senaste släppet",
+      "description": "Förtur för medlemmar. Begränsade släpp från Kinetic-serien.",
+      "cta": "Kommer snart"
+    },
+    "premiumCollection": {
+      "title": "Premiumkollektion",
+      "description": "Kurerade essentials med redaktionell känsla — begränsade och exklusiva."
+    },
+    "bestSellers": {
+      "title": "Bästsäljare",
+      "description": "Våra mest älskade plagg, utvalda av Mbody-communityn."
+    }
+  },
+  "badges": {
+    "limitedRelease": "Begränsat släpp",
+    "exclusive": "Exklusiv",
+    "bestSeller": "Bästsäljare"
+  },
+  "product": {
+    "shopNow": "Handla nu"
+  },
+  "completeTheLook": {
+    "eyebrow": "Komplettera looken",
+    "title": "Power Set",
+    "description": "Sculpt leggings, support-bh och flow crop — konstruerade som en sammanhängande look.",
+    "items": {
+      "sculptLeggings": "Sculpt Leggings",
+      "supportBra": "Support-bh",
+      "flowCropTop": "Flow Crop Top"
+    },
+    "shopTheLook": "Handla looken",
+    "imageAlt": "Komplett outfit-set"
+  },
+  "newsletter": {
+    "title": "Missa aldrig ett släpp",
+    "description": "Gå med i vårt community för tidiga accesskoder och exklusiva inbjudningar till framtida släpp innan de blir offentliga.",
+    "placeholder": "Ange din e-post",
+    "subscribe": "Prenumerera",
+    "consent": "Jag godkänner att ta emot marknadsföringsmejl och accepterar integritetspolicyn (GDPR)."
+  },
+  "countdown": {
+    "ariaLabel": "Nedräkning till släpp",
+    "days": "Dagar",
+    "hours": "Timmar",
+    "minutes": "Min",
+    "seconds": "Sek"
+  },
+  "shop": {
+    "title": "Shoppa allt",
+    "sortBy": "Sortera",
+    "filterSort": "Filtrera & sortera",
+    "itemCount": "{count} artiklar",
+    "breadcrumb": { "home": "Hem", "shop": "Shop" },
+    "categories": {
+      "all": "Alla",
+      "leggings": "Leggings",
+      "sports-bras": "Sport-BH",
+      "tops": "Toppar",
+      "shorts": "Shorts",
+      "matching-sets": "Set",
+      "accessories": "Accessoarer"
+    },
+    "sort": {
+      "newest": "Nyast",
+      "priceAsc": "Pris: lägst först",
+      "priceDesc": "Pris: högst först",
+      "bestSelling": "Bästsäljare"
+    },
+    "filters": {
+      "title": "Filtrera & sortera",
+      "close": "Stäng",
+      "apply": "Tillämpa",
+      "availability": "Tillgänglighet",
+      "inStock": "I lager",
+      "outOfStock": "Slut i lager",
+      "collection": "Kollektion",
+      "latestDrop": "Senaste drop",
+      "premiumLine": "Premium Line",
+      "bestSellers": "Bästsäljare",
+      "size": "Storlek"
+    },
+    "badges": { "new": "Ny", "limitedRelease": "Begränsad", "bestSeller": "Bästsäljare" }
+  },
+  "pdp": {
+    "breadcrumb": { "home": "Hem", "shop": "Shop" },
+    "socialProof": "Vald av {count} atleter denna månad",
+    "inclVat": "Inkl. moms",
+    "limitedStock": "Begränsat lager",
+    "stockLeft": "Bara {count} kvar i din region",
+    "color": "Färg",
+    "selectSize": "Välj storlek",
+    "sizeGuide": "Storleksguide",
+    "addToBag": "Lägg i varukorg",
+    "addToWishlist": "Lägg till önskelista"
+  },
+  "newDrops": {
+    "eyebrow": "Säsongslansering",
+    "title": "Nya drops",
+    "description": "Begränsade releaser från Kinetic-serien — tidig åtkomst för medlemmar."
+  },
+  "launch": {
+    "eyebrow": "Exklusiv säsongslansering",
+    "title": "Droppet går live snart",
+    "description": "Vår mest efterlängtade kollektion är nästan här. Tillgången är begränsad.",
+    "emailPlaceholder": "Din e-post",
+    "notify": "Meddela mig",
+    "imageAlt": "Atlet i premium activewear"
+  },
+  "checkout": {
+    "summary": {
+      "title": "Ordersammanfattning",
+      "size": "Storlek",
+      "qty": "Antal",
+      "subtotal": "Delsumma",
+      "shipping": "Frakt",
+      "free": "Gratis",
+      "total": "Totalt"
+    },
+    "shipping": {
+      "title": "Frakt",
+      "contact": "Kontakt",
+      "email": "E-postadress",
+      "address": "Leveransadress",
+      "firstName": "Förnamn",
+      "lastName": "Efternamn",
+      "addressLine": "Adress",
+      "city": "Stad",
+      "postalCode": "Postnummer",
+      "country": "Land",
+      "delivery": "Leveransmetod",
+      "standard": "Standardfrakt",
+      "standardEta": "3–5 arbetsdagar",
+      "express": "Expressfrakt",
+      "expressEta": "1–2 arbetsdagar",
+      "free": "Gratis",
+      "continue": "Fortsätt till betalning"
+    },
+    "payment": {
+      "title": "Betalning",
+      "method": "Betalningsmetod",
+      "cod": "Postförskott",
+      "codDescription": "Betala vid leverans",
+      "card": "Kort",
+      "cardSoon": "Kommer snart",
+      "billing": "Fakturering",
+      "sameAsShipping": "Samma som leveransadress",
+      "placeOrder": "Lägg beställning"
+    }
+  },
+  "account": {
+    "title": "Mitt konto",
+    "welcome": "Välkommen tillbaka",
+    "welcomeDescription": "Följ beställningar, hantera önskelista och uppdatera inställningar.",
+    "continueShopping": "Fortsätt shoppa",
+    "recentOrders": "Senaste beställningar",
+    "nav": {
+      "overview": "Översikt",
+      "orders": "Beställningar",
+      "wishlist": "Önskelista",
+      "settings": "Inställningar"
+    },
+    "login": {
+      "utilityHelp": "Hjälp",
+      "visualTitle": "Gå med i kollektivet.",
+      "visualDescription": "Få tillgång till exklusiva drops, medlemsträning och en personlig siluettarkiv.",
+      "welcomeBack": "Välkommen tillbaka",
+      "signInTitle": "Logga in på Mbody",
+      "email": "E-postadress",
+      "password": "Lösenord",
+      "forgotPassword": "Glömt?",
+      "logIn": "Logga in",
+      "newToCollective": "Ny i kollektivet?",
+      "createAccountLink": "Skapa konto",
+      "exclusivityAwaits": "Exklusivitet väntar",
+      "joinTitle": "Gå med i kollektivet",
+      "firstName": "Förnamn",
+      "lastName": "Efternamn",
+      "createPassword": "Skapa lösenord",
+      "passwordHint": "Minst 8 tecken",
+      "termsAgreement": "Jag godkänner användarvillkoren och vill få tidig åtkomst till nya kollektioner.",
+      "terms": "Användarvillkor",
+      "becomeMember": "Bli medlem",
+      "alreadyMember": "Redan medlem?",
+      "signInLink": "Logga in här",
+      "trustEncrypted": "Krypterad data",
+      "trustSecure": "Säker auth",
+      "trustPrivacy": "Integritet först",
+      "footerSustainability": "Hållbarhet",
+      "footerPrivacy": "Integritetspolicy",
+      "footerShipping": "Frakt",
+      "copyright": "© 2026 Mbody. Alla rättigheter förbehållna."
+    }
+  }
+}

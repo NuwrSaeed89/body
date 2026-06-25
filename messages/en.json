@@ -1,0 +1,280 @@
+{
+  "metadata": {
+    "title": "Mbody | Premium Women's Activewear",
+    "description": "Premium women's activewear designed for performance. Shop new drops, exclusive collections, and best sellers."
+  },
+  "nav": {
+    "shop": "Shop",
+    "shopAll": "Shop All",
+    "newDrops": "New Drops",
+    "collections": "Collections",
+    "about": "About"
+  },
+  "utilityBar": {
+    "shipping": "Worldwide Shipping",
+    "currency": "SEK",
+    "storeLocator": "Store Locator",
+    "support": "Support"
+  },
+  "header": {
+    "currency": "EUR",
+    "aria": {
+      "search": "Search",
+      "favorite": "Wishlist",
+      "person": "Account",
+      "shopping_bag": "Cart",
+      "menu": "Open menu",
+      "close": "Close menu"
+    }
+  },
+  "footer": {
+    "tagline": "Pioneering technical excellence for the modern athlete. Designed for those who move with intention.",
+    "taglineMobile": "Redefining the intersection of technical performance and high-fashion aesthetics.",
+    "shop": "Shop",
+    "help": "Help",
+    "support": "Support",
+    "connect": "Connect",
+    "links": {
+      "newDrops": "New Drops",
+      "newArrivals": "New Arrivals",
+      "shopAll": "Shop All",
+      "bestSellers": "Best Sellers",
+      "collections": "Collections",
+      "giftCards": "Gift Cards",
+      "shipping": "Shipping",
+      "returns": "Returns",
+      "shippingReturns": "Shipping & Returns",
+      "sizeGuide": "Size Guide",
+      "faq": "FAQ",
+      "contact": "Contact",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "copyright": "© 2026 Mbody. All rights reserved."
+  },
+  "hero": {
+    "eyebrow": "The Kinetic Series",
+    "title": "The Art of Performance",
+    "titleDesktop": "Engineered for Momentum",
+    "description": "Elevated activewear for the modern athlete. Precision engineered for grace.",
+    "descriptionDesktop": "Our most anticipated performance collection launches soon. Premium fabrics, sculpted silhouettes, and limited access for members first.",
+    "nextDrop": "Next Drop",
+    "shopNow": "Shop Now",
+    "viewNewDrops": "View New Drops",
+    "imageAlt": "Female athlete in premium charcoal performance gear"
+  },
+  "home": {
+    "latestDrop": {
+      "eyebrow": "Curated For You",
+      "title": "Latest Drops",
+      "description": "Pre-access available for members. Limited releases from the Kinetic Series.",
+      "viewAll": "View All",
+      "cta": "Coming Soon"
+    },
+    "coreElements": {
+      "title": "Core Elements",
+      "description": "The foundation of every performance. A curation of essential silhouettes designed to outlast the trends.",
+      "explore": "Explore"
+    },
+    "premiumCollection": {
+      "title": "Premium Collection",
+      "description": "Curated essentials with an editorial feel — limited and exclusive."
+    },
+    "bestSellers": {
+      "title": "Best Sellers",
+      "description": "Our most-loved pieces, chosen by the Mbody community."
+    }
+  },
+  "badges": {
+    "limitedRelease": "Limited Release",
+    "exclusive": "Exclusive",
+    "bestSeller": "Best Seller"
+  },
+  "product": {
+    "shopNow": "Shop Now"
+  },
+  "completeTheLook": {
+    "eyebrow": "Complete the Look",
+    "title": "The Power Set",
+    "setSavings": "Set Savings",
+    "description": "Sculpt leggings, support bra, and flow crop — engineered as one cohesive look.",
+    "items": {
+      "sculptLeggings": "Sculpt Leggings",
+      "supportBra": "Support Bra",
+      "flowCropTop": "Flow Crop Top"
+    },
+    "shopTheLook": "Shop the Look",
+    "imageAlt": "Complete the look outfit set"
+  },
+  "newsletter": {
+    "title": "Join The Circle",
+    "description": "Early access to drops, exclusive content, and community events.",
+    "emailLabel": "Email Address",
+    "placeholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "consent": "I consent to receiving marketing communications and agree to the Privacy Policy."
+  },
+  "countdown": {
+    "ariaLabel": "Drop countdown timer",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Mins",
+    "seconds": "Secs"
+  },
+  "shop": {
+    "title": "Shop All",
+    "sortBy": "Sort By",
+    "filterSort": "Filter & Sort",
+    "itemCount": "{count} Items",
+    "breadcrumb": {
+      "home": "Home",
+      "shop": "Shop"
+    },
+    "categories": {
+      "all": "All Items",
+      "leggings": "Leggings",
+      "sports-bras": "Sports Bras",
+      "tops": "Tops",
+      "shorts": "Shorts",
+      "matching-sets": "Matching Sets",
+      "accessories": "Accessories"
+    },
+    "sort": {
+      "newest": "Newest",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "bestSelling": "Best Selling"
+    },
+    "filters": {
+      "title": "Filter & Sort",
+      "close": "Close filters",
+      "apply": "Apply Filters",
+      "availability": "Availability",
+      "inStock": "In stock",
+      "outOfStock": "Out of stock",
+      "collection": "Collection",
+      "latestDrop": "Latest Drop",
+      "premiumLine": "Premium Line",
+      "bestSellers": "Best Sellers",
+      "size": "Size"
+    },
+    "badges": {
+      "new": "New",
+      "limitedRelease": "Limited",
+      "bestSeller": "Best Seller"
+    }
+  },
+  "pdp": {
+    "breadcrumb": {
+      "home": "Home",
+      "shop": "Shop"
+    },
+    "socialProof": "Joined by {count} athletes this month",
+    "inclVat": "Incl. VAT",
+    "limitedStock": "Limited Stock",
+    "stockLeft": "Only {count} left in your region",
+    "color": "Color",
+    "selectSize": "Select Size",
+    "sizeGuide": "Size Guide",
+    "addToBag": "Add to Bag",
+    "addToWishlist": "Add to Wishlist"
+  },
+  "newDrops": {
+    "eyebrow": "Seasonal Release",
+    "title": "New Drops",
+    "description": "Limited releases from the Kinetic Series — pre-access for members, first-come for everyone else."
+  },
+  "launch": {
+    "eyebrow": "Exclusive Seasonal Release",
+    "title": "The Drop Goes Live Soon",
+    "description": "Our most anticipated performance collection is almost here. Access is limited and strictly on a first-come basis.",
+    "emailPlaceholder": "Enter your email",
+    "notify": "Notify Me",
+    "imageAlt": "Athlete in premium charcoal performance gear"
+  },
+  "checkout": {
+    "summary": {
+      "title": "Order Summary",
+      "size": "Size",
+      "qty": "Qty",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "free": "Free",
+      "total": "Total"
+    },
+    "shipping": {
+      "title": "Shipping",
+      "contact": "Contact",
+      "email": "Email address",
+      "address": "Shipping Address",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "addressLine": "Address",
+      "city": "City",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "delivery": "Delivery Method",
+      "standard": "Standard Shipping",
+      "standardEta": "3–5 business days",
+      "express": "Express Shipping",
+      "expressEta": "1–2 business days",
+      "free": "Free",
+      "continue": "Continue to Payment"
+    },
+    "payment": {
+      "title": "Payment",
+      "method": "Payment Method",
+      "cod": "Cash on Delivery",
+      "codDescription": "Pay when your order arrives",
+      "card": "Credit Card",
+      "cardSoon": "Coming soon",
+      "billing": "Billing",
+      "sameAsShipping": "Same as shipping address",
+      "placeOrder": "Place Order"
+    }
+  },
+  "account": {
+    "title": "My Account",
+    "welcome": "Welcome back",
+    "welcomeDescription": "Track orders, manage your wishlist, and update your preferences.",
+    "continueShopping": "Continue Shopping",
+    "recentOrders": "Recent Orders",
+    "nav": {
+      "overview": "Overview",
+      "orders": "Orders",
+      "wishlist": "Wishlist",
+      "settings": "Settings"
+    },
+    "login": {
+      "utilityHelp": "Help",
+      "visualTitle": "Join the Collective.",
+      "visualDescription": "Access exclusive performance drops, member-only training sessions, and a personalized silhouette archive.",
+      "welcomeBack": "Welcome Back",
+      "signInTitle": "Sign in to Mbody",
+      "email": "Email Address",
+      "password": "Password",
+      "forgotPassword": "Forgot?",
+      "logIn": "Log In",
+      "newToCollective": "New to the collective?",
+      "createAccountLink": "Create an account",
+      "exclusivityAwaits": "Exclusivity Awaits",
+      "joinTitle": "Join the Collective",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "createPassword": "Create Password",
+      "passwordHint": "Min. 8 characters",
+      "termsAgreement": "I agree to the Terms of Service and wish to receive early access notifications to new collections.",
+      "terms": "Terms of Service",
+      "becomeMember": "Become a Member",
+      "alreadyMember": "Already a member?",
+      "signInLink": "Sign in here",
+      "trustEncrypted": "Encrypted Data",
+      "trustSecure": "Secure Auth",
+      "trustPrivacy": "Privacy First",
+      "footerSustainability": "Sustainability",
+      "footerPrivacy": "Privacy Policy",
+      "footerShipping": "Shipping",
+      "copyright": "© 2026 Mbody. All rights reserved."
+    }
+  }
+}

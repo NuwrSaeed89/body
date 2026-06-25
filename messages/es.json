@@ -1,0 +1,251 @@
+{
+  "metadata": {
+    "title": "Mbody | Ropa deportiva premium para mujer",
+    "description": "Ropa deportiva premium para mujer diseñada para el rendimiento. Descubre nuevos lanzamientos, colecciones exclusivas y los más vendidos."
+  },
+  "nav": {
+    "shop": "Tienda",
+    "shopAll": "Ver todo",
+    "newDrops": "Novedades",
+    "collections": "Colecciones",
+    "about": "Nosotros"
+  },
+  "utilityBar": {
+    "shipping": "Envío mundial",
+    "currency": "SEK",
+    "storeLocator": "Tiendas",
+    "support": "Soporte"
+  },
+  "header": {
+    "currency": "EUR",
+    "aria": {
+      "search": "Buscar",
+      "favorite": "Lista de deseos",
+      "person": "Cuenta",
+      "shopping_bag": "Carrito",
+      "menu": "Abrir menú",
+      "close": "Cerrar menú"
+    }
+  },
+  "footer": {
+    "tagline": "Excelencia técnica pionera para la atleta moderna. Diseñado para quienes se mueven con intención.",
+    "shop": "Tienda",
+    "help": "Ayuda",
+    "connect": "Conectar",
+    "links": {
+      "newDrops": "Novedades",
+      "shopAll": "Ver todo",
+      "collections": "Colecciones",
+      "shippingReturns": "Envíos y devoluciones",
+      "sizeGuide": "Guía de tallas",
+      "faq": "FAQ",
+      "contact": "Contacto",
+      "privacy": "Privacidad",
+      "terms": "Términos"
+    },
+    "copyright": "© 2026 Mbody. Todos los derechos reservados."
+  },
+  "hero": {
+    "eyebrow": "La serie Kinetic",
+    "title": "Diseñada para el impulso",
+    "description": "Nuestra colección de rendimiento más esperada llega pronto. Tejidos premium, siluetas esculpidas y acceso limitado para miembros primero.",
+    "shopNow": "Comprar ahora",
+    "viewNewDrops": "Ver novedades",
+    "imageAlt": "Atleta femenina con equipamiento premium en carbón"
+  },
+  "home": {
+    "latestDrop": {
+      "title": "Último lanzamiento",
+      "description": "Acceso anticipado para miembros. Lanzamientos limitados de la serie Kinetic.",
+      "cta": "Próximamente"
+    },
+    "premiumCollection": {
+      "title": "Colección Premium",
+      "description": "Esenciales curados con un toque editorial — limitados y exclusivos."
+    },
+    "bestSellers": {
+      "title": "Más vendidos",
+      "description": "Nuestras piezas favoritas, elegidas por la comunidad Mbody."
+    }
+  },
+  "badges": {
+    "limitedRelease": "Edición limitada",
+    "exclusive": "Exclusivo",
+    "bestSeller": "Más vendido"
+  },
+  "product": {
+    "shopNow": "Comprar ahora"
+  },
+  "completeTheLook": {
+    "eyebrow": "Completa el look",
+    "title": "The Power Set",
+    "description": "Sculpt leggings, sujetador de soporte y flow crop — diseñados como un look cohesivo.",
+    "items": {
+      "sculptLeggings": "Sculpt Leggings",
+      "supportBra": "Sujetador de soporte",
+      "flowCropTop": "Flow Crop Top"
+    },
+    "shopTheLook": "Comprar el look",
+    "imageAlt": "Conjunto completo del look"
+  },
+  "newsletter": {
+    "title": "No te pierdas nada",
+    "description": "Únete a nuestra comunidad para códigos de acceso anticipado e invitaciones exclusivas a futuros lanzamientos antes de que sean públicos.",
+    "placeholder": "Introduce tu correo",
+    "subscribe": "Suscribirse",
+    "consent": "Acepto recibir correos de marketing y la política de privacidad (GDPR)."
+  },
+  "countdown": {
+    "ariaLabel": "Cuenta atrás del lanzamiento",
+    "days": "Días",
+    "hours": "Horas",
+    "minutes": "Min",
+    "seconds": "Seg"
+  },
+  "shop": {
+    "title": "Ver todo",
+    "sortBy": "Ordenar",
+    "filterSort": "Filtrar y ordenar",
+    "itemCount": "{count} artículos",
+    "breadcrumb": { "home": "Inicio", "shop": "Tienda" },
+    "categories": {
+      "all": "Todos",
+      "leggings": "Leggings",
+      "sports-bras": "Sujetadores",
+      "tops": "Tops",
+      "shorts": "Shorts",
+      "matching-sets": "Conjuntos",
+      "accessories": "Accesorios"
+    },
+    "sort": {
+      "newest": "Más recientes",
+      "priceAsc": "Precio: menor a mayor",
+      "priceDesc": "Precio: mayor a menor",
+      "bestSelling": "Más vendidos"
+    },
+    "filters": {
+      "title": "Filtrar y ordenar",
+      "close": "Cerrar",
+      "apply": "Aplicar",
+      "availability": "Disponibilidad",
+      "inStock": "En stock",
+      "outOfStock": "Agotado",
+      "collection": "Colección",
+      "latestDrop": "Último lanzamiento",
+      "premiumLine": "Línea premium",
+      "bestSellers": "Más vendidos",
+      "size": "Talla"
+    },
+    "badges": { "new": "Nuevo", "limitedRelease": "Limitado", "bestSeller": "Top ventas" }
+  },
+  "pdp": {
+    "breadcrumb": { "home": "Inicio", "shop": "Tienda" },
+    "socialProof": "Elegido por {count} atletas este mes",
+    "inclVat": "IVA incl.",
+    "limitedStock": "Stock limitado",
+    "stockLeft": "Solo quedan {count} en tu región",
+    "color": "Color",
+    "selectSize": "Elegir talla",
+    "sizeGuide": "Guía de tallas",
+    "addToBag": "Añadir al carrito",
+    "addToWishlist": "Añadir a favoritos"
+  },
+  "newDrops": {
+    "eyebrow": "Lanzamiento de temporada",
+    "title": "Novedades",
+    "description": "Lanzamientos limitados de la serie Kinetic — acceso anticipado para miembros."
+  },
+  "launch": {
+    "eyebrow": "Lanzamiento exclusivo",
+    "title": "El drop llega pronto",
+    "description": "Nuestra colección más esperada está casi aquí. El acceso es limitado.",
+    "emailPlaceholder": "Tu correo",
+    "notify": "Avísame",
+    "imageAlt": "Atleta con ropa premium"
+  },
+  "checkout": {
+    "summary": {
+      "title": "Resumen del pedido",
+      "size": "Talla",
+      "qty": "Cant.",
+      "subtotal": "Subtotal",
+      "shipping": "Envío",
+      "free": "Gratis",
+      "total": "Total"
+    },
+    "shipping": {
+      "title": "Envío",
+      "contact": "Contacto",
+      "email": "Correo electrónico",
+      "address": "Dirección de envío",
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "addressLine": "Dirección",
+      "city": "Ciudad",
+      "postalCode": "Código postal",
+      "country": "País",
+      "delivery": "Método de entrega",
+      "standard": "Envío estándar",
+      "standardEta": "3–5 días laborables",
+      "express": "Envío express",
+      "expressEta": "1–2 días laborables",
+      "free": "Gratis",
+      "continue": "Continuar al pago"
+    },
+    "payment": {
+      "title": "Pago",
+      "method": "Método de pago",
+      "cod": "Contra reembolso",
+      "codDescription": "Paga al recibir el pedido",
+      "card": "Tarjeta",
+      "cardSoon": "Próximamente",
+      "billing": "Facturación",
+      "sameAsShipping": "Igual que la dirección de envío",
+      "placeOrder": "Realizar pedido"
+    }
+  },
+  "account": {
+    "title": "Mi cuenta",
+    "welcome": "Bienvenida de nuevo",
+    "welcomeDescription": "Sigue pedidos, gestiona favoritos y actualiza preferencias.",
+    "continueShopping": "Seguir comprando",
+    "recentOrders": "Pedidos recientes",
+    "nav": {
+      "overview": "Resumen",
+      "orders": "Pedidos",
+      "wishlist": "Favoritos",
+      "settings": "Ajustes"
+    },
+    "login": {
+      "utilityHelp": "Ayuda",
+      "visualTitle": "Únete al colectivo.",
+      "visualDescription": "Accede a drops exclusivos, sesiones de entrenamiento para miembros y un archivo personalizado de siluetas.",
+      "welcomeBack": "Bienvenida de nuevo",
+      "signInTitle": "Inicia sesión en Mbody",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "forgotPassword": "¿Olvidaste?",
+      "logIn": "Iniciar sesión",
+      "newToCollective": "¿Nueva en el colectivo?",
+      "createAccountLink": "Crear una cuenta",
+      "exclusivityAwaits": "La exclusividad te espera",
+      "joinTitle": "Únete al colectivo",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "createPassword": "Crear contraseña",
+      "passwordHint": "Mín. 8 caracteres",
+      "termsAgreement": "Acepto los Términos de servicio y deseo recibir notificaciones de acceso anticipado a nuevas colecciones.",
+      "terms": "Términos de servicio",
+      "becomeMember": "Hazte miembro",
+      "alreadyMember": "¿Ya eres miembro?",
+      "signInLink": "Inicia sesión aquí",
+      "trustEncrypted": "Datos cifrados",
+      "trustSecure": "Auth segura",
+      "trustPrivacy": "Privacidad primero",
+      "footerSustainability": "Sostenibilidad",
+      "footerPrivacy": "Política de privacidad",
+      "footerShipping": "Envíos",
+      "copyright": "© 2026 Mbody. Todos los derechos reservados."
+    }
+  }
+}
