@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { setRequestLocale } from "next-intl/server";
 import { AuthFooter } from "@/components/auth/auth-footer";
 import { AuthForms } from "@/components/auth/auth-forms";
@@ -15,9 +16,11 @@ export default async function LoginPage({ params }: LoginPageProps) {
   return (
     <div className="overflow-x-hidden bg-surface text-on-surface">
       <AuthUtilityBar />
-      <main className="flex min-h-screen flex-col items-stretch md:flex-row">
+      <main id="main-content" tabIndex={-1} className="flex min-h-screen flex-col items-stretch md:flex-row">
         <AuthVisualPanel />
-        <AuthForms />
+        <Suspense fallback={null}>
+          <AuthForms />
+        </Suspense>
       </main>
       <AuthFooter />
     </div>

@@ -1,3 +1,5 @@
+import type { ProductStats } from "@/lib/product-stats";
+
 export type ShopCategory =
   | "all"
   | "leggings"
@@ -11,9 +13,12 @@ export type ShopProduct = {
   id: string;
   slug: string;
   name: string;
-  price: string;
+  /** VAT-inclusive catalog price in SEK. */
+  priceSek: number;
   category: ShopCategory;
   badgeKey?: "new" | "limitedRelease" | "bestSeller";
+  stockStatus?: "in-stock" | "low" | "out-of-stock";
+  stockLeft?: number;
   image: string;
   imageAlt: string;
   colors?: string[];
@@ -22,12 +27,42 @@ export type ShopProduct = {
 export type ProductDetail = Omit<ShopProduct, "colors"> & {
   series: string;
   description: string;
-  socialProof: string;
+  /** Denormalized engagement counters (products.view_count, like_count, etc.). */
+  stats: ProductStats;
   stockLeft: number;
   images: Array<{ src: string; alt: string }>;
+  /** GLB URL for interactive 3D product view (model-viewer). */
+  modelGlbUrl?: string;
   sizes: string[];
   colors: Array<{ name: string; hex: string }>;
 };
+
+/** Placeholder GLB until per-product assets are uploaded. */
+const DEMO_GLB_URL =
+  "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
+
+/** Mock stats aligned with database/008_seed_catalog.sql engagement seed. */
+const MOCK_PRODUCT_STATS: Record<string, ProductStats> = {
+  "sculpt-leggings": { viewCount: 1240, likeCount: 186, waitingCount: 0, unitsSold: 412 },
+  "zen-flow-bra": { viewCount: 890, likeCount: 142, waitingCount: 0, unitsSold: 278 },
+  "essence-seamless-top": { viewCount: 640, likeCount: 98, waitingCount: 3, unitsSold: 156 },
+  "terra-ribbed-shorts": { viewCount: 520, likeCount: 76, waitingCount: 12, unitsSold: 94 },
+  "power-set": { viewCount: 710, likeCount: 118, waitingCount: 0, unitsSold: 201 },
+  "aero-flow-leggings": { viewCount: 980, likeCount: 164, waitingCount: 0, unitsSold: 335 },
+  "elite-bra": { viewCount: 430, likeCount: 67, waitingCount: 0, unitsSold: 112 },
+  "performance-headband": { viewCount: 210, likeCount: 34, waitingCount: 0, unitsSold: 88 },
+};
+
+const DEFAULT_PRODUCT_STATS: ProductStats = {
+  viewCount: 420,
+  likeCount: 64,
+  waitingCount: 0,
+  unitsSold: 96,
+};
+
+function getMockStatsForSlug(slug: string): ProductStats {
+  return MOCK_PRODUCT_STATS[slug] ?? DEFAULT_PRODUCT_STATS;
+}
 
 const LEGGINGS_IMAGE =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuCzEQA-iy1d5qkRDPEgXv2zaN-rsbH53gs9bhijbcCoRRUWYFymm09wSZv-NChprTcCJknOzluGYvsaKEhI1I_ASSVccuxG2Ox0V-35Y7-6xKZ_Vr1uq1-0kq20Rp3-TmIiasfuMx9WB7-mxWBIXQm_4gEdvw2Ew2iKHQ620-2TkkK5oPCyxNpwihJYJi4EeFGvkJkJeLyUtR6QxnZX5tMAE-WaLa94KhQt7r1QfT9cQw3jIvf8AlQWMluenSgoXq1r1IR5v50p3hs";
@@ -48,50 +83,62 @@ export const SHOP_CATEGORIES: ShopCategory[] = [
   "accessories",
 ];
 
+const TOP_IMAGE =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuBghrGHdipO4TPdjJQzMSbKWeGziZKEGJnS-oeGXCU5151P3jT8tkdCZPZ0AAGfuz9mb1FMkk1rOya3D6wfP8FVVjCRTKaXS2jdL2al7ldcejbWye2-VIk3Yr6pb-mjk8035JYfehkrXIpKWCXlKaPzp_5V-iChKKM2YCmIiPNTree9GDxH-Cv-nTqP9Z1dUwcCybyBs3xpshvL-yRPO2YdQOBcIDB8gXWLf93pR5Xt5nV8FIXVtU4nkSaoBc5Y6SM-SfdoZPR7dfA";
+
+const ZEN_BRA_IMAGE =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuBtar0I75HatgKN4jX09VnRrOQaj3mXdyW1L4GRiVLlmhWZwp7yNNdihLEfkwRNSg9VY-jGTEoWOaDjUFhcmdgOq6kDD5mIpparV841KySQp2f5xg7ridAyrKQ5LKi-pS35a0W3Qxdoj2Gn_BM91Cjy5cP491DBPk2dcP5bZ1DRCm3b5Z0kfvpCYXBumei5wjrQpdWP1zRHq4kNd5M3aaXbBzj7oHXnii6MUZNwDzgZ7AMxjMNgegQP1x4Q_ILP-TduZEnB-wRn5VQ";
+
+const TERRA_SHORTS_IMAGE =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuAazS27C55ywxPpQf2v5wRlMu7VfRGt6zrYYHEPvI05xI3tfT8mbjeheB4r99FH2CyRqd0Zd--I8CBgHg67kxHyzIgtm0vm8hzj14Jx64sgL3zHEzZ1YvzDf78smKU-gs6U5y1inENTG6Yg3d882AZovxKRAYBeFd2O1E9iRGS34-Tz6iBwhW2TTEaMetpq9g_7Xre9hasEzLx48jMz9fa5UcqhOBAriSVAgl13MyW7kAgyShOvlgImI-qx1kpOu4Lav42505oAODI";
+
 export const SHOP_PRODUCTS: ShopProduct[] = [
   {
     id: "core-sculpt-leggings",
     slug: "sculpt-leggings",
     name: "Core Sculpt Leggings",
-    price: "€89",
+    priceSek: 1150,
     category: "leggings",
     badgeKey: "new",
     image: LEGGINGS_IMAGE,
     imageAlt: "Core sculpt leggings in charcoal grey",
   },
   {
-    id: "seamless-support-bra",
-    slug: "seamless-support-bra",
-    name: "Seamless Support Bra",
-    price: "€59",
+    id: "zen-flow-bra",
+    slug: "zen-flow-bra",
+    name: "Zen Flow Sports Bra",
+    priceSek: 750,
     category: "sports-bras",
-    image: BRA_IMAGE,
-    imageAlt: "Seamless support bra",
+    badgeKey: "limitedRelease",
+    image: ZEN_BRA_IMAGE,
+    imageAlt: "Zen Flow sports bra",
   },
   {
-    id: "flow-crop-top",
-    slug: "flow-crop-top",
-    name: "Flow Crop Top",
-    price: "€49",
+    id: "essence-seamless-top",
+    slug: "essence-seamless-top",
+    name: "Essence Seamless Top",
+    priceSek: 880,
     category: "tops",
-    badgeKey: "bestSeller",
-    image: BRA_IMAGE,
-    imageAlt: "Flow crop top",
+    stockStatus: "low",
+    stockLeft: 3,
+    image: TOP_IMAGE,
+    imageAlt: "Essence seamless top",
   },
   {
-    id: "stride-shorts",
-    slug: "stride-shorts",
-    name: "Stride Performance Shorts",
-    price: "€65",
+    id: "terra-ribbed-shorts",
+    slug: "terra-ribbed-shorts",
+    name: "Terra Ribbed Shorts",
+    priceSek: 720,
     category: "shorts",
-    image: SHORTS_IMAGE,
-    imageAlt: "Stride performance shorts",
+    stockStatus: "out-of-stock",
+    image: TERRA_SHORTS_IMAGE,
+    imageAlt: "Terra ribbed shorts",
   },
   {
     id: "power-set",
     slug: "power-set",
     name: "The Power Matching Set",
-    price: "€199",
+    priceSek: 2190,
     category: "matching-sets",
     badgeKey: "limitedRelease",
     image: LEGGINGS_IMAGE,
@@ -101,7 +148,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     id: "aero-flow-leggings",
     slug: "aero-flow-leggings",
     name: "Aero-Flow Leggings",
-    price: "€89",
+    priceSek: 990,
     category: "leggings",
     image: LEGGINGS_IMAGE,
     imageAlt: "Aero-flow leggings",
@@ -110,7 +157,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     id: "elite-bra",
     slug: "elite-bra",
     name: "Elite Support Bra",
-    price: "€68",
+    priceSek: 750,
     category: "sports-bras",
     image: BRA_IMAGE,
     imageAlt: "Elite support bra",
@@ -119,7 +166,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     id: "performance-headband",
     slug: "performance-headband",
     name: "Performance Headband",
-    price: "€24",
+    priceSek: 265,
     category: "accessories",
     image: SHORTS_IMAGE,
     imageAlt: "Performance headband",
@@ -147,16 +194,17 @@ export const PRODUCT_DETAILS: Record<string, ProductDetail> = {
     slug: "sculpt-leggings",
     name: "Sculpt High-Rise Leggings",
     series: "PREMIUM COLLECTION",
-    price: "€89",
+    priceSek: 990,
     category: "leggings",
     badgeKey: "new",
     image: PDP_GALLERY[0].src,
     imageAlt: PDP_GALLERY[0].alt,
     description:
       "High-rise sculpting leggings engineered with four-way stretch compression. Seamless construction, moisture-wicking finish, and a second-skin feel for studio to street.",
-    socialProof: "1,240+",
+    stats: getMockStatsForSlug("sculpt-leggings"),
     stockLeft: 5,
     images: PDP_GALLERY,
+    modelGlbUrl: DEMO_GLB_URL,
     sizes: ["XS", "S", "M", "L", "XL"],
     colors: [
       { name: "Charcoal Black", hex: "#121212" },
@@ -166,6 +214,10 @@ export const PRODUCT_DETAILS: Record<string, ProductDetail> = {
   },
 };
 
+export function getShopProductById(id: string): ShopProduct | undefined {
+  return SHOP_PRODUCTS.find((product) => product.id === id);
+}
+
 export function getProductBySlug(slug: string): ProductDetail | undefined {
   if (PRODUCT_DETAILS[slug]) return PRODUCT_DETAILS[slug];
   const shopProduct = SHOP_PRODUCTS.find((p) => p.slug === slug);
@@ -174,8 +226,8 @@ export function getProductBySlug(slug: string): ProductDetail | undefined {
     ...shopProduct,
     series: "MBODY",
     description: `${shopProduct.name} — premium performance activewear with sculpted fit and technical fabrics.`,
-    socialProof: "840+",
-    stockLeft: 12,
+    stats: getMockStatsForSlug(slug),
+    stockLeft: shopProduct.stockStatus === "out-of-stock" ? 0 : shopProduct.stockLeft ?? 12,
     images: [{ src: shopProduct.image, alt: shopProduct.imageAlt }],
     sizes: ["XS", "S", "M", "L"],
     colors: [{ name: "Charcoal Black", hex: "#121212" }],

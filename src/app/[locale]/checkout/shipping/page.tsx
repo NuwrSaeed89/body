@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { CheckoutLayout } from "@/components/checkout/checkout-layout";
 import { OrderSummary } from "@/components/checkout/order-summary";
+import { ShippingMethodOptions } from "@/components/checkout/shipping-method-options";
 import { Link } from "@/i18n/navigation";
 
 type ShippingPageProps = {
@@ -71,27 +72,7 @@ export default async function ShippingPage({ params }: ShippingPageProps) {
             />
           </fieldset>
 
-          <fieldset className="space-y-3">
-            <legend className="mb-4 text-sm font-semibold uppercase tracking-[0.1em] text-primary">
-              {t("delivery")}
-            </legend>
-            <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-primary bg-surface-container-low p-4">
-              <input type="radio" name="shipping" defaultChecked className="text-primary" />
-              <div>
-                <p className="text-sm font-medium">{t("standard")}</p>
-                <p className="text-sm text-secondary">{t("standardEta")}</p>
-              </div>
-              <span className="ml-auto text-sm font-medium">{t("free")}</span>
-            </label>
-            <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-outline-variant p-4">
-              <input type="radio" name="shipping" className="text-primary" />
-              <div>
-                <p className="text-sm font-medium">{t("express")}</p>
-                <p className="text-sm text-secondary">{t("expressEta")}</p>
-              </div>
-              <span className="ml-auto text-sm font-medium">€12</span>
-            </label>
-          </fieldset>
+          <ShippingMethodOptions />
 
           <Link
             href="/checkout/payment"

@@ -3,7 +3,15 @@
     "title": "Mbody | Premium damaktivkläder",
     "description": "Premium damaktivkläder designade för prestation. Handla nya släpp, exklusiva kollektioner och bästsäljare."
   },
+  "a11y": {
+    "skipToContent": "Hoppa till huvudinnehåll",
+    "primaryNav": "Huvudnavigering",
+    "utilityNav": "Verktygsnavigering",
+    "footerNav": "Sidfotsnavigering",
+    "siteFooter": "Sidfot"
+  },
   "nav": {
+    "new": "Nytt",
     "shop": "Butik",
     "shopAll": "Shoppa allt",
     "newDrops": "Nya släpp",
@@ -13,6 +21,7 @@
   "utilityBar": {
     "shipping": "Världsomspännande frakt",
     "currency": "SEK",
+    "promo": "Fri frakt globalt på beställningar över €250.",
     "storeLocator": "Butiker",
     "support": "Support"
   },
@@ -29,13 +38,20 @@
   },
   "footer": {
     "tagline": "Banbrytande teknisk excellens för den moderna atleten. Designad för dig som rör dig med avsikt.",
+    "taglineMobile": "Omdefinierar skärningspunkten mellan teknisk prestanda och exklusiv modeestetik.",
     "shop": "Butik",
     "help": "Hjälp",
+    "support": "Support",
     "connect": "Följ oss",
     "links": {
       "newDrops": "Nya släpp",
+      "newArrivals": "Nya ankomster",
       "shopAll": "Handla allt",
+      "bestSellers": "Bästsäljare",
       "collections": "Kollektioner",
+      "giftCards": "Presentkort",
+      "shipping": "Frakt",
+      "returns": "Returer",
       "shippingReturns": "Frakt & returer",
       "sizeGuide": "Storleksguide",
       "faq": "FAQ",
@@ -46,26 +62,39 @@
     "copyright": "© 2026 Mbody. Alla rättigheter förbehållna."
   },
   "hero": {
-    "eyebrow": "Kinetic-serien",
-    "title": "Konstruerad för momentum",
-    "description": "Vår mest efterlängtade prestationskollektion lanseras snart. Premiumtyger, skulpterade siluetter och begränsad tillgång för medlemmar först.",
+    "title": "Konsten att prestera",
+    "description": "Designad i Sverige. Skapad för den globala atleten. Lyft din rörelse med arkitektonisk precision.",
     "shopNow": "Handla nu",
-    "viewNewDrops": "Se nya släpp",
-    "imageAlt": "Kvinnlig atlet i premium kolprestationskläder"
+    "imageAlt": "Kvinnlig atlet i minimalistiska kolprestationskläder"
   },
   "home": {
     "latestDrop": {
-      "title": "Senaste släppet",
-      "description": "Förtur för medlemmar. Begränsade släpp från Kinetic-serien.",
-      "cta": "Kommer snart"
+      "eyebrow": "Sommar 2024",
+      "title": "Senaste drop: Aero-serien",
+      "description": "Förtur för medlemmar. Begränsade släpp från Aero-serien.",
+      "viewAll": "Visa alla",
+      "quickAdd": "Snabbköp",
+      "limitedBadge": "Begränsad",
+      "cta": "Handla nu"
+    },
+    "sculptCollection": {
+      "title": "Sculpt-kollektionen",
+      "description": "Siluetter som stärker. Upptäck fusionen av kompressionsteknik och skulptural elegans.",
+      "cta": "Utforska kollektionen",
+      "innovationEyebrow": "Innovation",
+      "innovationTitle": "Sömlös komfort",
+      "innovationDescription": "Vår patenterade M-Knit-teknik ger 360-graders stretch utan att tappa formen.",
+      "learnMore": "Läs mer"
     },
     "premiumCollection": {
+      "eyebrow": "Redaktionell serie",
       "title": "Premiumkollektion",
-      "description": "Kurerade essentials med redaktionell känsla — begränsade och exklusiva."
+      "description": "Kurerade essentials med redaktionell känsla — begränsade och exklusiva.",
+      "viewProduct": "Visa produkt",
+      "fabricLabel": "Performance Rib-tyg"
     },
-    "bestSellers": {
-      "title": "Bästsäljare",
-      "description": "Våra mest älskade plagg, utvalda av Mbody-communityn."
+    "boutiqueFavorites": {
+      "title": "Boutique-favoriter"
     }
   },
   "badges": {
@@ -77,23 +106,50 @@
     "shopNow": "Handla nu"
   },
   "completeTheLook": {
-    "eyebrow": "Komplettera looken",
-    "title": "Power Set",
-    "description": "Sculpt leggings, support-bh och flow crop — konstruerade som en sammanhängande look.",
-    "items": {
-      "sculptLeggings": "Sculpt Leggings",
-      "supportBra": "Support-bh",
-      "flowCropTop": "Flow Crop Top"
-    },
-    "shopTheLook": "Handla looken",
-    "imageAlt": "Komplett outfit-set"
+    "eyebrow": "Kurerad stil",
+    "title": "Komplettera looken:",
+    "titleLine2": "Sandstone Kit",
+    "imageAlt": "Kvinna på yogastudio i sandstone activewear-set",
+    "addEntireSet": "Lägg till hela setet —"
+  },
+  "bottomNav": {
+    "ariaLabel": "Huvudnavigering",
+    "home": "Hem",
+    "shop": "Shop",
+    "wishlist": "Önskelista",
+    "account": "Konto"
   },
   "newsletter": {
-    "title": "Missa aldrig ett släpp",
-    "description": "Gå med i vårt community för tidiga accesskoder och exklusiva inbjudningar till framtida släpp innan de blir offentliga.",
-    "placeholder": "Ange din e-post",
-    "subscribe": "Prenumerera",
-    "consent": "Jag godkänner att ta emot marknadsföringsmejl och accepterar integritetspolicyn (GDPR)."
+    "title": "Gå med i rörelsen",
+    "description": "Var först med att få tillgång till nya släpp och exklusiva insikter om framtidens performance wear.",
+    "emailLabel": "E-postadress",
+    "placeholder": "Din e-postadress",
+    "subscribe": "Prenumerera"
+  },
+  "cookieConsent": {
+    "ariaLabel": "Cookie-samtycke",
+    "title": "Vi värdesätter din integritet",
+    "description": "Vi använder nödvändiga cookies för att driva butiken (varukorg, session, språk och valuta). Med ditt samtycke använder vi även analys- och marknadsföringscookies. Slutlig juridisk text levereras av Mbody före lansering.",
+    "learnMore": "Integritetspolicy",
+    "acceptAll": "Acceptera alla",
+    "rejectNonEssential": "Endast nödvändiga",
+    "customize": "Anpassa",
+    "closePreferences": "Stäng",
+    "savePreferences": "Spara val",
+    "preferencesTitle": "Cookie-inställningar",
+    "alwaysActive": "Alltid aktiv",
+    "essential": {
+      "title": "Nödvändiga",
+      "description": "Krävs för att webbplatsen ska fungera. Kan inte inaktiveras."
+    },
+    "analytics": {
+      "title": "Analys",
+      "description": "Hjälper oss förstå hur besökare använder sidan så vi kan förbättra upplevelsen."
+    },
+    "marketing": {
+      "title": "Marknadsföring",
+      "description": "Används för relevanta erbjudanden och mätning av kampanjer."
+    }
   },
   "countdown": {
     "ariaLabel": "Nedräkning till släpp",
@@ -107,6 +163,8 @@
     "sortBy": "Sortera",
     "filterSort": "Filtrera & sortera",
     "itemCount": "{count} artiklar",
+    "outOfStock": "Slut i lager",
+    "notifyMe": "Meddela mig",
     "breadcrumb": { "home": "Hem", "shop": "Shop" },
     "categories": {
       "all": "Alla",
@@ -125,8 +183,11 @@
     },
     "filters": {
       "title": "Filtrera & sortera",
+      "filtersTitle": "Filter",
+      "clearAll": "Rensa alla",
       "close": "Stäng",
       "apply": "Tillämpa",
+      "showResults": "Visa {count} resultat",
       "availability": "Tillgänglighet",
       "inStock": "I lager",
       "outOfStock": "Slut i lager",
@@ -134,21 +195,67 @@
       "latestDrop": "Senaste drop",
       "premiumLine": "Premium Line",
       "bestSellers": "Bästsäljare",
-      "size": "Storlek"
+      "signatureEssentials": "Signature Essentials",
+      "zenSeries": "The Zen Series",
+      "size": "Storlek",
+      "color": "Färg",
+      "priceRange": "Prisintervall",
+      "min": "Min",
+      "max": "Max"
     },
-    "badges": { "new": "Ny", "limitedRelease": "Begränsad", "bestSeller": "Bästsäljare" }
+    "badges": {
+      "new": "Ny",
+      "limitedRelease": "Begränsad",
+      "bestSeller": "Bästsäljare",
+      "onlyLeft": "Bara {count} kvar"
+    }
   },
   "pdp": {
     "breadcrumb": { "home": "Hem", "shop": "Shop" },
     "socialProof": "Vald av {count} atleter denna månad",
     "inclVat": "Inkl. moms",
     "limitedStock": "Begränsat lager",
+    "outOfStock": "Slut i lager",
     "stockLeft": "Bara {count} kvar i din region",
     "color": "Färg",
     "selectSize": "Välj storlek",
     "sizeGuide": "Storleksguide",
     "addToBag": "Lägg i varukorg",
-    "addToWishlist": "Lägg till önskelista"
+    "addToWishlist": "Lägg till önskelista",
+    "removeFromWishlist": "Ta bort från önskelista",
+    "engagement": {
+      "groupLabel": "Produktengagemang",
+      "views": "{count} visningar",
+      "likes": "{count} gillningar",
+      "waiting": "{count} väntar",
+      "sold": "{count} sålda"
+    },
+    "ratings": {
+      "title": "Kundbetyg",
+      "summary": "{average} · {count, plural, one {# betyg} other {# betyg}}",
+      "prompt": "Hur skulle du betygsätta denna produkt?",
+      "selectStars": "Välj stjärnbetyg",
+      "starLabel": "{value, plural, one {# stjärna} other {# stjärnor}}",
+      "submit": "Skicka betyg",
+      "submitting": "Skickar…",
+      "success": "Tack — ditt betyg har sparats.",
+      "yourRating": "Du betygsatte med {stars, plural, one {# stjärna} other {# stjärnor}}.",
+      "signInRequired": "Logga in för att betygsätta produkter du köpt.",
+      "signInCta": "Logga in",
+      "notPurchased": "Endast verifierade köpare som köpt denna produkt kan lämna betyg.",
+      "alreadyRated": "Du har redan betygsatt denna produkt.",
+      "error": "Kunde inte spara betyget. Försök igen.",
+      "loading": "Laddar betyg…"
+    },
+    "viewer": {
+      "modeLabel": "Produktgalleri",
+      "images": "Bilder",
+      "view3d": "3D",
+      "loading": "Laddar 3D-modell…",
+      "error": "Kunde inte ladda 3D-modellen",
+      "hint": "Dra för att rotera · Nyp för att zooma · Två fingrar för att panorera",
+      "backToImages": "Bilder"
+    }
   },
   "newDrops": {
     "eyebrow": "Säsongslansering",
@@ -190,6 +297,7 @@
       "express": "Expressfrakt",
       "expressEta": "1–2 arbetsdagar",
       "free": "Gratis",
+      "freeShippingHint": "Fri standardfrakt vid order över {threshold}.",
       "continue": "Fortsätt till betalning"
     },
     "payment": {
@@ -203,6 +311,143 @@
       "sameAsShipping": "Samma som leveransadress",
       "placeOrder": "Lägg beställning"
     }
+  },
+  "cart": {
+    "title": "Din väska",
+    "back": "Gå tillbaka",
+    "itemsTotal": "{count} artiklar totalt",
+    "selection": "Ditt urval ({count})",
+    "remove": "Ta bort",
+    "shippingNoticeTitle": "Fri frakt tillämpas.",
+    "shippingNoticeBody": "Du har nått minimibeloppet på $150 för premiumleverans.",
+    "shippingNoticeTitleFree": "Fri frakt tillämpas.",
+    "shippingNoticeBodyFree": "Din order kvalificerar för fri frakt vid köp över {threshold}.",
+    "shippingNoticeTitleProgress": "Du är nära fri frakt.",
+    "shippingNoticeBodyProgress": "Lägg till {amount} till för fri frakt (order över {threshold}).",
+    "orderSummary": "Ordersammanfattning",
+    "summary": "Sammanfattning",
+    "subtotal": "Delsumma",
+    "shipping": "Frakt",
+    "free": "Gratis",
+    "estimatedTax": "Beräknad moms (VAT)",
+    "vat": "Moms (25%)",
+    "total": "Totalt",
+    "klarna": "eller 4 betalningar på {amount} med Klarna.",
+    "proceedToCheckout": "Fortsätt till kassan",
+    "payWithPaypal": "Betala med PayPal",
+    "promoCode": "Rabattkod",
+    "apply": "Använd",
+    "estimatedDelivery": "Beräknad leverans: 2–3 dagar",
+    "youMightAlsoLike": "Du kanske också gillar",
+    "essentialAdditions": "Viktiga tillägg",
+    "completeTheLook": "Komplettera looken",
+    "addToBag": "Lägg i väskan",
+    "newArrival": "Nyhet",
+    "essentials": "Grundutbud",
+    "accessories": "Tillbehör",
+    "footerTagline": "Förhöjd rörelse. Teknisk precision. Minimalistisk design.",
+    "footerNewsletterHint": "Gå med för exklusiv early access och studionyheter.",
+    "copyright": "© 2024 Mbody. Alla rättigheter förbehållna.",
+    "mobileFooterTagline": "Architectural Performance Wear",
+    "mobileFooterCopyright": "© 2024 MBODY",
+    "nav": {
+      "sustainability": "Hållbarhet",
+      "sizeGuide": "Storleksguide",
+      "performance": "Performance"
+    },
+    "footer": {
+      "shop": "Butik",
+      "support": "Support",
+      "shippingReturns": "Frakt & returer"
+    },
+    "items": {
+      "sculpt-leggings": {
+        "name": "Sculpt High-Rise Leggings",
+        "variant": "Charcoal / Small"
+      },
+      "zen-bra": {
+        "name": "Zen Flow Sports Bra",
+        "variant": "Sage Green / Small"
+      },
+      "apex-bra": {
+        "name": "Apex Sculpt Bra",
+        "variant": "Charcoal / Small"
+      },
+      "flow-legging": {
+        "name": "Flow Legging",
+        "variant": "Bone / Medium"
+      }
+    },
+    "crossSell": {
+      "cloud-hoodie": { "name": "Cloud Cropped Hoodie" },
+      "ankle-sock": { "name": "Performance Ankle Sock" },
+      "core-flask": { "name": "Core 500ml Flask" },
+      "yoga-mat": { "name": "Grip Motion Yoga Mat" },
+      "aero-jacket": { "name": "Aero Shell Jacket" },
+      "studio-tote": { "name": "Core Studio Tote" },
+      "crew-socks": { "name": "Flow Crew Socks" }
+    },
+    "empty": {
+      "title": "Din väska är tom.",
+      "titleMobile": "Din väska är tom",
+      "description": "Utforska våra senaste performance-kollektioner för att hitta din nästa favorit. Våra tekniska material och arkitektoniska silhuetter är designade för din bästa rörelse.",
+      "descriptionMobile": "Letar du inspiration? Upptäck våra mest älskade essentials.",
+      "startShopping": "Börja shoppa",
+      "shopNewArrivals": "Shoppa nyheter",
+      "curatedSelection": "Kurerat urval",
+      "newArrivals": "Nyheter",
+      "viewAll": "Visa alla",
+      "mustHaves": "Must-haves",
+      "bagLabel": "Väska",
+      "close": "Stäng",
+      "footerTagline": "Höjer mänsklig prestation genom arkitektonisk design och kompromisslös teknisk innovation.",
+      "newsletterHint": "Gå med för exklusiv tillgång till lanseringar och athletic insights.",
+      "copyright": "© 2024 Mbody. Alla rättigheter förbehållna.",
+      "badges": { "newArrival": "Nyhet", "limited": "Limited" },
+      "categories": { "compression": "Compression", "essentials": "Essentials", "outerwear": "Ytterplagg" },
+      "bottomNav": { "shop": "Butik", "discover": "Upptäck", "bag": "Väska", "account": "Konto" },
+      "products": {
+        "aero-sculpt-legging": { "name": "Aero-Sculpt Legging", "color": "Carbon Black" },
+        "precision-bra": { "name": "Precision Support Bra", "color": "Slate Grey" },
+        "vapor-shell": { "name": "Vapor Shell Jacket", "color": "Oyster White" },
+        "ribbed-short": { "name": "Ribbed Core Short", "color": "Moss Green" },
+        "sculpt-legging-mh": { "name": "Sculpt High-Rise Legging" },
+        "ribbed-bra-mh": { "name": "Ribbed Core Bra" },
+        "studio-parka-mh": { "name": "Over-Sized Studio Parka" }
+      }
+    }
+  },
+  "stockNotify": {
+    "description": "Ange din e-post så meddelar vi dig när varan är tillbaka i lager.",
+    "emailLabel": "E-postadress",
+    "emailPlaceholder": "E-postadress",
+    "submit": "Meddela mig",
+    "submitting": "Sparar…",
+    "success": "Du står på listan — vi mejlar när den är tillbaka.",
+    "alreadySubscribed": "Du är redan registrerad för denna variant.",
+    "invalidEmail": "Ange en giltig e-postadress.",
+    "error": "Något gick fel. Försök igen.",
+    "variantHint": "Vi meddelar dig för storlek {size}, färg {color}."
+  },
+  "wishlist": {
+    "metaTitle": "Önskelista | Mbody",
+    "metaDescription": "Spara dina favoritplagg från Mbody och handla senare.",
+    "title": "Min önskelista",
+    "itemCount": "{count, plural, one {# produkt} other {# produkter}}",
+    "emptyTitle": "Din önskelista är tom",
+    "emptyDescription": "Tryck på hjärtat på valfri produkt i butiken för att spara den här.",
+    "browseShop": "Till butiken",
+    "signInTitle": "Logga in för att se önskelistan",
+    "signInDescription": "Önskelistan är endast tillgänglig för registrerade medlemmar.",
+    "signInCta": "Logga in",
+    "signOut": "Logga ut",
+    "addToWishlist": "Lägg till önskelista",
+    "removeFromWishlist": "Ta bort från önskelista",
+    "added": "Tillagd i önskelistan",
+    "removed": "Borttagen från önskelistan",
+    "remove": "Ta bort",
+    "viewProduct": "Visa produkt",
+    "membersOnly": "Logga in för att spara produkter"
   },
   "account": {
     "title": "Mitt konto",
@@ -245,7 +490,174 @@
       "footerSustainability": "Hållbarhet",
       "footerPrivacy": "Integritetspolicy",
       "footerShipping": "Frakt",
-      "copyright": "© 2026 Mbody. Alla rättigheter förbehållna."
+      "copyright": "© 2024 Mbody Performance. Alla rättigheter förbehållna."
+    }
+  },
+  "legal": {
+    "placeholderBanner": "Platshållartext i linje med EU:s konsument- och GDPR-krav. Slutlig juridisk text levereras av Mbody och ersätter detta innehåll före lansering.",
+    "euComplianceLabel": "EU-marknad · Platshållare",
+    "lastUpdated": "Senast uppdaterad: juni 2026 (utkast)",
+    "questionsPrefix": "Frågor om denna policy? Kontakta",
+    "contactEmail": "legal@mbody.com",
+    "terms": {
+      "metaTitle": "Användarvillkor | Mbody",
+      "metaDescription": "Användarvillkor för Mbody — EU-platshållare tills kundens juridiska text integreras.",
+      "title": "Användarvillkor",
+      "sections": {
+        "introduction": {
+          "title": "1. Avtal",
+          "paragraphs": [
+            "Dessa användarvillkor reglerar din användning av Mbody webbutik och köp av våra produkter inom EES. Genom att lägga en order godkänner du villkoren.",
+            "Mbody säljer premium damträningskläder direkt till konsumenter (B2C). Villkoren påverkar inte dina tvingande lagstadgade rättigheter enligt tillämplig EU- och nationell konsumentlagstiftning."
+          ]
+        },
+        "orders": {
+          "title": "2. Order och avtal",
+          "paragraphs": [
+            "När du slutför checkout lämnar du ett köperbjudande. Ett bindande avtal ingås när vi skickar orderbekräftelse via e-post.",
+            "Vi förbehåller oss rätten att annullera order vid prisfel, misstänkt bedrägeri eller slut i lager. Du meddelas och återbetalas omgående om betalning redan tagits."
+          ]
+        },
+        "pricing": {
+          "title": "3. Priser och betalning",
+          "paragraphs": [
+            "Alla priser på webbplatsen är inklusive moms för EU-kunder, i enlighet med svenska momsregler (25 %) där tillämpligt.",
+            "Godkända betalningsmetoder visas i checkout. Betalning hanteras av vår certifierade betalningsleverantör. Vi lagrar inte fullständiga kortuppgifter."
+          ]
+        },
+        "shipping": {
+          "title": "4. Leverans",
+          "paragraphs": [
+            "Vi levererar till länder inom vår fas 1 europeiska marknad. Beräknade leveranstider och fraktkostnader visas innan du bekräftar ordern.",
+            "Risken för varan övergår till dig vid leverans till angiven adress, om inte tvingande lokal lag kräver annat."
+          ]
+        },
+        "liability": {
+          "title": "5. Ansvarsbegränsning",
+          "paragraphs": [
+            "I den utsträckning lagen tillåter ansvarar Mbody inte för indirekta skador från användning av produkter eller webbplats.",
+            "Inget i dessa villkor begränsar ansvar för dödsfall eller personskada genom vårdslöshet, bedrägeri eller ansvar som inte kan uteslutas enligt EU:s konsumentskydd."
+          ]
+        },
+        "law": {
+          "title": "6. Tillämplig lag och ändringar",
+          "paragraphs": [
+            "Villkoren styrs av svensk lag, utan att inskränka tvingande konsumentskydd i ditt hemland inom EES.",
+            "Vi kan uppdatera villkoren. Väsentliga ändringar meddelas på denna sida. Fortsatt användning efter ändringar utgör acceptans där lagen tillåter."
+          ]
+        }
+      }
+    },
+    "privacy": {
+      "metaTitle": "Integritetspolicy | Mbody",
+      "metaDescription": "Hur Mbody behandlar personuppgifter enligt GDPR — EU-platshållare.",
+      "title": "Integritetspolicy",
+      "sections": {
+        "controller": {
+          "title": "1. Personuppgiftsansvarig",
+          "paragraphs": [
+            "Mbody är personuppgiftsansvarig för data som samlas in via webbplatsen. Kontaktuppgifter för integritetsfrågor finns längst ned.",
+            "Denna policy beskriver hur vi behandlar data när du surfar, skapar konto, köper produkter eller prenumererar på marknadsföring inom EU/EES."
+          ]
+        },
+        "dataCollected": {
+          "title": "2. Data vi samlar in",
+          "paragraphs": [
+            "Identitet och kontakt: namn, e-post, telefon, leverans- och fakturaadress.",
+            "Orderdata: köpta produkter, betalningsstatus, leveransuppdateringar.",
+            "Teknisk data: IP-adress, enhet/webbläsare, cookies och analys för att driva butiken.",
+            "Marknadsföringspreferenser: nyhetsbrevsgodkännande där du gett samtycke."
+          ]
+        },
+        "legalBasis": {
+          "title": "3. Rättslig grund (GDPR art. 6)",
+          "paragraphs": [
+            "Avtal — för att behandla order, leverera varor och ge support.",
+            "Rättslig förpliktelse — skatt, bokföring och bedrägeriförebyggande.",
+            "Berättigat intresse — säkerhet, analys och förbättring, avvägt mot dina rättigheter.",
+            "Samtycke — marknadsföringsmejl och icke-nödvändiga cookies, som du kan återkalla."
+          ]
+        },
+        "rights": {
+          "title": "4. Dina rättigheter",
+          "paragraphs": [
+            "Enligt GDPR har du rätt till tillgång, rättelse, radering, begränsning, dataportabilitet och att invända mot viss behandling.",
+            "Du kan klaga hos tillsynsmyndighet. I Sverige är det Integritetsskyddsmyndigheten (IMY).",
+            "Kontakta oss via e-post nedan. Vi svarar inom en månad om inte förlängning krävs."
+          ]
+        },
+        "cookies": {
+          "title": "5. Cookies",
+          "paragraphs": [
+            "Vi använder nödvändiga cookies för varukorg, session, språk och valuta.",
+            "Analys- och marknadsföringscookies används endast med ditt samtycke via cookie-bannern."
+          ]
+        },
+        "transfers": {
+          "title": "6. Lagring och överföringar",
+          "paragraphs": [
+            "Vi sparar order- och kontodata så länge det krävs för avtal, lag och bokföring, sedan raderas eller anonymiseras data.",
+            "Vid behandling utanför EES använder vi lämpliga skydd såsom EU:s standardavtalsklausuler."
+          ]
+        },
+        "contact": {
+          "title": "7. Kontakt",
+          "paragraphs": [
+            "För integritetsförfrågningar, e-posta legal@mbody.com. Dedikerad dataskyddskontakt bekräftas före lansering."
+          ]
+        }
+      }
+    },
+    "returns": {
+      "metaTitle": "Returer och återbetalning | Mbody",
+      "metaDescription": "EU ångerrätt och returpolicy för Mbody — platshållare.",
+      "title": "Returer och återbetalning",
+      "sections": {
+        "withdrawal": {
+          "title": "1. Ångerrätt (14 dagar)",
+          "paragraphs": [
+            "Som konsument inom EU/EES har du rätt att ångra köpet inom 14 dagar från mottagande, utan att ange skäl.",
+            "Ångerfristen löper ut 14 dagar efter den dag du eller en av dig angiven tredje part får varan i fysisk besittning."
+          ]
+        },
+        "conditions": {
+          "title": "2. Returvillkor",
+          "paragraphs": [
+            "Varor ska returneras oanvända, oanvända och med original etiketter och förpackning där tillämpligt.",
+            "Hygiensealerade produkter kan inte returneras om förseglingen brutits, om de inte är defekta.",
+            "Du ansvarar för värdeminskning från hantering utöver vad som behövs för att bedöma varans art och funktion."
+          ]
+        },
+        "process": {
+          "title": "3. Så returnerar du",
+          "paragraphs": [
+            "Meddela oss om ånger via e-post innan 14-dagarsfristen löper ut. Vi ger returinstruktioner och vid behov returetikett.",
+            "Skicka tillbaka varan utan onödigt dröjsmål och inom 14 dagar från meddelandet. Spara fraktkvitto."
+          ]
+        },
+        "refunds": {
+          "title": "4. Återbetalning",
+          "paragraphs": [
+            "Vi återbetalar alla mottagna betalningar, inklusive standardfrakt, inom 14 dagar efter mottagen retur eller returbevis.",
+            "Återbetalning sker via samma betalningsmetod om du inte godkänner annat.",
+            "Du står för returfrakt om varan inte är felaktig eller vi erbjudit fri retur."
+          ]
+        },
+        "defective": {
+          "title": "5. Felaktiga varor",
+          "paragraphs": [
+            "Vid defekt eller fel vara, kontakta oss inom skälig tid. Dina lagstadgade garantirättigheter gäller utöver denna policy.",
+            "Vi ordnar reparation, ersättning eller återbetalning. Returfrakt för defekta varor betalas av oss."
+          ]
+        },
+        "exceptions": {
+          "title": "6. Undantag",
+          "paragraphs": [
+            "Ångerrätten gäller inte skräddarsydda varor, förseglade hygienprodukter eller förbrukningsvaror enligt direktiv 2011/83/EU.",
+            "Slutliga returregler och eventuellt förlängt frivilligt returfönster bekräftas i kundens policy före lansering."
+          ]
+        }
+      }
     }
   }
 }

@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { LEGAL_PATHS } from "@/lib/legal-pages";
 
 export async function AuthFooter() {
   const t = await getTranslations("account.login");
@@ -15,13 +16,13 @@ export async function AuthFooter() {
             {t("footerSustainability")}
           </Link>
           <Link
-            href="#"
+            href={LEGAL_PATHS.privacy}
             className="text-[11px] font-semibold uppercase tracking-widest text-secondary transition-colors hover:text-primary"
           >
             {t("footerPrivacy")}
           </Link>
           <Link
-            href="#"
+            href={LEGAL_PATHS.returns}
             className="text-[11px] font-semibold uppercase tracking-widest text-secondary transition-colors hover:text-primary"
           >
             {t("footerShipping")}

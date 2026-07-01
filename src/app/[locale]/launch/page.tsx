@@ -17,7 +17,7 @@ export default async function LaunchPage({ params }: LaunchPageProps) {
   return (
     <>
       <SiteHeader variant="dark" />
-      <main className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden">
+      <main id="main-content" tabIndex={-1} className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0 scale-105">
           <div className="absolute inset-0 z-10 bg-primary/20 luxury-gradient" />
           <Image

@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
+import { AccountNav } from "@/components/account/account-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { PageContainer } from "@/components/ui/page-container";
@@ -28,23 +29,7 @@ export default async function AccountPage({ params }: AccountPageProps) {
         </h1>
 
         <div className="flex flex-col gap-10 lg:flex-row lg:gap-16">
-          <nav className="flex gap-4 overflow-x-auto hide-scrollbar lg:w-56 lg:shrink-0 lg:flex-col lg:gap-2 lg:overflow-visible">
-            {(["overview", "orders", "wishlist", "settings"] as const).map(
-              (item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={`shrink-0 py-2 text-left text-xs font-semibold uppercase tracking-[0.1em] lg:px-0 ${
-                    item === "overview"
-                      ? "text-primary"
-                      : "text-on-surface-variant hover:text-primary"
-                  }`}
-                >
-                  {t(`nav.${item}`)}
-                </button>
-              ),
-            )}
-          </nav>
+          <AccountNav />
 
           <div className="min-w-0 flex-1 space-y-10">
             <section className="rounded-xl border border-outline-variant/30 p-6">

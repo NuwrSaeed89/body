@@ -1,14 +1,14 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { AccountHeaderLink } from "@/components/layout/account-header-link";
+import { WishlistHeaderLink } from "@/components/layout/wishlist-header-link";
 import { MobileNav } from "./mobile-nav";
 import { UtilityBar } from "./utility-bar";
-import { LocaleSwitcher } from "./locale-switcher";
 
 const navLinks = [
+  { labelKey: "nav.new", href: "/new-drops" as const },
   { labelKey: "nav.shop", href: "/shop" as const },
-  { labelKey: "nav.newDrops", href: "/new-drops" as const },
   { labelKey: "nav.collections", href: "/#collections" as const },
-  { labelKey: "nav.about", href: "/#about" as const },
 ] as const;
 
 type SiteHeaderProps = {
@@ -24,8 +24,12 @@ export async function SiteHeader({
   const isDark = variant === "dark";
   const isHome = layout === "home";
 
+  const mobileHomeIcons = ["search", "shopping_bag"] as const;
+  const defaultIcons = ["search", "favorite", "person", "shopping_bag"] as const;
+  const headerIcons = isHome ? mobileHomeIcons : defaultIcons;
+
   const headerClass = isHome
-    ? "sticky top-0 z-50 w-full bg-surface/80 backdrop-blur-md md:fixed md:border-b md:border-outline-variant/20 md:bg-surface/90 md:shadow-[0_4px_30px_rgba(18,18,18,0.03)]"
+    ? "sticky top-0 z-50 w-full bg-surface/80 backdrop-blur-md"
     : `fixed top-0 z-50 w-full ${
         isDark
           ? "bg-transparent"
@@ -34,24 +38,35 @@ export async function SiteHeader({
 
   return (
     <>
-      {isHome && <UtilityBar />}
-      <header className={headerClass}>
+      {isHome && (
+        <div className="hidden md:block">
+          <UtilityBar />
+        </div>
+      )}
+      <header
+        className={`${headerClass} ${
+          isHome ? "border-b border-outline-variant/30 bg-surface/90 backdrop-blur-md" : ""
+        }`}
+      >
         <div
-          className={`mx-auto flex w-full max-w-[1440px] items-center justify-between px-5 md:h-20 md:px-16 ${
-            isHome ? "py-4" : "h-20"
+          className={`mx-auto flex w-full max-w-[1440px] items-center justify-between px-5 py-4 md:px-16 ${
+            isHome ? "" : "h-20"
           }`}
         >
           <div className="flex items-center gap-4 md:gap-10">
             <MobileNav />
             <Link
               href="/"
-              className={`text-2xl font-medium tracking-tighter md:text-3xl ${
+              className={`text-2xl font-bold tracking-tighter md:text-2xl ${
                 isDark ? "text-white" : "text-primary"
               }`}
             >
               Mbody
             </Link>
-            <nav className="ml-0 hidden gap-8 md:ml-12 md:flex">
+            <nav
+              className="ml-0 hidden items-center gap-8 md:ml-12 md:flex"
+              aria-label={t("a11y.primaryNav")}
+            >
               {navLinks.map((link) => (
                 <Link
                   key={link.labelKey}
@@ -68,18 +83,8 @@ export async function SiteHeader({
             </nav>
           </div>
 
-          <div className="flex items-center gap-3 md:gap-4">
-            <div className="hidden items-center gap-3 text-xs font-semibold uppercase tracking-[0.08em] md:flex">
-              <LocaleSwitcher variant={variant} />
-              <span className={isDark ? "text-white/30" : "text-outline-variant"}>
-                |
-              </span>
-              <span className={isDark ? "text-white/70" : "text-secondary"}>
-                {t("header.currency")}
-              </span>
-            </div>
-            {(["search", "favorite", "person", "shopping_bag"] as const).map(
-              (icon) => {
+          <div className="flex items-center gap-4">
+            {headerIcons.map((icon) => {
                 const className = `relative transition-opacity hover:opacity-70 ${
                   isDark ? "text-white" : "text-primary"
                 }`;
@@ -99,14 +104,24 @@ export async function SiteHeader({
                 );
 
                 return icon === "person" ? (
+                  <AccountHeaderLink key={icon} className={className}>
+                    {iconEl}
+                  </AccountHeaderLink>
+                ) : icon === "shopping_bag" ? (
                   <Link
                     key={icon}
-                    href="/account/login"
+                    href="/cart"
                     className={className}
                     aria-label={t(`header.aria.${icon}`)}
                   >
                     {iconEl}
                   </Link>
+                ) : icon === "favorite" ? (
+                  <WishlistHeaderLink
+                    key={icon}
+                    className={className}
+                    isDark={isDark}
+                  />
                 ) : (
                   <button
                     key={icon}
@@ -117,8 +132,32 @@ export async function SiteHeader({
                     {iconEl}
                   </button>
                 );
-              },
-            )}
+              })}
+            {isHome &&
+              defaultIcons
+                .filter((icon) => icon !== "search" && icon !== "shopping_bag")
+                .map((icon) => {
+                  const className = `relative hidden transition-opacity hover:opacity-70 md:block ${
+                    isDark ? "text-white" : "text-primary"
+                  }`;
+                  const iconEl = (
+                    <>
+                      <span className="material-symbols-outlined">{icon}</span>
+                    </>
+                  );
+
+                  return icon === "person" ? (
+                    <AccountHeaderLink key={icon} className={className}>
+                      {iconEl}
+                    </AccountHeaderLink>
+                  ) : icon === "favorite" ? (
+                    <WishlistHeaderLink
+                      key={icon}
+                      className={className}
+                      isDark={isDark}
+                    />
+                  ) : null;
+                })}
           </div>
         </div>
       </header>

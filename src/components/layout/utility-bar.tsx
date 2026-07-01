@@ -1,24 +1,25 @@
 import { getTranslations } from "next-intl/server";
 import { LocaleSwitcher } from "./locale-switcher";
+import { CurrencySwitcher } from "./currency-switcher";
 
 export async function UtilityBar() {
   const t = await getTranslations("utilityBar");
+  const a11y = await getTranslations("a11y");
 
   return (
-    <nav className="relative z-[60] flex w-full items-center justify-between bg-surface-container-low px-5 py-2 md:hidden">
-      <div className="flex items-center gap-4">
-        <LocaleSwitcher variant="light" mobile />
-        <button
-          type="button"
-          className="flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.08em] text-on-surface-variant"
-        >
-          {t("currency")}
-          <span className="material-symbols-outlined text-[14px]">expand_more</span>
-        </button>
-      </div>
-      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-on-surface-variant">
-        {t("shipping")}
-      </div>
-    </nav>
+    <div className="relative z-[60] w-full overflow-visible border-b border-outline-variant/30 bg-surface-container-low">
+      <nav
+        className="mx-auto flex h-10 w-full max-w-[1440px] items-center justify-between overflow-visible px-5 text-xs font-semibold uppercase tracking-[0.08em] text-on-surface-variant md:px-16"
+        aria-label={a11y("utilityNav")}
+      >
+        <div className="flex items-center gap-4 overflow-visible">
+          <LocaleSwitcher variant="light" mobile />
+          <CurrencySwitcher />
+        </div>
+
+        <div className="hidden text-center md:block">{t("promo")}</div>
+        <div className="hidden md:block" aria-hidden />
+      </nav>
+    </div>
   );
 }

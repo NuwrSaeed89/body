@@ -3,7 +3,15 @@
     "title": "Mbody | Premium Activewear für Damen",
     "description": "Premium Activewear für Damen – entwickelt für Leistung. Entdecke neue Drops, exklusive Kollektionen und Bestseller."
   },
+  "a11y": {
+    "skipToContent": "Zum Hauptinhalt springen",
+    "primaryNav": "Hauptnavigation",
+    "utilityNav": "Hilfsnavigation",
+    "footerNav": "Fußzeilennavigation",
+    "siteFooter": "Website-Fußzeile"
+  },
   "nav": {
+    "new": "Neu",
     "shop": "Shop",
     "shopAll": "Alles shoppen",
     "newDrops": "Neue Drops",
@@ -13,6 +21,7 @@
   "utilityBar": {
     "shipping": "Weltweiter Versand",
     "currency": "SEK",
+    "promo": "Kostenloser weltweiter Versand ab €250.",
     "storeLocator": "Store Finder",
     "support": "Support"
   },
@@ -29,13 +38,20 @@
   },
   "footer": {
     "tagline": "Pionierarbeit in technischer Exzellenz für die moderne Athletin. Entwickelt für alle, die mit Absicht in Bewegung sind.",
+    "taglineMobile": "Wir definieren die Schnittstelle zwischen technischer Performance und hochwertiger Fashion-Ästhetik neu.",
     "shop": "Shop",
     "help": "Hilfe",
+    "support": "Support",
     "connect": "Folge uns",
     "links": {
       "newDrops": "Neue Drops",
+      "newArrivals": "Neu eingetroffen",
       "shopAll": "Alles shoppen",
+      "bestSellers": "Bestseller",
       "collections": "Kollektionen",
+      "giftCards": "Geschenkkarten",
+      "shipping": "Versand",
+      "returns": "Retouren",
       "shippingReturns": "Versand & Retouren",
       "sizeGuide": "Größentabelle",
       "faq": "FAQ",
@@ -46,26 +62,39 @@
     "copyright": "© 2026 Mbody. Alle Rechte vorbehalten."
   },
   "hero": {
-    "eyebrow": "Die Kinetic Serie",
-    "title": "Entwickelt für Momentum",
-    "description": "Unsere meisterwartete Performance-Kollektion startet bald. Premium-Stoffe, skulptierte Silhouetten und limitierter Zugang für Mitglieder zuerst.",
+    "title": "Die Kunst der Performance",
+    "description": "In Schweden designt. Für die globale Athletin gemacht. Hebe deine Bewegung mit architektonischer Präzision.",
     "shopNow": "Jetzt shoppen",
-    "viewNewDrops": "Neue Drops ansehen",
-    "imageAlt": "Sportlerin in premium Anthrazit-Performance-Bekleidung"
+    "imageAlt": "Sportlerin in minimalistischer Anthrazit-Performance-Bekleidung"
   },
   "home": {
     "latestDrop": {
-      "title": "Neuester Drop",
-      "description": "Vorabzugang für Mitglieder. Limitierte Releases aus der Kinetic Serie.",
-      "cta": "Demnächst"
+      "eyebrow": "Sommer 2024",
+      "title": "Neuester Drop: Die Aero Serie",
+      "description": "Vorabzugang für Mitglieder. Limitierte Releases aus der Aero Serie.",
+      "viewAll": "Alle ansehen",
+      "quickAdd": "Schnell hinzufügen",
+      "limitedBadge": "Limitiert",
+      "cta": "Jetzt shoppen"
+    },
+    "sculptCollection": {
+      "title": "Die Sculpt Kollektion",
+      "description": "Silhouetten, die stärken. Entdecke die Fusion aus Kompressionstechnologie und skulpturaler Eleganz.",
+      "cta": "Kollektion entdecken",
+      "innovationEyebrow": "Innovation",
+      "innovationTitle": "Nahtloser Komfort",
+      "innovationDescription": "Unsere patentierte M-Knit-Technologie bietet 360-Grad-Stretch ohne Formverlust.",
+      "learnMore": "Mehr erfahren"
     },
     "premiumCollection": {
+      "eyebrow": "Editorial Series",
       "title": "Premium-Kollektion",
-      "description": "Kuratierte Essentials mit redaktionellem Anspruch — limitiert und exklusiv."
+      "description": "Kuratierte Essentials mit redaktionellem Anspruch — limitiert und exklusiv.",
+      "viewProduct": "Produkt ansehen",
+      "fabricLabel": "Performance-Rib-Stoff"
     },
-    "bestSellers": {
-      "title": "Bestseller",
-      "description": "Unsere beliebtesten Pieces, ausgewählt von der Mbody-Community."
+    "boutiqueFavorites": {
+      "title": "Boutique-Favoriten"
     }
   },
   "badges": {
@@ -77,23 +106,50 @@
     "shopNow": "Jetzt shoppen"
   },
   "completeTheLook": {
-    "eyebrow": "Vervollständige den Look",
-    "title": "The Power Set",
-    "description": "Sculpt Leggings, Support-BH und Flow Crop — als ein stimmiges Outfit entwickelt.",
-    "items": {
-      "sculptLeggings": "Sculpt Leggings",
-      "supportBra": "Support-BH",
-      "flowCropTop": "Flow Crop Top"
-    },
-    "shopTheLook": "Look shoppen",
-    "imageAlt": "Komplettes Outfit-Set"
+    "eyebrow": "Kurierter Stil",
+    "title": "Vervollständige den Look:",
+    "titleLine2": "Das Sandstone Kit",
+    "imageAlt": "Frau im Yoga-Studio in Sandstone-Activewear-Set",
+    "addEntireSet": "Ganzes Set in die Tasche —"
+  },
+  "bottomNav": {
+    "ariaLabel": "Hauptnavigation",
+    "home": "Start",
+    "shop": "Shop",
+    "wishlist": "Wunschliste",
+    "account": "Konto"
   },
   "newsletter": {
-    "title": "Verpasse nichts",
-    "description": "Werde Teil unserer Community für Early-Access-Codes und exklusive Einladungen zu zukünftigen Drops, bevor sie öffentlich werden.",
-    "placeholder": "E-Mail eingeben",
-    "subscribe": "Abonnieren",
-    "consent": "Ich stimme Marketing-E-Mails und der Datenschutzerklärung zu (DSGVO)."
+    "title": "Werde Teil der Bewegung",
+    "description": "Sei die Erste, die Zugang zu neuen Drops erhält und exklusive Einblicke in die Zukunft von Performance Wear bekommt.",
+    "emailLabel": "E-Mail-Adresse",
+    "placeholder": "Deine E-Mail-Adresse",
+    "subscribe": "Abonnieren"
+  },
+  "cookieConsent": {
+    "ariaLabel": "Cookie-Einwilligung",
+    "title": "Wir schätzen deine Privatsphäre",
+    "description": "Wir verwenden notwendige Cookies für den Betrieb des Shops (Warenkorb, Sitzung, Sprache und Währung). Mit deiner Einwilligung nutzen wir auch Analyse- und Marketing-Cookies. Der finale Rechtstext wird von Mbody vor dem Launch bereitgestellt.",
+    "learnMore": "Datenschutzerklärung",
+    "acceptAll": "Alle akzeptieren",
+    "rejectNonEssential": "Nur notwendige",
+    "customize": "Anpassen",
+    "closePreferences": "Schließen",
+    "savePreferences": "Einstellungen speichern",
+    "preferencesTitle": "Cookie-Einstellungen",
+    "alwaysActive": "Immer aktiv",
+    "essential": {
+      "title": "Notwendig",
+      "description": "Erforderlich für die Funktion der Website. Kann nicht deaktiviert werden."
+    },
+    "analytics": {
+      "title": "Analyse",
+      "description": "Helfen uns zu verstehen, wie Besucher die Seite nutzen, um die Erfahrung zu verbessern."
+    },
+    "marketing": {
+      "title": "Marketing",
+      "description": "Werden für relevante Angebote und Kampagnenmessung verwendet."
+    }
   },
   "countdown": {
     "ariaLabel": "Countdown zum Drop",
@@ -107,6 +163,8 @@
     "sortBy": "Sortieren",
     "filterSort": "Filter & Sortierung",
     "itemCount": "{count} Artikel",
+    "outOfStock": "Ausverkauft",
+    "notifyMe": "Benachrichtigen",
     "breadcrumb": { "home": "Start", "shop": "Shop" },
     "categories": {
       "all": "Alle Artikel",
@@ -125,8 +183,11 @@
     },
     "filters": {
       "title": "Filter & Sortierung",
+      "filtersTitle": "Filter",
+      "clearAll": "Alle löschen",
       "close": "Schließen",
       "apply": "Anwenden",
+      "showResults": "{count} Ergebnisse anzeigen",
       "availability": "Verfügbarkeit",
       "inStock": "Auf Lager",
       "outOfStock": "Ausverkauft",
@@ -134,21 +195,67 @@
       "latestDrop": "Neuester Drop",
       "premiumLine": "Premium Line",
       "bestSellers": "Bestseller",
-      "size": "Größe"
+      "signatureEssentials": "Signature Essentials",
+      "zenSeries": "The Zen Series",
+      "size": "Größe",
+      "color": "Farbe",
+      "priceRange": "Preisspanne",
+      "min": "Min",
+      "max": "Max"
     },
-    "badges": { "new": "Neu", "limitedRelease": "Limitiert", "bestSeller": "Bestseller" }
+    "badges": {
+      "new": "Neu",
+      "limitedRelease": "Limitiert",
+      "bestSeller": "Bestseller",
+      "onlyLeft": "Nur noch {count}"
+    }
   },
   "pdp": {
     "breadcrumb": { "home": "Start", "shop": "Shop" },
     "socialProof": "Diesen Monat von {count} Athletinnen gewählt",
     "inclVat": "inkl. MwSt.",
     "limitedStock": "Limitierter Bestand",
+    "outOfStock": "Nicht auf Lager",
     "stockLeft": "Nur noch {count} in deiner Region",
     "color": "Farbe",
     "selectSize": "Größe wählen",
     "sizeGuide": "Größentabelle",
     "addToBag": "In den Warenkorb",
-    "addToWishlist": "Auf die Wunschliste"
+    "addToWishlist": "Auf die Wunschliste",
+    "removeFromWishlist": "Von Wunschliste entfernen",
+    "engagement": {
+      "groupLabel": "Produkt-Engagement",
+      "views": "{count} Aufrufe",
+      "likes": "{count} Likes",
+      "waiting": "{count} warten",
+      "sold": "{count} verkauft"
+    },
+    "ratings": {
+      "title": "Kundenbewertungen",
+      "summary": "{average} · {count, plural, one {# Bewertung} other {# Bewertungen}}",
+      "prompt": "Wie würdest du dieses Produkt bewerten?",
+      "selectStars": "Sternebewertung wählen",
+      "starLabel": "{value, plural, one {# Stern} other {# Sterne}}",
+      "submit": "Bewertung absenden",
+      "submitting": "Wird gesendet…",
+      "success": "Danke — deine Bewertung wurde gespeichert.",
+      "yourRating": "Du hast {stars, plural, one {# Stern} other {# Sterne}} vergeben.",
+      "signInRequired": "Melde dich an, um gekaufte Produkte zu bewerten.",
+      "signInCta": "Anmelden",
+      "notPurchased": "Nur verifizierte Käufer dieses Artikels können bewerten.",
+      "alreadyRated": "Du hast dieses Produkt bereits bewertet.",
+      "error": "Bewertung konnte nicht gespeichert werden. Bitte erneut versuchen.",
+      "loading": "Bewertungen werden geladen…"
+    },
+    "viewer": {
+      "modeLabel": "Produktgalerie",
+      "images": "Bilder",
+      "view3d": "3D",
+      "loading": "3D-Modell wird geladen…",
+      "error": "3D-Modell konnte nicht geladen werden",
+      "hint": "Ziehen zum Drehen · Kneifen zum Zoomen · Zwei Finger zum Verschieben",
+      "backToImages": "Bilder"
+    }
   },
   "newDrops": {
     "eyebrow": "Saisonales Release",
@@ -190,6 +297,7 @@
       "express": "Expressversand",
       "expressEta": "1–2 Werktage",
       "free": "Kostenlos",
+      "freeShippingHint": "Kostenloser Standardversand ab {threshold}.",
       "continue": "Weiter zur Zahlung"
     },
     "payment": {
@@ -203,6 +311,143 @@
       "sameAsShipping": "Wie Lieferadresse",
       "placeOrder": "Bestellung aufgeben"
     }
+  },
+  "cart": {
+    "title": "Deine Tasche",
+    "back": "Zurück",
+    "itemsTotal": "{count} Artikel gesamt",
+    "selection": "Deine Auswahl ({count})",
+    "remove": "Entfernen",
+    "shippingNoticeTitle": "Kostenloser Versand angewendet.",
+    "shippingNoticeBody": "Du hast das Minimum von $150 für Premium-Lieferung erreicht.",
+    "shippingNoticeTitleFree": "Kostenloser Versand angewendet.",
+    "shippingNoticeBodyFree": "Deine Bestellung qualifiziert sich für kostenlosen Versand ab {threshold}.",
+    "shippingNoticeTitleProgress": "Du bist kurz vor kostenlosem Versand.",
+    "shippingNoticeBodyProgress": "Füge noch {amount} hinzu für kostenlosen Versand (Bestellungen über {threshold}).",
+    "orderSummary": "Bestellübersicht",
+    "summary": "Zusammenfassung",
+    "subtotal": "Zwischensumme",
+    "shipping": "Versand",
+    "free": "Kostenlos",
+    "estimatedTax": "Geschätzte Steuer (MwSt.)",
+    "vat": "MwSt. (25%)",
+    "total": "Gesamt",
+    "klarna": "oder 4 Zahlungen à {amount} mit Klarna.",
+    "proceedToCheckout": "Zur Kasse",
+    "payWithPaypal": "Mit PayPal bezahlen",
+    "promoCode": "Aktionscode",
+    "apply": "Anwenden",
+    "estimatedDelivery": "Voraussichtliche Lieferung: 2–3 Tage",
+    "youMightAlsoLike": "Das könnte dir auch gefallen",
+    "essentialAdditions": "Wichtige Ergänzungen",
+    "completeTheLook": "Look vervollständigen",
+    "addToBag": "In die Tasche",
+    "newArrival": "Neuheit",
+    "essentials": "Basics",
+    "accessories": "Accessoires",
+    "footerTagline": "Erhabene Bewegung. Technische Präzision. Minimalistisches Design.",
+    "footerNewsletterHint": "Melde dich für exklusiven Early Access und Studio-Updates an.",
+    "copyright": "© 2024 Mbody. Alle Rechte vorbehalten.",
+    "mobileFooterTagline": "Architectural Performance Wear",
+    "mobileFooterCopyright": "© 2024 MBODY",
+    "nav": {
+      "sustainability": "Nachhaltigkeit",
+      "sizeGuide": "Größentabelle",
+      "performance": "Performance"
+    },
+    "footer": {
+      "shop": "Shop",
+      "support": "Support",
+      "shippingReturns": "Versand & Retouren"
+    },
+    "items": {
+      "sculpt-leggings": {
+        "name": "Sculpt High-Rise Leggings",
+        "variant": "Charcoal / Small"
+      },
+      "zen-bra": {
+        "name": "Zen Flow Sports Bra",
+        "variant": "Sage Green / Small"
+      },
+      "apex-bra": {
+        "name": "Apex Sculpt Bra",
+        "variant": "Charcoal / Small"
+      },
+      "flow-legging": {
+        "name": "Flow Legging",
+        "variant": "Bone / Medium"
+      }
+    },
+    "crossSell": {
+      "cloud-hoodie": { "name": "Cloud Cropped Hoodie" },
+      "ankle-sock": { "name": "Performance Ankle Sock" },
+      "core-flask": { "name": "Core 500ml Flask" },
+      "yoga-mat": { "name": "Grip Motion Yoga Mat" },
+      "aero-jacket": { "name": "Aero Shell Jacket" },
+      "studio-tote": { "name": "Core Studio Tote" },
+      "crew-socks": { "name": "Flow Crew Socks" }
+    },
+    "empty": {
+      "title": "Deine Tasche ist derzeit leer.",
+      "titleMobile": "Deine Tasche ist leer",
+      "description": "Entdecke unsere neuesten Performance-Kollektionen für dein nächstes Lieblingsstück. Unsere technischen Stoffe und architektonischen Silhouetten sind für deine Bewegung gemacht.",
+      "descriptionMobile": "Suchst du Inspiration? Entdecke unsere beliebtesten Essentials.",
+      "startShopping": "Jetzt shoppen",
+      "shopNewArrivals": "Neuheiten shoppen",
+      "curatedSelection": "Kuratierte Auswahl",
+      "newArrivals": "Neuheiten",
+      "viewAll": "Alle anzeigen",
+      "mustHaves": "Must-Haves",
+      "bagLabel": "Tasche",
+      "close": "Schließen",
+      "footerTagline": "Menschliche Leistung durch architektonisches Design und kompromisslose technische Innovation.",
+      "newsletterHint": "Melde dich für exklusiven Zugang zu Launches und Athletic Insights an.",
+      "copyright": "© 2024 Mbody. Alle Rechte vorbehalten.",
+      "badges": { "newArrival": "Neuheit", "limited": "Limited" },
+      "categories": { "compression": "Compression", "essentials": "Basics", "outerwear": "Outerwear" },
+      "bottomNav": { "shop": "Shop", "discover": "Entdecken", "bag": "Tasche", "account": "Konto" },
+      "products": {
+        "aero-sculpt-legging": { "name": "Aero-Sculpt Legging", "color": "Carbon Black" },
+        "precision-bra": { "name": "Precision Support Bra", "color": "Slate Grey" },
+        "vapor-shell": { "name": "Vapor Shell Jacket", "color": "Oyster White" },
+        "ribbed-short": { "name": "Ribbed Core Short", "color": "Moss Green" },
+        "sculpt-legging-mh": { "name": "Sculpt High-Rise Legging" },
+        "ribbed-bra-mh": { "name": "Ribbed Core Bra" },
+        "studio-parka-mh": { "name": "Over-Sized Studio Parka" }
+      }
+    }
+  },
+  "stockNotify": {
+    "description": "Gib deine E-Mail ein — wir benachrichtigen dich, sobald der Artikel wieder verfügbar ist.",
+    "emailLabel": "E-Mail-Adresse",
+    "emailPlaceholder": "E-Mail-Adresse",
+    "submit": "Benachrichtigen",
+    "submitting": "Wird gespeichert…",
+    "success": "Du stehst auf der Liste — wir mailen dir, wenn er wieder da ist.",
+    "alreadySubscribed": "Du bist für diese Variante bereits angemeldet.",
+    "invalidEmail": "Bitte eine gültige E-Mail eingeben.",
+    "error": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
+    "variantHint": "Wir benachrichtigen dich für Größe {size}, Farbe {color}."
+  },
+  "wishlist": {
+    "metaTitle": "Wunschliste | Mbody",
+    "metaDescription": "Speichere deine Mbody-Favoriten und kaufe sie später.",
+    "title": "Meine Wunschliste",
+    "itemCount": "{count, plural, one {# Artikel} other {# Artikel}}",
+    "emptyTitle": "Deine Wunschliste ist leer",
+    "emptyDescription": "Tippe auf das Herz bei einem Produkt im Shop, um es hier zu speichern.",
+    "browseShop": "Zum Shop",
+    "signInTitle": "Anmelden für die Wunschliste",
+    "signInDescription": "Die Wunschliste ist nur für registrierte Mitglieder verfügbar.",
+    "signInCta": "Anmelden",
+    "signOut": "Abmelden",
+    "addToWishlist": "Zur Wunschliste",
+    "removeFromWishlist": "Von Wunschliste entfernen",
+    "added": "Zur Wunschliste hinzugefügt",
+    "removed": "Von der Wunschliste entfernt",
+    "remove": "Entfernen",
+    "viewProduct": "Produkt ansehen",
+    "membersOnly": "Anmelden, um Produkte zu speichern"
   },
   "account": {
     "title": "Mein Konto",
@@ -245,7 +490,174 @@
       "footerSustainability": "Nachhaltigkeit",
       "footerPrivacy": "Datenschutz",
       "footerShipping": "Versand",
-      "copyright": "© 2026 Mbody. Alle Rechte vorbehalten."
+      "copyright": "© 2024 Mbody Performance. Alle Rechte vorbehalten."
+    }
+  },
+  "legal": {
+    "placeholderBanner": "Platzhaltertext gemäß EU-Verbraucher- und DSGVO-Anforderungen. Der endgültige Rechtstext wird von Mbody vor dem Launch bereitgestellt.",
+    "euComplianceLabel": "EU-Markt · Platzhalter",
+    "lastUpdated": "Zuletzt aktualisiert: Juni 2026 (Entwurf)",
+    "questionsPrefix": "Fragen zu dieser Richtlinie? Kontakt",
+    "contactEmail": "legal@mbody.com",
+    "terms": {
+      "metaTitle": "Nutzungsbedingungen | Mbody",
+      "metaDescription": "Nutzungsbedingungen für Mbody — EU-Platzhalter bis zur Integration des Kundentextes.",
+      "title": "Nutzungsbedingungen",
+      "sections": {
+        "introduction": {
+          "title": "1. Vertrag",
+          "paragraphs": [
+            "Diese Nutzungsbedingungen regeln die Nutzung des Mbody Online-Shops und Käufe im Europäischen Wirtschaftsraum (EWR). Mit einer Bestellung akzeptieren Sie diese Bedingungen.",
+            "Mbody verkauft Premium-Damen-Aktivwear direkt an Verbraucher (B2C). Diese Bedingungen schränken Ihre zwingenden gesetzlichen Rechte nach EU-Verbraucherschutz nicht ein."
+          ]
+        },
+        "orders": {
+          "title": "2. Bestellungen und Vertrag",
+          "paragraphs": [
+            "Mit Abschluss des Checkouts geben Sie ein Kaufangebot ab. Ein Vertrag kommt zustande, wenn wir die Bestellbestätigung per E-Mail senden.",
+            "Wir behalten uns vor, Bestellungen bei Preisfehlern, Betrugsverdacht oder fehlendem Lager zu stornieren. Sie werden informiert und erstattet, wenn die Zahlung bereits erfolgt ist."
+          ]
+        },
+        "pricing": {
+          "title": "3. Preise und Zahlung",
+          "paragraphs": [
+            "Alle angezeigten Preise sind für EU-Kunden inklusive MwSt., gemäß schwedischen Regeln (25 %), wo anwendbar.",
+            "Akzeptierte Zahlungsmethoden werden im Checkout angezeigt. Die Zahlungsabwicklung erfolgt über unseren zertifizierten Anbieter. Wir speichern keine vollständigen Kartendaten."
+          ]
+        },
+        "shipping": {
+          "title": "4. Lieferung",
+          "paragraphs": [
+            "Wir liefern in Länder unseres europäischen Phase-1-Marktes. Geschätzte Lieferzeiten und Versandkosten werden vor Bestätigung angezeigt.",
+            "Die Gefahr geht bei Lieferung an Ihre Adresse auf Sie über, sofern zwingendes lokales Recht nichts anderes vorschreibt."
+          ]
+        },
+        "liability": {
+          "title": "5. Haftungsbeschränkung",
+          "paragraphs": [
+            "Soweit gesetzlich zulässig haftet Mbody nicht für indirekte Schäden aus der Nutzung von Produkten oder der Website.",
+            "Nichts in diesen Bedingungen beschränkt die Haftung bei Tod oder Körperverletzung durch Fahrlässigkeit, Betrug oder unabdingbarer Haftung nach EU-Verbraucherrecht."
+          ]
+        },
+        "law": {
+          "title": "6. Anwendbares Recht und Änderungen",
+          "paragraphs": [
+            "Es gilt schwedisches Recht, unbeschadet zwingenden Verbraucherschutzes in Ihrem Wohnsitzland im EWR.",
+            "Wir können diese Bedingungen aktualisieren. Wesentliche Änderungen werden auf dieser Seite mitgeteilt."
+          ]
+        }
+      }
+    },
+    "privacy": {
+      "metaTitle": "Datenschutzerklärung | Mbody",
+      "metaDescription": "Wie Mbody personenbezogene Daten nach DSGVO verarbeitet — EU-Platzhalter.",
+      "title": "Datenschutzerklärung",
+      "sections": {
+        "controller": {
+          "title": "1. Verantwortlicher",
+          "paragraphs": [
+            "Mbody ist Verantwortlicher für personenbezogene Daten auf dieser Website. Kontaktdaten für Datenschutzanfragen stehen unten.",
+            "Diese Erklärung beschreibt die Verarbeitung beim Surfen, Kontoerstellung, Kauf oder Marketing-Opt-in in der EU/im EWR."
+          ]
+        },
+        "dataCollected": {
+          "title": "2. Erhobene Daten",
+          "paragraphs": [
+            "Identität und Kontakt: Name, E-Mail, Telefon, Liefer- und Rechnungsadresse.",
+            "Bestelldaten: gekaufte Produkte, Zahlungsstatus, Versandupdates.",
+            "Technische Daten: IP-Adresse, Gerät/Browser, Cookies und Analyse zur Shop-Betrieb.",
+            "Marketing-Präferenzen: Newsletter-Einwilligung, sofern erteilt."
+          ]
+        },
+        "legalBasis": {
+          "title": "3. Rechtsgrundlage (DSGVO Art. 6)",
+          "paragraphs": [
+            "Vertragserfüllung — Bestellungen, Lieferung und Support.",
+            "Rechtliche Verpflichtung — Steuern, Buchführung, Betrugsprävention.",
+            "Berechtigtes Interesse — Sicherheit, Analyse und Verbesserung.",
+            "Einwilligung — Marketing-E-Mails und nicht notwendige Cookies, jederzeit widerrufbar."
+          ]
+        },
+        "rights": {
+          "title": "4. Ihre Rechte",
+          "paragraphs": [
+            "Nach der DSGVO haben Sie Recht auf Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit und Widerspruch.",
+            "Sie können sich bei Ihrer Aufsichtsbehörde beschweren. In Schweden ist dies die Integritetsskyddsmyndigheten (IMY).",
+            "Kontaktieren Sie uns per E-Mail. Wir antworten innerhalb eines Monats, sofern keine Verlängerung nötig ist."
+          ]
+        },
+        "cookies": {
+          "title": "5. Cookies",
+          "paragraphs": [
+            "Wir verwenden notwendige Cookies für Warenkorb, Sitzung, Sprache und Währung.",
+            "Analyse- und Marketing-Cookies nur mit Ihrer Einwilligung über das Cookie-Banner."
+          ]
+        },
+        "transfers": {
+          "title": "6. Aufbewahrung und Übermittlungen",
+          "paragraphs": [
+            "Bestell- und Kontodaten speichern wir so lange wie für Vertrag, Recht und Buchführung nötig, danach Löschung oder Anonymisierung.",
+            "Bei Verarbeitung außerhalb des EWR nutzen wir geeignete Garantien wie EU-Standardvertragsklauseln."
+          ]
+        },
+        "contact": {
+          "title": "7. Kontakt",
+          "paragraphs": [
+            "Datenschutzanfragen an legal@mbody.com. Ein dedizierter Datenschutzkontakt wird vor Launch bestätigt."
+          ]
+        }
+      }
+    },
+    "returns": {
+      "metaTitle": "Retouren und Erstattungen | Mbody",
+      "metaDescription": "EU-Widerrufsrecht und Retourenrichtlinie für Mbody — Platzhalter.",
+      "title": "Retouren und Erstattungen",
+      "sections": {
+        "withdrawal": {
+          "title": "1. Widerrufsrecht (14 Tage)",
+          "paragraphs": [
+            "Als Verbraucher in der EU/im EWR können Sie innerhalb von 14 Tagen nach Erhalt der Ware ohne Angabe von Gründen widerrufen.",
+            "Die Frist endet 14 Tage nach dem Tag, an dem Sie oder ein von Ihnen benannter Dritter die Ware in Besitz nimmt."
+          ]
+        },
+        "conditions": {
+          "title": "2. Retourenbedingungen",
+          "paragraphs": [
+            "Artikel müssen unbenutzt, ungetragen und mit Original-Etiketten und Verpackung zurückgesendet werden, wo zutreffend.",
+            "Hygieneversiegelte Produkte können nach Öffnung der Versiegelung nicht retourniert werden, außer bei Mängeln.",
+            "Sie tragen Wertminderung durch Handhabung über das zur Prüfung Erforderliche hinaus."
+          ]
+        },
+        "process": {
+          "title": "3. So retournieren Sie",
+          "paragraphs": [
+            "Teilen Sie uns Ihren Widerruf per E-Mail vor Ablauf der 14 Tage mit. Wir senden Anweisungen und ggf. ein Retourenlabel.",
+            "Senden Sie die Ware unverzüglich und innerhalb von 14 Tagen nach Mitteilung zurück. Bewahren Sie den Versandnachweis auf."
+          ]
+        },
+        "refunds": {
+          "title": "4. Erstattungen",
+          "paragraphs": [
+            "Wir erstatten alle Zahlungen einschließlich Standardversand innerhalb von 14 Tagen nach Erhalt der Retoure oder des Rücksendebeleges.",
+            "Erstattung erfolgt über dieselbe Zahlungsmethode, sofern nicht anders vereinbart.",
+            "Direkte Rücksendekosten tragen Sie, außer bei Mängeln oder angebotener Gratisretoure."
+          ]
+        },
+        "defective": {
+          "title": "5. Defekte oder falsche Artikel",
+          "paragraphs": [
+            "Bei defekten oder falschen Artikeln kontaktieren Sie uns innerhalb angemessener Frist. Gesetzliche Gewährleistungsrechte gelten zusätzlich.",
+            "Wir organisieren Reparatur, Ersatz oder Erstattung. Rückversand bei Mängeln tragen wir."
+          ]
+        },
+        "exceptions": {
+          "title": "6. Ausnahmen",
+          "paragraphs": [
+            "Das Widerrufsrecht gilt nicht für maßgeschneiderte Ware, versiegelte Hygieneprodukte oder verderbliche Güter gemäß Richtlinie 2011/83/EU.",
+            "Finale Retourenregeln und freiwillige Verlängerungen werden in der Kundenrichtlinie vor Launch bestätigt."
+          ]
+        }
+      }
     }
   }
 }

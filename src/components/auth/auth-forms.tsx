@@ -1,19 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
+import { LEGAL_PATHS } from "@/lib/legal-pages";
+import { useAuth } from "@/providers/auth-provider";
 
 type AuthView = "login" | "register";
 
 function UnderlineField({
   id,
+  name,
   label,
   type = "text",
   placeholder,
   labelExtra,
 }: {
   id: string;
+  name?: string;
   label: string;
   type?: string;
   placeholder?: string;
@@ -21,17 +26,27 @@ function UnderlineField({
 }) {
   return (
     <div className="input-underline border-b border-outline-variant/50">
-      <div className="flex items-end justify-between">
+      {labelExtra ? (
+        <div className="flex items-end justify-between">
+          <label
+            htmlFor={id}
+            className="text-[10px] font-semibold uppercase tracking-widest text-secondary"
+          >
+            {label}
+          </label>
+          {labelExtra}
+        </div>
+      ) : (
         <label
           htmlFor={id}
           className="text-[10px] font-semibold uppercase tracking-widest text-secondary"
         >
           {label}
         </label>
-        {labelExtra}
-      </div>
+      )}
       <input
         id={id}
+        name={name ?? id}
         type={type}
         placeholder={placeholder}
         className="w-full border-none bg-transparent px-0 py-3 text-base text-primary placeholder:text-outline-variant/60 focus:ring-0"
@@ -42,8 +57,35 @@ function UnderlineField({
 
 export function AuthForms() {
   const t = useTranslations("account.login");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { signIn, signUp } = useAuth();
   const [view, setView] = useState<AuthView>("login");
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const redirectTo = searchParams.get("redirect") || "/account";
+
+  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const email = String(form.get("email") ?? "").trim();
+    if (!email) return;
+    signIn(email);
+    router.push(redirectTo);
+  };
+
+  const handleRegister = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const email = String(form.get("email") ?? "").trim();
+    if (!email) return;
+    signUp({
+      email,
+      firstName: String(form.get("firstName") ?? "").trim() || undefined,
+      lastName: String(form.get("lastName") ?? "").trim() || undefined,
+    });
+    router.push(redirectTo);
+  };
 
   useEffect(() => {
     const container = containerRef.current;
@@ -52,7 +94,7 @@ export function AuthForms() {
     const onMove = (e: MouseEvent) => {
       const x = (window.innerWidth / 2 - e.pageX) / 100;
       const y = (window.innerHeight / 2 - e.pageY) / 100;
-      container.style.transform = `translate(${x}px, ${y}px)`;
+      container.style.transform = `translateX(${x}px) translateY(${y}px)`;
     };
 
     window.addEventListener("mousemove", onMove);
@@ -62,8 +104,17 @@ export function AuthForms() {
   const isLogin = view === "login";
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-surface px-5 py-24 md:px-16 md:py-20">
+    <div className="flex flex-1 items-center justify-center bg-surface px-5 py-20 md:px-16">
       <div className="w-full max-w-md">
+        <div className="mb-16">
+          <Link
+            href="/"
+            className="text-2xl font-extrabold tracking-tighter text-primary"
+          >
+            Mbody
+          </Link>
+        </div>
+
         <div ref={containerRef} className="relative auth-form-transition">
           {/* Login */}
           <div
@@ -83,16 +134,18 @@ export function AuthForms() {
               </h1>
             </div>
 
-            <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-8" onSubmit={handleLogin}>
               <div className="space-y-6">
                 <UnderlineField
                   id="login-email"
+                  name="email"
                   label={t("email")}
                   type="email"
                   placeholder="name@example.com"
                 />
                 <UnderlineField
                   id="login-password"
+                  name="password"
                   label={t("password")}
                   type="password"
                   placeholder="••••••••"
@@ -147,27 +200,31 @@ export function AuthForms() {
               </h1>
             </div>
 
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-6" onSubmit={handleRegister}>
               <div className="grid grid-cols-2 gap-4">
                 <UnderlineField
                   id="reg-first"
+                  name="firstName"
                   label={t("firstName")}
                   placeholder="Jane"
                 />
                 <UnderlineField
                   id="reg-last"
+                  name="lastName"
                   label={t("lastName")}
                   placeholder="Doe"
                 />
               </div>
               <UnderlineField
                 id="reg-email"
+                name="email"
                 label={t("email")}
                 type="email"
                 placeholder="name@example.com"
               />
               <UnderlineField
                 id="reg-password"
+                name="password"
                 label={t("createPassword")}
                 type="password"
                 placeholder={t("passwordHint")}
@@ -181,7 +238,7 @@ export function AuthForms() {
                 />
                 <label htmlFor="terms" className="text-sm leading-tight text-secondary">
                   {t("termsAgreement")}{" "}
-                  <Link href="#" className="underline">
+                  <Link href={LEGAL_PATHS.terms} className="underline">
                     {t("terms")}
                   </Link>
                 </label>
@@ -210,7 +267,7 @@ export function AuthForms() {
           </div>
         </div>
 
-        <div className="mt-16 flex items-center justify-center gap-8 opacity-40 grayscale transition-all duration-700 hover:grayscale-0 hover:opacity-100">
+        <div className="group mt-16 flex items-center justify-center gap-8 opacity-40 grayscale transition-all duration-700 hover:grayscale-0 hover:opacity-100">
           {[t("trustEncrypted"), t("trustSecure"), t("trustPrivacy")].map(
             (label) => (
               <span

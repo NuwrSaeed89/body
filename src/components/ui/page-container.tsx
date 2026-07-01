@@ -11,8 +11,12 @@ export function PageContainer({
   className = "",
   as: Tag = "div",
 }: PageContainerProps) {
+  const isMain = Tag === "main";
+
   return (
     <Tag
+      id={isMain ? "main-content" : undefined}
+      tabIndex={isMain ? -1 : undefined}
       className={`mx-auto w-full max-w-[1440px] px-5 md:px-16 ${className}`}
     >
       {children}

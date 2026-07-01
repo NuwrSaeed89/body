@@ -10,6 +10,7 @@ import {
 } from "@/components/pdp/product-purchase-panel";
 import { PageContainer } from "@/components/ui/page-container";
 import { Link } from "@/i18n/navigation";
+import { getProductRatingState } from "@/lib/product-ratings/get-product-rating-state";
 import { getAllProductSlugs, getProductBySlug } from "@/lib/shop-data";
 
 type ProductPageProps = {
@@ -27,11 +28,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product) notFound();
 
   const t = await getTranslations("pdp");
+  const ratingState = getProductRatingState(slug);
+  const initialRatingSummary = ratingState?.summary;
 
   return (
     <>
       <SiteHeader />
-      <PageContainer as="main" className="pb-28 pt-28 md:pb-24 md:pt-32">
+      <PageContainer as="main" className="pb-40 pt-28 md:pb-24 md:pt-32">
         <nav className="mb-6 hidden items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-on-surface-variant md:flex">
           <Link href="/" className="hover:text-primary">
             {t("breadcrumb.home")}
@@ -46,7 +49,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         <div className="grid gap-8 md:grid-cols-2 md:gap-12 lg:gap-16">
           <ProductGallery product={product} />
-          <ProductPurchasePanel product={product} />
+          <ProductPurchasePanel
+            product={product}
+            initialRatingSummary={initialRatingSummary}
+          />
         </div>
       </PageContainer>
       <ProductStickyBar product={product} />

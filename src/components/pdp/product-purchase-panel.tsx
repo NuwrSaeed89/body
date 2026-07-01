@@ -1,17 +1,29 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { ProductEngagementBar } from "@/components/pdp/product-engagement-bar";
+import { ProductRatingHeader } from "@/components/pdp/product-rating-header";
+import { ProductRatingsSection } from "@/components/pdp/product-ratings-section";
+import { FormattedPrice } from "@/components/ui/formatted-price";
+import { NotifyWhenBackForm } from "@/components/stock-notify/notify-when-back-form";
+import { WishlistToggleButton } from "@/components/wishlist/wishlist-toggle-button";
 import { useState } from "react";
 import type { ProductDetail } from "@/lib/shop-data";
+import type { ProductRatingSummary } from "@/lib/product-ratings/types";
 
 type ProductPurchasePanelProps = {
   product: ProductDetail;
+  initialRatingSummary?: ProductRatingSummary;
 };
 
-export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
+export function ProductPurchasePanel({ product, initialRatingSummary }: ProductPurchasePanelProps) {
   const t = useTranslations("pdp");
+  const tWishlist = useTranslations("wishlist");
   const [selectedSize, setSelectedSize] = useState(product.sizes[1] ?? product.sizes[0]);
   const [selectedColor, setSelectedColor] = useState(0);
+  const [wishlistFeedback, setWishlistFeedback] = useState<string | null>(null);
+  const isOutOfStock = product.stockStatus === "out-of-stock" || product.stockLeft <= 0;
+  const selectedColorName = product.colors[selectedColor]?.name ?? null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -23,44 +35,43 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
           <h1 className="text-xl font-medium uppercase tracking-wider text-primary md:text-2xl">
             {product.name}
           </h1>
-          <div className="flex shrink-0 items-center gap-0.5 text-primary">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <span
-                key={i}
-                className="material-symbols-outlined text-[16px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                star
-              </span>
-            ))}
-            <span className="material-symbols-outlined text-[16px]">star_half</span>
-          </div>
+          <ProductRatingHeader slug={product.slug} initialSummary={initialRatingSummary} />
         </div>
-        <div className="flex items-center gap-2 rounded-lg bg-surface-container-low px-3 py-2">
-          <span className="material-symbols-outlined text-[18px] text-secondary">
-            trending_up
-          </span>
-          <p className="text-sm text-secondary">
-            {t("socialProof", { count: product.socialProof })}
-          </p>
-        </div>
+        <ProductEngagementBar slug={product.slug} initialStats={product.stats} />
       </div>
 
       <div className="flex flex-col gap-3">
         <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-medium text-primary">{product.price}</span>
-          <span className="text-sm text-secondary">{t("inclVat")}</span>
+          <FormattedPrice
+            amountSek={product.priceSek}
+            showVat
+            className="text-2xl font-medium text-primary"
+          />
         </div>
-        <div className="flex items-center gap-3 rounded-lg border border-red-200/50 bg-red-50/50 px-4 py-2">
-          <div className="flex flex-col">
-            <span className="text-[10px] font-semibold uppercase text-red-700">
-              {t("limitedStock")}
-            </span>
-            <span className="text-sm font-semibold text-red-700">
-              {t("stockLeft", { count: product.stockLeft })}
-            </span>
+        {isOutOfStock ? (
+          <div className="rounded-lg border border-outline-variant/40 bg-surface-container-low px-4 py-4">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.1em] text-secondary">
+              {t("outOfStock")}
+            </p>
+            <NotifyWhenBackForm
+              productId={product.id}
+              slug={product.slug}
+              size={selectedSize}
+              color={selectedColorName}
+            />
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center gap-3 rounded-lg border border-red-200/50 bg-red-50/50 px-4 py-2">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-semibold uppercase text-red-700">
+                {t("limitedStock")}
+              </span>
+              <span className="text-sm font-semibold text-red-700">
+                {t("stockLeft", { count: product.stockLeft })}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-3">
@@ -115,21 +126,34 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
         </div>
       </div>
 
+      <ProductRatingsSection slug={product.slug} />
+
       <p className="text-sm leading-relaxed text-secondary">{product.description}</p>
 
       <div className="hidden flex-col gap-3 md:flex">
-        <button
-          type="button"
-          className="w-full bg-primary py-4 text-xs font-semibold uppercase tracking-[0.15em] text-white transition-opacity hover:opacity-90"
-        >
-          {t("addToBag")}
-        </button>
-        <button
-          type="button"
-          className="w-full border border-primary py-4 text-xs font-semibold uppercase tracking-[0.15em] text-primary transition-colors hover:bg-primary hover:text-white"
-        >
-          {t("addToWishlist")}
-        </button>
+        {!isOutOfStock && (
+          <button
+            type="button"
+            className="w-full bg-primary py-4 text-xs font-semibold uppercase tracking-[0.15em] text-white transition-opacity hover:opacity-90"
+          >
+            {t("addToBag")}
+          </button>
+        )}
+        <div className="flex flex-col gap-2">
+          <WishlistToggleButton
+            productId={product.id}
+            variant="labeled"
+            iconClassName="text-[20px]"
+            onToggle={(added) =>
+              setWishlistFeedback(added ? tWishlist("added") : tWishlist("removed"))
+            }
+          />
+          {wishlistFeedback && (
+            <p className="text-xs text-secondary" role="status">
+              {wishlistFeedback}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -137,20 +161,23 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
 
 export function ProductStickyBar({ product }: ProductPurchasePanelProps) {
   const t = useTranslations("pdp");
+  const isOutOfStock = product.stockStatus === "out-of-stock" || product.stockLeft <= 0;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant/20 bg-surface/95 p-4 backdrop-blur-md md:hidden">
+    <div className="fixed inset-x-0 bottom-[var(--mobile-nav-height)] z-40 border-t border-outline-variant/20 bg-surface/95 p-4 backdrop-blur-md md:hidden">
       <div className="flex items-center gap-4">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium text-primary">{product.name}</p>
-          <p className="text-sm text-secondary">{product.price}</p>
+          <FormattedPrice amountSek={product.priceSek} className="text-sm text-secondary" />
         </div>
-        <button
-          type="button"
-          className="shrink-0 bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-[0.1em] text-white"
-        >
-          {t("addToBag")}
-        </button>
+        {!isOutOfStock && (
+          <button
+            type="button"
+            className="shrink-0 bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-[0.1em] text-white"
+          >
+            {t("addToBag")}
+          </button>
+        )}
       </div>
     </div>
   );

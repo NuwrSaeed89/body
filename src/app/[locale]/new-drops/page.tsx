@@ -18,7 +18,7 @@ export default async function NewDropsPage({ params }: NewDropsPageProps) {
   return (
     <>
       <SiteHeader />
-      <main className="pb-24 pt-28 md:pt-32">
+      <main id="main-content" tabIndex={-1} className="pb-24 pt-28 md:pt-32">
         <PageContainer className="mb-12 md:mb-16">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
             {t("eyebrow")}

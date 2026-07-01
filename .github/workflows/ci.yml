@@ -44,3 +44,6 @@ jobs:
         run: pnpm build
         env:
           NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_APP_ENV: development
+          NEXT_PUBLIC_USE_MOCK_DATA: "true"

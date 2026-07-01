@@ -1,16 +1,26 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { LEGAL_PATHS } from "@/lib/legal-pages";
+
+const footerLinksMobile = {
+  shop: [
+    { labelKey: "footer.links.newArrivals", href: "/new-drops" as const },
+    { labelKey: "footer.links.collections", href: "/#collections" as const },
+  ],
+  support: [
+    { labelKey: "footer.links.shipping", href: LEGAL_PATHS.returns },
+    { labelKey: "footer.links.returns", href: LEGAL_PATHS.returns },
+  ],
+} as const;
 
 const footerLinks = {
   shop: [
-    { labelKey: "footer.links.newArrivals", href: "/new-drops" as const },
+    ...footerLinksMobile.shop,
     { labelKey: "footer.links.bestSellers", href: "/shop" as const },
-    { labelKey: "footer.links.collections", href: "/#collections" as const },
     { labelKey: "footer.links.giftCards", href: "#" as const },
   ],
   support: [
-    { labelKey: "footer.links.shipping", href: "#" },
-    { labelKey: "footer.links.returns", href: "#" },
+    ...footerLinksMobile.support,
     { labelKey: "footer.links.faq", href: "#" },
     { labelKey: "footer.links.contact", href: "#" },
   ],
@@ -18,31 +28,38 @@ const footerLinks = {
 
 export async function SiteFooter() {
   const t = await getTranslations();
+  const a11y = await getTranslations("a11y");
 
   return (
-    <footer className="bg-surface-container-low px-5 py-16 md:mt-20 md:border-t md:border-outline-variant/30">
+    <footer
+      className="mb-16 bg-surface-container-low px-5 py-12 md:mb-0 md:mt-20 md:border-t md:border-outline-variant/30 md:py-16"
+      aria-label={a11y("siteFooter")}
+    >
       <div className="mx-auto max-w-[1440px] md:px-16">
         {/* Mobile layout */}
-        <div className="mb-16 grid grid-cols-2 gap-x-6 gap-y-12 md:hidden">
+        <div className="mb-12 grid grid-cols-2 gap-8 md:hidden">
           <div className="col-span-2">
-            <span className="mb-4 block text-lg font-semibold tracking-wide text-primary">
+            <span className="mb-2 block text-lg font-semibold tracking-wide text-primary">
               Mbody
             </span>
-            <p className="max-w-[240px] text-sm leading-relaxed text-on-surface-variant">
+            <p className="text-xs leading-relaxed text-on-surface-variant">
               {t("footer.taglineMobile")}
             </p>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <h5 className="text-xs font-semibold uppercase tracking-[0.1em] text-primary">
+          <div className="flex flex-col gap-3">
+            <h5 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-primary">
               {t("footer.shop")}
             </h5>
-            <nav className="flex flex-col gap-2">
-              {footerLinks.shop.map((link) => (
+            <nav
+              className="flex flex-col gap-2"
+              aria-label={`${t("footer.shop")} — ${a11y("footerNav")}`}
+            >
+              {footerLinksMobile.shop.map((link) => (
                 <Link
                   key={link.labelKey}
                   href={link.href}
-                  className="text-sm text-on-surface-variant transition-colors hover:text-primary"
+                  className="text-xs text-on-surface-variant transition-colors hover:text-primary"
                 >
                   {t(link.labelKey)}
                 </Link>
@@ -50,33 +67,24 @@ export async function SiteFooter() {
             </nav>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <h5 className="text-xs font-semibold uppercase tracking-[0.1em] text-primary">
+          <div className="flex flex-col gap-3">
+            <h5 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-primary">
               {t("footer.support")}
             </h5>
-            <nav className="flex flex-col gap-2">
-              {footerLinks.support.map((link) => (
+            <nav
+              className="flex flex-col gap-2"
+              aria-label={`${t("footer.support")} — ${a11y("footerNav")}`}
+            >
+              {footerLinksMobile.support.map((link) => (
                 <Link
                   key={link.labelKey}
                   href={link.href}
-                  className="text-sm text-on-surface-variant transition-colors hover:text-primary"
+                  className="text-xs text-on-surface-variant transition-colors hover:text-primary"
                 >
                   {t(link.labelKey)}
                 </Link>
               ))}
             </nav>
-          </div>
-
-          <div className="col-span-2 flex justify-start gap-8 pt-4">
-            {(["facebook", "photo_camera", "music_note"] as const).map((icon) => (
-              <Link
-                key={icon}
-                href="#"
-                className="text-on-surface-variant transition-colors hover:text-primary"
-              >
-                <span className="material-symbols-outlined">{icon}</span>
-              </Link>
-            ))}
           </div>
         </div>
 
@@ -94,6 +102,7 @@ export async function SiteFooter() {
             <h4 className="mb-6 text-xs font-semibold uppercase tracking-[0.1em] text-primary">
               {t("footer.shop")}
             </h4>
+            <nav aria-label={`${t("footer.shop")} — ${a11y("footerNav")}`}>
             <ul className="space-y-4">
               {footerLinks.shop.map((link) => (
                 <li key={link.labelKey}>
@@ -106,11 +115,13 @@ export async function SiteFooter() {
                 </li>
               ))}
             </ul>
+            </nav>
           </div>
           <div>
             <h4 className="mb-6 text-xs font-semibold uppercase tracking-[0.1em] text-primary">
               {t("footer.support")}
             </h4>
+            <nav aria-label={`${t("footer.support")} — ${a11y("footerNav")}`}>
             <ul className="space-y-4">
               {footerLinks.support.map((link) => (
                 <li key={link.labelKey}>
@@ -123,37 +134,27 @@ export async function SiteFooter() {
                 </li>
               ))}
             </ul>
+            </nav>
           </div>
         </div>
 
-        <div className="border-t border-outline-variant pt-8">
-          <div className="mb-8 flex flex-wrap justify-center gap-6 opacity-60 md:hidden">
-            {(["credit_card", "account_balance", "payments", "contactless"] as const).map(
-              (icon) => (
-                <span key={icon} className="material-symbols-outlined">
-                  {icon}
-                </span>
-              ),
-            )}
-          </div>
-          <div className="text-center">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-on-surface-variant">
-              {t("footer.copyright")}
-            </p>
-            <div className="mt-2 flex justify-center gap-4">
-              <Link
-                href="#"
-                className="text-[10px] font-semibold uppercase tracking-[0.1em] text-on-surface-variant underline"
-              >
-                {t("footer.links.privacy")}
-              </Link>
-              <Link
-                href="#"
-                className="text-[10px] font-semibold uppercase tracking-[0.1em] text-on-surface-variant underline"
-              >
-                {t("footer.links.terms")}
-              </Link>
-            </div>
+        <div className="border-t border-outline-variant/30 pt-8 text-center md:border-outline-variant">
+          <p className="text-[8px] font-semibold uppercase tracking-[0.1em] text-on-surface-variant md:text-[10px]">
+            {t("footer.copyright")}
+          </p>
+          <div className="mt-2 hidden justify-center gap-4 md:flex">
+            <Link
+              href={LEGAL_PATHS.privacy}
+              className="text-[10px] font-semibold uppercase tracking-[0.1em] text-on-surface-variant underline"
+            >
+              {t("footer.links.privacy")}
+            </Link>
+            <Link
+              href={LEGAL_PATHS.terms}
+              className="text-[10px] font-semibold uppercase tracking-[0.1em] text-on-surface-variant underline"
+            >
+              {t("footer.links.terms")}
+            </Link>
           </div>
         </div>
       </div>

@@ -3,7 +3,15 @@
     "title": "Mbody | Premium Women's Activewear",
     "description": "Premium women's activewear designed for performance. Shop new drops, exclusive collections, and best sellers."
   },
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "primaryNav": "Primary navigation",
+    "utilityNav": "Utility navigation",
+    "footerNav": "Footer navigation",
+    "siteFooter": "Site footer"
+  },
   "nav": {
+    "new": "New",
     "shop": "Shop",
     "shopAll": "Shop All",
     "newDrops": "New Drops",
@@ -13,6 +21,7 @@
   "utilityBar": {
     "shipping": "Worldwide Shipping",
     "currency": "SEK",
+    "promo": "Complimentary global shipping on orders over €250.",
     "storeLocator": "Store Locator",
     "support": "Support"
   },
@@ -29,7 +38,7 @@
   },
   "footer": {
     "tagline": "Pioneering technical excellence for the modern athlete. Designed for those who move with intention.",
-    "taglineMobile": "Redefining the intersection of technical performance and high-fashion aesthetics.",
+    "taglineMobile": "Technical performance meets high-fashion aesthetics.",
     "shop": "Shop",
     "help": "Help",
     "support": "Support",
@@ -53,36 +62,39 @@
     "copyright": "© 2026 Mbody. All rights reserved."
   },
   "hero": {
-    "eyebrow": "The Kinetic Series",
     "title": "The Art of Performance",
-    "titleDesktop": "Engineered for Momentum",
-    "description": "Elevated activewear for the modern athlete. Precision engineered for grace.",
-    "descriptionDesktop": "Our most anticipated performance collection launches soon. Premium fabrics, sculpted silhouettes, and limited access for members first.",
-    "nextDrop": "Next Drop",
+    "description": "Designed in Sweden. Crafted for the global athlete. Elevate your movement with architectural precision.",
     "shopNow": "Shop Now",
-    "viewNewDrops": "View New Drops",
-    "imageAlt": "Female athlete in premium charcoal performance gear"
+    "imageAlt": "Female athlete in minimalist charcoal performance wear"
   },
   "home": {
     "latestDrop": {
-      "eyebrow": "Curated For You",
-      "title": "Latest Drops",
-      "description": "Pre-access available for members. Limited releases from the Kinetic Series.",
+      "eyebrow": "Summer 2024",
+      "title": "Latest Drop: The Aero Series",
+      "description": "Pre-access available for members. Limited releases from the Aero Series.",
       "viewAll": "View All",
-      "cta": "Coming Soon"
+      "quickAdd": "Quick Add",
+      "limitedBadge": "Limited",
+      "cta": "Shop Now"
     },
-    "coreElements": {
-      "title": "Core Elements",
-      "description": "The foundation of every performance. A curation of essential silhouettes designed to outlast the trends.",
-      "explore": "Explore"
+    "sculptCollection": {
+      "title": "The Sculpt Collection",
+      "description": "Engineering silhouettes that empower. Discover the fusion of compression technology and sculptural elegance.",
+      "cta": "Explore Collection",
+      "innovationEyebrow": "Innovation",
+      "innovationTitle": "Seamless Comfort",
+      "innovationDescription": "Our patented M-Knit technology provides 360-degree stretch without losing its form.",
+      "learnMore": "Learn More"
     },
     "premiumCollection": {
+      "eyebrow": "Editorial Series",
       "title": "Premium Collection",
-      "description": "Curated essentials with an editorial feel — limited and exclusive."
+      "description": "Curated essentials with an editorial feel — limited and exclusive.",
+      "viewProduct": "View Product",
+      "fabricLabel": "Performance Rib Fabric"
     },
-    "bestSellers": {
-      "title": "Best Sellers",
-      "description": "Our most-loved pieces, chosen by the Mbody community."
+    "boutiqueFavorites": {
+      "title": "Boutique Favorites"
     }
   },
   "badges": {
@@ -94,25 +106,50 @@
     "shopNow": "Shop Now"
   },
   "completeTheLook": {
-    "eyebrow": "Complete the Look",
-    "title": "The Power Set",
-    "setSavings": "Set Savings",
-    "description": "Sculpt leggings, support bra, and flow crop — engineered as one cohesive look.",
-    "items": {
-      "sculptLeggings": "Sculpt Leggings",
-      "supportBra": "Support Bra",
-      "flowCropTop": "Flow Crop Top"
-    },
-    "shopTheLook": "Shop the Look",
-    "imageAlt": "Complete the look outfit set"
+    "eyebrow": "Curated Style",
+    "title": "Complete The Look:",
+    "titleLine2": "The Sandstone Kit",
+    "imageAlt": "Woman at a yoga studio in sandstone activewear set",
+    "addEntireSet": "Add Entire Set to Bag —"
+  },
+  "bottomNav": {
+    "ariaLabel": "Main navigation",
+    "home": "Home",
+    "shop": "Shop",
+    "wishlist": "Wishlist",
+    "account": "Account"
   },
   "newsletter": {
-    "title": "Join The Circle",
-    "description": "Early access to drops, exclusive content, and community events.",
+    "title": "Join the Movement",
+    "description": "Be the first to access our new drops and receive exclusive insights into the future of performance wear.",
     "emailLabel": "Email Address",
-    "placeholder": "Enter your email",
-    "subscribe": "Subscribe",
-    "consent": "I consent to receiving marketing communications and agree to the Privacy Policy."
+    "placeholder": "Your Email Address",
+    "subscribe": "Subscribe"
+  },
+  "cookieConsent": {
+    "ariaLabel": "Cookie consent",
+    "title": "We value your privacy",
+    "description": "We use essential cookies to operate the store (cart, session, language, and currency). With your consent, we also use analytics and marketing cookies to improve your experience. Final legal copy will be supplied by Mbody before launch.",
+    "learnMore": "Privacy Policy",
+    "acceptAll": "Accept All",
+    "rejectNonEssential": "Essential Only",
+    "customize": "Customize",
+    "closePreferences": "Close",
+    "savePreferences": "Save Preferences",
+    "preferencesTitle": "Cookie Preferences",
+    "alwaysActive": "Always active",
+    "essential": {
+      "title": "Essential",
+      "description": "Required for the website to function. Cannot be disabled."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "Help us understand how visitors use the site so we can improve performance."
+    },
+    "marketing": {
+      "title": "Marketing",
+      "description": "Used to deliver relevant offers and measure campaign effectiveness."
+    }
   },
   "countdown": {
     "ariaLabel": "Drop countdown timer",
@@ -126,6 +163,8 @@
     "sortBy": "Sort By",
     "filterSort": "Filter & Sort",
     "itemCount": "{count} Items",
+    "outOfStock": "Out of Stock",
+    "notifyMe": "Notify Me",
     "breadcrumb": {
       "home": "Home",
       "shop": "Shop"
@@ -147,8 +186,11 @@
     },
     "filters": {
       "title": "Filter & Sort",
+      "filtersTitle": "Filters",
+      "clearAll": "Clear All",
       "close": "Close filters",
       "apply": "Apply Filters",
+      "showResults": "Show {count} Results",
       "availability": "Availability",
       "inStock": "In stock",
       "outOfStock": "Out of stock",
@@ -156,12 +198,19 @@
       "latestDrop": "Latest Drop",
       "premiumLine": "Premium Line",
       "bestSellers": "Best Sellers",
-      "size": "Size"
+      "signatureEssentials": "Signature Essentials",
+      "zenSeries": "The Zen Series",
+      "size": "Size",
+      "color": "Color",
+      "priceRange": "Price Range",
+      "min": "Min",
+      "max": "Max"
     },
     "badges": {
       "new": "New",
       "limitedRelease": "Limited",
-      "bestSeller": "Best Seller"
+      "bestSeller": "Best Seller",
+      "onlyLeft": "Only {count} left"
     }
   },
   "pdp": {
@@ -172,12 +221,47 @@
     "socialProof": "Joined by {count} athletes this month",
     "inclVat": "Incl. VAT",
     "limitedStock": "Limited Stock",
+    "outOfStock": "Out of Stock",
     "stockLeft": "Only {count} left in your region",
     "color": "Color",
     "selectSize": "Select Size",
     "sizeGuide": "Size Guide",
     "addToBag": "Add to Bag",
-    "addToWishlist": "Add to Wishlist"
+    "addToWishlist": "Add to Wishlist",
+    "removeFromWishlist": "Remove from Wishlist",
+    "engagement": {
+      "groupLabel": "Product engagement",
+      "views": "{count} views",
+      "likes": "{count} likes",
+      "waiting": "{count} waiting",
+      "sold": "{count} sold"
+    },
+    "ratings": {
+      "title": "Customer ratings",
+      "summary": "{average} · {count, plural, one {# rating} other {# ratings}}",
+      "prompt": "How would you rate this product?",
+      "selectStars": "Select a star rating",
+      "starLabel": "{value, plural, one {# star} other {# stars}}",
+      "submit": "Submit rating",
+      "submitting": "Submitting…",
+      "success": "Thanks — your rating has been saved.",
+      "yourRating": "You rated this {stars, plural, one {# star} other {# stars}}.",
+      "signInRequired": "Sign in to rate products you've purchased.",
+      "signInCta": "Sign in",
+      "notPurchased": "Only verified buyers who purchased this item can leave a rating.",
+      "alreadyRated": "You've already rated this product.",
+      "error": "Could not save your rating. Try again.",
+      "loading": "Loading ratings…"
+    },
+    "viewer": {
+      "modeLabel": "Product gallery view",
+      "images": "Images",
+      "view3d": "3D",
+      "loading": "Loading 3D model…",
+      "error": "Could not load 3D model",
+      "hint": "Drag to rotate · Pinch to zoom · Two fingers to pan",
+      "backToImages": "Images"
+    }
   },
   "newDrops": {
     "eyebrow": "Seasonal Release",
@@ -219,6 +303,7 @@
       "express": "Express Shipping",
       "expressEta": "1–2 business days",
       "free": "Free",
+      "freeShippingHint": "Free standard shipping on orders over {threshold}.",
       "continue": "Continue to Payment"
     },
     "payment": {
@@ -232,6 +317,155 @@
       "sameAsShipping": "Same as shipping address",
       "placeOrder": "Place Order"
     }
+  },
+  "cart": {
+    "title": "Your Bag",
+    "back": "Go back",
+    "itemsTotal": "{count} Items total",
+    "selection": "Your Selection ({count})",
+    "remove": "Remove",
+    "shippingNoticeTitle": "Complimentary shipping applied.",
+    "shippingNoticeBody": "You've reached the $150 minimum for premium delivery.",
+    "shippingNoticeTitleFree": "Complimentary shipping applied.",
+    "shippingNoticeBodyFree": "Your order qualifies for free shipping on orders over {threshold}.",
+    "shippingNoticeTitleProgress": "You're close to free shipping.",
+    "shippingNoticeBodyProgress": "Add {amount} more for free shipping (orders over {threshold}).",
+    "orderSummary": "Order Summary",
+    "summary": "Summary",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "free": "Free",
+    "estimatedTax": "Estimated Tax (VAT)",
+    "vat": "VAT (25%)",
+    "total": "Total",
+    "klarna": "or 4 payments of {amount} with Klarna.",
+    "proceedToCheckout": "Proceed to Checkout",
+    "payWithPaypal": "Pay with PayPal",
+    "promoCode": "Promo code",
+    "apply": "Apply",
+    "estimatedDelivery": "Estimated Delivery: 2-3 Days",
+    "youMightAlsoLike": "You might also like",
+    "essentialAdditions": "Essential additions",
+    "completeTheLook": "Complete the Look",
+    "addToBag": "Add to Bag",
+    "newArrival": "New Arrival",
+    "essentials": "Essentials",
+    "accessories": "Accessories",
+    "footerTagline": "Elevated movement. Technical precision. Minimalist design.",
+    "footerNewsletterHint": "Join for exclusive early access and studio updates.",
+    "copyright": "© 2024 Mbody. All Rights Reserved.",
+    "mobileFooterTagline": "Architectural Performance Wear",
+    "mobileFooterCopyright": "© 2024 MBODY",
+    "nav": {
+      "sustainability": "Sustainability",
+      "sizeGuide": "Size Guide",
+      "performance": "Performance"
+    },
+    "footer": {
+      "shop": "Shop",
+      "support": "Support",
+      "shippingReturns": "Shipping & Returns"
+    },
+    "items": {
+      "sculpt-leggings": {
+        "name": "Sculpt High-Rise Leggings",
+        "variant": "Charcoal / Small"
+      },
+      "zen-bra": {
+        "name": "Zen Flow Sports Bra",
+        "variant": "Sage Green / Small"
+      },
+      "apex-bra": {
+        "name": "Apex Sculpt Bra",
+        "variant": "Charcoal / Small"
+      },
+      "flow-legging": {
+        "name": "Flow Legging",
+        "variant": "Bone / Medium"
+      }
+    },
+    "crossSell": {
+      "cloud-hoodie": { "name": "Cloud Cropped Hoodie" },
+      "ankle-sock": { "name": "Performance Ankle Sock" },
+      "core-flask": { "name": "Core 500ml Flask" },
+      "yoga-mat": { "name": "Grip Motion Yoga Mat" },
+      "aero-jacket": { "name": "Aero Shell Jacket" },
+      "studio-tote": { "name": "Core Studio Tote" },
+      "crew-socks": { "name": "Flow Crew Socks" }
+    },
+    "empty": {
+      "title": "Your bag is currently empty.",
+      "titleMobile": "Your bag is empty",
+      "description": "Explore our latest performance collections to find your next favorite piece. Our technical fabrics and architectural silhouettes are designed for your peak motion.",
+      "descriptionMobile": "Looking for inspiration? Discover our most-loved essentials.",
+      "startShopping": "Start Shopping",
+      "shopNewArrivals": "Shop New Arrivals",
+      "curatedSelection": "Curated Selection",
+      "newArrivals": "New Arrivals",
+      "viewAll": "View All",
+      "mustHaves": "Must-Haves",
+      "bagLabel": "Bag",
+      "close": "Close",
+      "footerTagline": "Elevating human performance through architectural design and uncompromising technical innovation.",
+      "newsletterHint": "Join for exclusive access to launches and athletic insights.",
+      "copyright": "© 2024 Mbody. All Rights Reserved.",
+      "badges": {
+        "newArrival": "New Arrival",
+        "limited": "Limited"
+      },
+      "categories": {
+        "compression": "Compression",
+        "essentials": "Essentials",
+        "outerwear": "Outerwear"
+      },
+      "bottomNav": {
+        "shop": "Shop",
+        "discover": "Discover",
+        "bag": "Bag",
+        "account": "Account"
+      },
+      "products": {
+        "aero-sculpt-legging": { "name": "Aero-Sculpt Legging", "color": "Carbon Black" },
+        "precision-bra": { "name": "Precision Support Bra", "color": "Slate Grey" },
+        "vapor-shell": { "name": "Vapor Shell Jacket", "color": "Oyster White" },
+        "ribbed-short": { "name": "Ribbed Core Short", "color": "Moss Green" },
+        "sculpt-legging-mh": { "name": "Sculpt High-Rise Legging" },
+        "ribbed-bra-mh": { "name": "Ribbed Core Bra" },
+        "studio-parka-mh": { "name": "Over-Sized Studio Parka" }
+      }
+    }
+  },
+  "stockNotify": {
+    "description": "Enter your email and we'll notify you when this item is back in stock.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Email address",
+    "submit": "Notify Me",
+    "submitting": "Saving…",
+    "success": "You're on the list — we'll email you when it's back.",
+    "alreadySubscribed": "You're already signed up for this variant.",
+    "invalidEmail": "Enter a valid email address.",
+    "error": "Something went wrong. Try again.",
+    "variantHint": "We'll notify you for size {size}, color {color}."
+  },
+  "wishlist": {
+    "metaTitle": "Wishlist | Mbody",
+    "metaDescription": "Save your favorite Mbody pieces and shop them later.",
+    "title": "My Wishlist",
+    "itemCount": "{count, plural, one {# item} other {# items}}",
+    "emptyTitle": "Your wishlist is empty",
+    "emptyDescription": "Tap the heart on any product while browsing the shop to save it here.",
+    "browseShop": "Browse the Shop",
+    "signInTitle": "Sign in to view your wishlist",
+    "signInDescription": "Wishlist is available for registered members only.",
+    "signInCta": "Sign In",
+    "signOut": "Sign Out",
+    "addToWishlist": "Add to wishlist",
+    "removeFromWishlist": "Remove from wishlist",
+    "added": "Added to your wishlist",
+    "removed": "Removed from your wishlist",
+    "remove": "Remove",
+    "viewProduct": "View Product",
+    "membersOnly": "Sign in to save items to your wishlist"
   },
   "account": {
     "title": "My Account",
@@ -274,7 +508,174 @@
       "footerSustainability": "Sustainability",
       "footerPrivacy": "Privacy Policy",
       "footerShipping": "Shipping",
-      "copyright": "© 2026 Mbody. All rights reserved."
+      "copyright": "© 2024 Mbody Performance. All rights reserved."
+    }
+  },
+  "legal": {
+    "placeholderBanner": "Placeholder copy aligned with EU consumer and GDPR requirements. Final legal text will be supplied by Mbody and replace this content before launch.",
+    "euComplianceLabel": "EU Market · Placeholder",
+    "lastUpdated": "Last updated: June 2026 (draft placeholder)",
+    "questionsPrefix": "Questions about this policy? Contact",
+    "contactEmail": "legal@mbody.com",
+    "terms": {
+      "metaTitle": "Terms of Service | Mbody",
+      "metaDescription": "Terms of Service for shopping at Mbody — EU placeholder until client legal copy is integrated.",
+      "title": "Terms of Service",
+      "sections": {
+        "introduction": {
+          "title": "1. Agreement",
+          "paragraphs": [
+            "These Terms of Service govern your use of the Mbody online store and purchases of our products within the European Economic Area (EEA). By placing an order, you agree to these terms.",
+            "Mbody sells premium women's activewear directly to consumers (B2C). These terms do not affect your mandatory statutory rights under applicable EU and national consumer law."
+          ]
+        },
+        "orders": {
+          "title": "2. Orders & Contract",
+          "paragraphs": [
+            "When you complete checkout, you submit an offer to purchase. A binding contract is formed when we send an order confirmation email.",
+            "We reserve the right to cancel orders in cases of pricing errors, suspected fraud, or stock unavailability. You will be notified and refunded promptly if payment was already captured."
+          ]
+        },
+        "pricing": {
+          "title": "3. Prices & Payment",
+          "paragraphs": [
+            "All prices displayed on the storefront are VAT-inclusive for EU customers, in accordance with Swedish VAT rules (25%) where applicable.",
+            "Accepted payment methods will be shown at checkout. Payment processing is handled by our certified payment provider. We do not store full card details on our servers."
+          ]
+        },
+        "shipping": {
+          "title": "4. Delivery",
+          "paragraphs": [
+            "We ship to countries within our Phase 1 European market. Estimated delivery times and shipping costs are shown before you confirm your order.",
+            "Risk of loss passes to you upon delivery to the address you provide, unless otherwise required by mandatory local law."
+          ]
+        },
+        "liability": {
+          "title": "5. Limitation of Liability",
+          "paragraphs": [
+            "To the fullest extent permitted by law, Mbody is not liable for indirect or consequential damages arising from use of our products or website.",
+            "Nothing in these terms limits liability for death or personal injury caused by negligence, fraud, or any liability that cannot be excluded under EU consumer protection law."
+          ]
+        },
+        "law": {
+          "title": "6. Governing Law & Changes",
+          "paragraphs": [
+            "These terms are governed by the laws of Sweden, without prejudice to mandatory consumer protections in your country of residence within the EEA.",
+            "We may update these terms. Material changes will be communicated on this page. Continued use after changes constitutes acceptance where permitted by law."
+          ]
+        }
+      }
+    },
+    "privacy": {
+      "metaTitle": "Privacy Policy | Mbody",
+      "metaDescription": "How Mbody collects and processes personal data under GDPR — EU placeholder until client legal copy is integrated.",
+      "title": "Privacy Policy",
+      "sections": {
+        "controller": {
+          "title": "1. Data Controller",
+          "paragraphs": [
+            "Mbody is the data controller for personal data collected through this website. Contact details for privacy inquiries are listed at the bottom of this page.",
+            "This policy describes how we process data when you browse, create an account, purchase products, or subscribe to marketing communications within the EU/EEA."
+          ]
+        },
+        "dataCollected": {
+          "title": "2. Data We Collect",
+          "paragraphs": [
+            "Identity & contact: name, email, phone, delivery and billing address.",
+            "Order data: products purchased, payment status, shipping updates.",
+            "Technical data: IP address, device/browser type, cookies, and analytics events necessary to operate and improve the store.",
+            "Marketing preferences: newsletter opt-in status where you have given consent."
+          ]
+        },
+        "legalBasis": {
+          "title": "3. Legal Basis (GDPR Art. 6)",
+          "paragraphs": [
+            "Contract performance — to process orders, deliver goods, and provide customer support.",
+            "Legal obligation — tax, accounting, and fraud-prevention requirements.",
+            "Legitimate interests — site security, analytics, and service improvement, balanced against your rights.",
+            "Consent — marketing emails and non-essential cookies, which you may withdraw at any time."
+          ]
+        },
+        "rights": {
+          "title": "4. Your Rights",
+          "paragraphs": [
+            "Under the GDPR you have the right to access, rectify, erase, restrict, or port your personal data, and to object to certain processing.",
+            "You may lodge a complaint with your local supervisory authority. In Sweden, this is Integritetsskyddsmyndigheten (IMY).",
+            "To exercise your rights, contact us using the email below. We respond within one month unless an extension is required."
+          ]
+        },
+        "cookies": {
+          "title": "5. Cookies",
+          "paragraphs": [
+            "We use essential cookies to operate the cart, session, language, and currency preferences.",
+            "Analytics and marketing cookies are used only with your consent via our cookie banner. You can change preferences at any time."
+          ]
+        },
+        "transfers": {
+          "title": "6. Retention & Transfers",
+          "paragraphs": [
+            "We retain order and account data as long as necessary for contractual, legal, and accounting purposes, then delete or anonymize it.",
+            "Where data is processed outside the EEA, we rely on appropriate safeguards such as Standard Contractual Clauses approved by the European Commission."
+          ]
+        },
+        "contact": {
+          "title": "7. Contact",
+          "paragraphs": [
+            "For privacy requests or questions about this policy, email legal@mbody.com. A dedicated Data Protection contact will be confirmed before launch."
+          ]
+        }
+      }
+    },
+    "returns": {
+      "metaTitle": "Returns & Refunds | Mbody",
+      "metaDescription": "EU withdrawal and return policy for Mbody orders — placeholder until client legal copy is integrated.",
+      "title": "Returns & Refunds",
+      "sections": {
+        "withdrawal": {
+          "title": "1. Right of Withdrawal (14 Days)",
+          "paragraphs": [
+            "If you are a consumer in the EU/EEA, you have the right to withdraw from your purchase within 14 days of receiving the goods, without giving a reason.",
+            "The withdrawal period expires 14 days after the day on which you, or a third party indicated by you, take physical possession of the goods."
+          ]
+        },
+        "conditions": {
+          "title": "2. Return Conditions",
+          "paragraphs": [
+            "Items must be returned unused, unworn, and with original tags and packaging where applicable.",
+            "Hygiene-sealed products (e.g. underwear or swimwear) cannot be returned once the seal is broken, unless defective.",
+            "You are responsible for diminished value resulting from handling beyond what is necessary to establish the nature and functioning of the goods."
+          ]
+        },
+        "process": {
+          "title": "3. How to Return",
+          "paragraphs": [
+            "Notify us of your decision to withdraw by email before the 14-day period expires. We will provide return instructions and, where applicable, a return label.",
+            "Send the goods back without undue delay and within 14 days of notifying us. Proof of postage is recommended."
+          ]
+        },
+        "refunds": {
+          "title": "4. Refunds",
+          "paragraphs": [
+            "We refund all payments received, including standard delivery costs, within 14 days of receiving the returned goods or proof of return.",
+            "Refunds are made using the same payment method unless you agree otherwise. We may withhold reimbursement until we receive the goods or evidence of return.",
+            "You bear the direct cost of returning goods unless the item is faulty or we have offered free returns for your order."
+          ]
+        },
+        "defective": {
+          "title": "5. Faulty or Incorrect Items",
+          "paragraphs": [
+            "If you receive a defective or wrong item, contact us within a reasonable time. Your statutory warranty rights under EU consumer law apply in addition to this policy.",
+            "We will arrange repair, replacement, or refund as appropriate. Return shipping for faulty goods is at our expense."
+          ]
+        },
+        "exceptions": {
+          "title": "6. Exceptions",
+          "paragraphs": [
+            "The right of withdrawal does not apply to custom-made or personalized products, sealed goods not suitable for return due to health protection, or perishable goods, as permitted by Directive 2011/83/EU.",
+            "Final return rules and any extended voluntary return window will be confirmed in the client-provided policy before launch."
+          ]
+        }
+      }
     }
   }
 }

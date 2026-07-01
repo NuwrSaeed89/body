@@ -10,9 +10,14 @@
     "build": "next build",
     "start": "next start -p ${PORT:-3000}",
     "lint": "eslint .",
-    "type-check": "tsc --noEmit -p tsconfig.ci.json"
+    "type-check": "tsc --noEmit -p tsconfig.ci.json",
+    "check:payment": "npx --yes tsx scripts/check-payment-config.ts",
+    "check:supabase": "npx --yes tsx scripts/check-supabase-config.ts"
   },
   "dependencies": {
+    "@google/model-viewer": "^4.3.1",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.0",
     "next": "16.2.9",
     "next-intl": "^4.13.0",
     "react": "19.2.4",

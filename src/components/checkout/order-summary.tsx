@@ -1,12 +1,26 @@
-import { getTranslations } from "next-intl/server";
+"use client";
 
-export async function OrderSummary() {
-  const t = await getTranslations("checkout.summary");
+import { useLocale, useTranslations } from "next-intl";
+import { useMemo } from "react";
+import { FormattedPrice } from "@/components/ui/formatted-price";
+import { calculateCartSummary } from "@/lib/currency";
+import { useCurrency } from "@/providers/currency-provider";
 
-  const items = [
-    { name: "Sculpt High-Rise Leggings", size: "S", qty: 1, price: "€89" },
-    { name: "Elite Support Bra", size: "M", qty: 1, price: "€68" },
-  ];
+const CHECKOUT_ITEMS = [
+  { name: "Sculpt High-Rise Leggings", size: "S", qty: 1, priceSek: 990 },
+  { name: "Elite Support Bra", size: "M", qty: 1, priceSek: 750 },
+] as const;
+
+export function OrderSummary() {
+  const t = useTranslations("checkout.summary");
+  const { currency } = useCurrency();
+  const locale = useLocale();
+
+  const subtotalSek = CHECKOUT_ITEMS.reduce((sum, item) => sum + item.priceSek, 0);
+  const summary = useMemo(
+    () => calculateCartSummary(subtotalSek, currency, locale),
+    [subtotalSek, currency, locale],
+  );
 
   return (
     <div className="rounded-xl border border-outline-variant/30 bg-surface-container-low p-6">
@@ -15,7 +29,7 @@ export async function OrderSummary() {
       </h2>
 
       <ul className="mb-6 space-y-4 border-b border-outline-variant/20 pb-6">
-        {items.map((item) => (
+        {CHECKOUT_ITEMS.map((item) => (
           <li key={item.name} className="flex justify-between gap-4 text-sm">
             <div>
               <p className="font-medium text-on-surface">{item.name}</p>
@@ -23,7 +37,7 @@ export async function OrderSummary() {
                 {t("size")}: {item.size} · {t("qty")}: {item.qty}
               </p>
             </div>
-            <span className="shrink-0 text-on-surface">{item.price}</span>
+            <FormattedPrice amountSek={item.priceSek} className="shrink-0 text-on-surface" />
           </li>
         ))}
       </ul>
@@ -31,15 +45,15 @@ export async function OrderSummary() {
       <dl className="space-y-3 text-sm">
         <div className="flex justify-between">
           <dt className="text-secondary">{t("subtotal")}</dt>
-          <dd>€157</dd>
+          <dd>{summary.subtotal}</dd>
         </div>
         <div className="flex justify-between">
           <dt className="text-secondary">{t("shipping")}</dt>
-          <dd>{t("free")}</dd>
+          <dd>{summary.freeShipping ? t("free") : summary.shipping}</dd>
         </div>
         <div className="flex justify-between border-t border-outline-variant/20 pt-3 text-base font-medium">
           <dt>{t("total")}</dt>
-          <dd>€157</dd>
+          <dd>{summary.grandTotal}</dd>
         </div>
       </dl>
     </div>

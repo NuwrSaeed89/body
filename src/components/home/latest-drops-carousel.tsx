@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
+import { FormattedPrice } from "@/components/ui/formatted-price";
 import { Link } from "@/i18n/navigation";
 import { LATEST_DROPS_CAROUSEL } from "@/lib/home-data";
 
@@ -7,7 +8,7 @@ export async function LatestDropsCarousel() {
   const t = await getTranslations();
 
   return (
-    <section id="new-drops" className="bg-surface py-16 md:hidden">
+    <section id="new-drops" className="bg-surface py-12 md:hidden">
       <div className="mb-8 flex items-end justify-between px-5">
         <div>
           <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.1em] text-secondary">
@@ -49,16 +50,16 @@ export async function LatestDropsCarousel() {
                   {t(`shop.badges.${product.badgeKey}`)}
                 </span>
               )}
-              <span className="absolute bottom-4 right-4 rounded-full bg-white/90 p-2 opacity-100 shadow-lg backdrop-blur-sm transition-opacity md:opacity-0 md:group-hover:opacity-100">
-                <span className="material-symbols-outlined text-primary">add</span>
-              </span>
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-start justify-between gap-2">
                 <h3 className="text-lg font-semibold tracking-wide text-primary">
                   {product.name}
                 </h3>
-                <span className="shrink-0 text-base text-primary">{product.price}</span>
+                <FormattedPrice
+                  amountSek={product.priceSek}
+                  className="shrink-0 text-base text-primary"
+                />
               </div>
               <p className="text-sm text-on-surface-variant">{product.color}</p>
             </div>

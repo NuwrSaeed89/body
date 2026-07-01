@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { FormattedPrice } from "@/components/ui/formatted-price";
 import type { Product } from "@/lib/home-data";
 
 type ProductCardProps = {
@@ -58,8 +59,10 @@ export async function ProductCard({
           <h3 className="text-base font-semibold tracking-wide text-primary md:text-lg">
             {product.name}
           </h3>
-          {product.price && (
-            <p className="mt-2 text-sm text-secondary">{product.price}</p>
+          {product.priceSek > 0 && (
+            <p className="mt-2 text-sm text-secondary">
+              <FormattedPrice amountSek={product.priceSek} />
+            </p>
           )}
         </div>
         <button
