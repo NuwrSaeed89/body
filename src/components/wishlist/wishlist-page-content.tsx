@@ -80,7 +80,7 @@ export function WishlistPageContent({ catalog }: WishlistPageContentProps) {
             <button
               type="button"
               onClick={() => {
-                signOut();
+                void signOut();
                 router.push("/account/login");
               }}
               className="text-xs font-semibold uppercase tracking-[0.1em] text-secondary underline underline-offset-4 hover:text-primary"

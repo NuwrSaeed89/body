@@ -40,9 +40,120 @@
 
 **المسار:** Authentication → **Email Templates**
 
-- [ ] Confirm signup
-- [ ] Reset password
-- [ ] (لاحقاً) ترجمة القوالب لـ SV, ES, DE
+- [ ] فعّل قالب **Confirm signup** وحدث العنوان + النص + زر الـ CTA
+- [ ] فعّل قالب **Reset password** بنفس أسلوب الهوية (Mbody)
+- [ ] اجعل الروابط تشير إلى `{{ .ConfirmationURL }}`
+- [ ] استخدم دومين المتجر الفعلي في الروابط المعروضة للمستخدم
+- [ ] اختبر كل قالب من زر **Send test email** داخل Supabase
+
+#### متغيرات القوالب المهمة (Supabase)
+
+- `{{ .Email }}` بريد المستخدم
+- `{{ .SiteURL }}` موقعك المعرّف في Authentication
+- `{{ .ConfirmationURL }}` رابط آمن (يحتوي token/code) — استخدمه في زر الإجراء
+- `{{ .Token }}` أو `{{ .TokenHash }}` (استخدمها فقط إن كنت تبني رابطاً مخصصاً)
+
+> الأفضل في MVP: الاعتماد على `{{ .ConfirmationURL }}` بدل تركيب الرابط يدوياً لتقليل الأخطاء.
+
+#### Template — Confirm signup
+
+**EN (default)**
+
+- Subject: `Confirm your Mbody account`
+- Body:
+
+```html
+<h2>Welcome to Mbody</h2>
+<p>Confirm your email to activate your account and start shopping.</p>
+<p><a href="{{ .ConfirmationURL }}">Confirm my account</a></p>
+<p>If you did not create this account, you can ignore this email.</p>
+```
+
+**SV**
+
+- Subject: `Bekräfta ditt Mbody-konto`
+- Body:
+
+```html
+<h2>Välkommen till Mbody</h2>
+<p>Bekräfta din e-post för att aktivera ditt konto och börja handla.</p>
+<p><a href="{{ .ConfirmationURL }}">Bekräfta mitt konto</a></p>
+<p>Om du inte skapade kontot kan du ignorera detta e-postmeddelande.</p>
+```
+
+**ES**
+
+- Subject: `Confirma tu cuenta de Mbody`
+- Body:
+
+```html
+<h2>Bienvenida a Mbody</h2>
+<p>Confirma tu correo para activar tu cuenta y empezar a comprar.</p>
+<p><a href="{{ .ConfirmationURL }}">Confirmar mi cuenta</a></p>
+<p>Si no creaste esta cuenta, puedes ignorar este correo.</p>
+```
+
+**DE**
+
+- Subject: `Bestätige dein Mbody-Konto`
+- Body:
+
+```html
+<h2>Willkommen bei Mbody</h2>
+<p>Bestätige deine E-Mail, um dein Konto zu aktivieren und einzukaufen.</p>
+<p><a href="{{ .ConfirmationURL }}">Mein Konto bestätigen</a></p>
+<p>Wenn du dieses Konto nicht erstellt hast, ignoriere bitte diese E-Mail.</p>
+```
+
+#### Template — Reset password
+
+**EN (default)**
+
+- Subject: `Reset your Mbody password`
+- Body:
+
+```html
+<h2>Password reset request</h2>
+<p>We received a request to reset your password.</p>
+<p><a href="{{ .ConfirmationURL }}">Reset password</a></p>
+<p>If you did not request this, you can ignore this email.</p>
+```
+
+**SV**
+
+- Subject: `Återställ ditt Mbody-lösenord`
+- Body:
+
+```html
+<h2>Begäran om återställning av lösenord</h2>
+<p>Vi har mottagit en begäran om att återställa ditt lösenord.</p>
+<p><a href="{{ .ConfirmationURL }}">Återställ lösenord</a></p>
+<p>Om du inte begärde detta kan du ignorera detta e-postmeddelande.</p>
+```
+
+**ES**
+
+- Subject: `Restablece tu contraseña de Mbody`
+- Body:
+
+```html
+<h2>Solicitud de restablecimiento de contraseña</h2>
+<p>Hemos recibido una solicitud para restablecer tu contraseña.</p>
+<p><a href="{{ .ConfirmationURL }}">Restablecer contraseña</a></p>
+<p>Si no solicitaste esto, puedes ignorar este correo.</p>
+```
+
+**DE**
+
+- Subject: `Setze dein Mbody-Passwort zurück`
+- Body:
+
+```html
+<h2>Anfrage zum Zurücksetzen des Passworts</h2>
+<p>Wir haben eine Anfrage zum Zurücksetzen deines Passworts erhalten.</p>
+<p><a href="{{ .ConfirmationURL }}">Passwort zurücksetzen</a></p>
+<p>Wenn du das nicht angefordert hast, ignoriere bitte diese E-Mail.</p>
+```
 
 ### الخطوة 0.4 — اختبار يدوي سريع
 

@@ -9,29 +9,54 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { shouldUseAuthMock } from "@/lib/auth/should-use-auth-mock";
 import {
   AUTH_COOKIE,
   AUTH_STORAGE_KEY,
   parseAuthSession,
   serializeAuthSession,
-  userIdFromEmail,
   type MockUser,
 } from "@/lib/auth-session";
+import { routing, type Locale } from "@/i18n/routing";
+
+type SignUpInput = {
+  email: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+};
+
+type SignUpResult = {
+  user: MockUser;
+  sessionCreated: boolean;
+};
 
 type AuthContextValue = {
   user: MockUser | null;
   isAuthenticated: boolean;
   mounted: boolean;
-  signIn: (email: string) => MockUser;
-  signUp: (input: {
-    email: string;
-    firstName?: string;
-    lastName?: string;
-  }) => MockUser;
-  signOut: () => void;
+  signIn: (email: string, password?: string) => Promise<MockUser>;
+  signUp: (input: SignUpInput) => Promise<SignUpResult>;
+  signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+function readPathLocale(): Locale {
+  if (typeof window === "undefined") return routing.defaultLocale;
+  const segment = window.location.pathname.split("/")[1];
+  return routing.locales.includes(segment as Locale)
+    ? (segment as Locale)
+    : routing.defaultLocale;
+}
+
+function authCallbackUrl(redirectPath: string): string {
+  const locale = readPathLocale();
+  const path = redirectPath.startsWith("/") ? redirectPath : `/${redirectPath}`;
+  const resolved = `/${locale}${path}`;
+  return `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(resolved)}`;
+}
 
 function persistSession(user: MockUser | null) {
   if (user) {
@@ -53,45 +78,154 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const saved = parseAuthSession(window.localStorage.getItem(AUTH_STORAGE_KEY));
-    setUser(saved);
-    setMounted(true);
+    if (shouldUseAuthMock()) {
+      const saved = parseAuthSession(window.localStorage.getItem(AUTH_STORAGE_KEY));
+      setUser(saved);
+      setMounted(true);
 
-    const onAuthChange = () => {
-      setUser(parseAuthSession(window.localStorage.getItem(AUTH_STORAGE_KEY)));
+      const onAuthChange = () => {
+        setUser(parseAuthSession(window.localStorage.getItem(AUTH_STORAGE_KEY)));
+      };
+      window.addEventListener("mbody-auth-change", onAuthChange);
+      return () => window.removeEventListener("mbody-auth-change", onAuthChange);
+    }
+
+    const supabase = createSupabaseBrowserClient();
+    let isActive = true;
+
+    const toMockUser = (
+      authUser: { id: string; email?: string | null; user_metadata?: Record<string, unknown> } | null,
+    ): MockUser | null => {
+      if (!authUser?.email) return null;
+      const metadata = authUser.user_metadata ?? {};
+      return {
+        id: authUser.id,
+        email: authUser.email.toLowerCase(),
+        firstName: typeof metadata.first_name === "string" ? metadata.first_name : undefined,
+        lastName: typeof metadata.last_name === "string" ? metadata.last_name : undefined,
+      };
     };
-    window.addEventListener("mbody-auth-change", onAuthChange);
-    return () => window.removeEventListener("mbody-auth-change", onAuthChange);
+
+    void supabase.auth.getSession().then(({ data }) => {
+      if (!isActive) return;
+      setUser(toMockUser(data.session?.user ?? null));
+      setMounted(true);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isActive) return;
+      setUser(toMockUser(session?.user ?? null));
+    });
+
+    return () => {
+      isActive = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const signIn = useCallback((email: string) => {
-    const next: MockUser = {
-      id: userIdFromEmail(email),
-      email: email.trim().toLowerCase(),
-    };
-    setUser(next);
-    persistSession(next);
-    return next;
-  }, []);
+  const signIn = useCallback(async (email: string, password?: string) => {
+    const normalizedEmail = email.trim().toLowerCase();
 
-  const signUp = useCallback(
-    (input: { email: string; firstName?: string; lastName?: string }) => {
+    if (shouldUseAuthMock()) {
       const next: MockUser = {
-        id: userIdFromEmail(input.email),
-        email: input.email.trim().toLowerCase(),
-        firstName: input.firstName?.trim() || undefined,
-        lastName: input.lastName?.trim() || undefined,
+        id: normalizedEmail,
+        email: normalizedEmail,
       };
       setUser(next);
       persistSession(next);
       return next;
+    }
+
+    if (!password) throw new Error("Password is required");
+    const supabase = createSupabaseBrowserClient();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
+      password,
+    });
+    if (error) throw error;
+    if (!data.user?.email) throw new Error("Could not resolve authenticated user");
+
+    const next: MockUser = {
+      id: data.user.id,
+      email: data.user.email.toLowerCase(),
+      firstName:
+        typeof data.user.user_metadata?.first_name === "string"
+          ? data.user.user_metadata.first_name
+          : undefined,
+      lastName:
+        typeof data.user.user_metadata?.last_name === "string"
+          ? data.user.user_metadata.last_name
+          : undefined,
+    };
+    setUser(next);
+    return next;
+  }, []);
+
+  const signUp = useCallback(
+    async (input: SignUpInput) => {
+      const normalizedEmail = input.email.trim().toLowerCase();
+      const firstName = input.firstName?.trim() || undefined;
+      const lastName = input.lastName?.trim() || undefined;
+
+      if (shouldUseAuthMock()) {
+        const next: MockUser = {
+          id: normalizedEmail,
+          email: normalizedEmail,
+          firstName,
+          lastName,
+        };
+        setUser(next);
+        persistSession(next);
+        return { user: next, sessionCreated: true };
+      }
+
+      if (!input.password) throw new Error("Password is required");
+      const supabase = createSupabaseBrowserClient();
+      const fullName = [firstName, lastName].filter(Boolean).join(" ");
+
+      const { data, error } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password: input.password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            full_name: fullName || undefined,
+          },
+          emailRedirectTo: authCallbackUrl("/account"),
+        },
+      });
+      if (error) throw error;
+
+      const next: MockUser = {
+        id: data.user?.id ?? normalizedEmail,
+        email: normalizedEmail,
+        firstName,
+        lastName,
+      };
+
+      const sessionCreated = !!data.session;
+      if (sessionCreated) {
+        setUser(next);
+      }
+      return { user: next, sessionCreated };
     },
     [],
   );
 
-  const signOut = useCallback(() => {
+  const signOut = useCallback(async () => {
+    if (shouldUseAuthMock()) {
+      setUser(null);
+      persistSession(null);
+      return;
+    }
+
+    const supabase = createSupabaseBrowserClient();
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
     setUser(null);
-    persistSession(null);
   }, []);
 
   const value = useMemo(

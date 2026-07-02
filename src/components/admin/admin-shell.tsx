@@ -3,6 +3,7 @@
 import { Link, usePathname } from "@/i18n/navigation";
 import type { ReactNode } from "react";
 import { ADMIN_NAV, type AdminNavKey } from "./admin-nav";
+import { AdminSignOutButton } from "./admin-sign-out-button";
 import { AdminSourceBadge } from "./admin-source-badge";
 
 type AdminShellProps = {
@@ -78,6 +79,7 @@ export function AdminShell({
             <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">
               {managerRole}
             </p>
+            <AdminSignOutButton />
           </div>
         </div>
       </aside>

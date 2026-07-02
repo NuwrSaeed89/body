@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { PageContainer } from "@/components/ui/page-container";
 import { WishlistPageContent } from "@/components/wishlist/wishlist-page-content";
 import { getStorefrontProducts } from "@/lib/catalog/get-storefront-catalog";
+import { requireUser } from "@/lib/auth/require-user";
 
 type WishlistPageProps = {
   params: Promise<{ locale: string }>;
@@ -26,6 +27,7 @@ export async function generateMetadata({
 export default async function WishlistPage({ params }: WishlistPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await requireUser(locale, `/${locale}/account/wishlist`);
   const t = await getTranslations("wishlist");
   const catalog = await getStorefrontProducts(locale);
 

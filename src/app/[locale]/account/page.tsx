@@ -1,10 +1,13 @@
 import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
 import { AccountNav } from "@/components/account/account-nav";
+import { AccountSignOutButton } from "@/components/account/account-sign-out-button";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { PageContainer } from "@/components/ui/page-container";
 import { Link } from "@/i18n/navigation";
+import { getServerProfile } from "@/lib/auth/get-session";
+import { requireUser } from "@/lib/auth/require-user";
 
 type AccountPageProps = {
   params: Promise<{ locale: string }>;
@@ -13,7 +16,13 @@ type AccountPageProps = {
 export default async function AccountPage({ params }: AccountPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await requireUser(locale, `/${locale}/account`);
   const t = await getTranslations("account");
+  const profile = await getServerProfile();
+
+  const welcomeTitle = profile?.full_name
+    ? t("welcomeNamed", { name: profile.full_name })
+    : t("welcome");
 
   const orders = [
     { id: "MB-1042", date: "12 Jun 2026", status: "Delivered", total: "€157" },
@@ -33,10 +42,16 @@ export default async function AccountPage({ params }: AccountPageProps) {
 
           <div className="min-w-0 flex-1 space-y-10">
             <section className="rounded-xl border border-outline-variant/30 p-6">
-              <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.1em] text-primary">
-                {t("welcome")}
-              </h2>
-              <p className="text-sm text-secondary">{t("welcomeDescription")}</p>
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-sm font-semibold uppercase tracking-[0.1em] text-primary">
+                  {welcomeTitle}
+                </h2>
+                <AccountSignOutButton />
+              </div>
+              <p className="text-sm text-secondary">
+                {profile?.email ? `${profile.email} · ` : ""}
+                {t("welcomeDescription")}
+              </p>
               <Link
                 href="/shop"
                 className="mt-6 inline-block text-xs font-semibold uppercase tracking-[0.1em] text-primary underline underline-offset-4"

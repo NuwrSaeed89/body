@@ -1,5 +1,5 @@
 import { revalidatePath } from "next/cache";
-import { adminWritesDisabledResponse } from "@/lib/admin/admin-api-guard";
+import { requireAdminApiAccess } from "@/lib/admin/admin-api-guard";
 import {
   deleteProduct,
   getProductById,
@@ -13,8 +13,8 @@ type RouteContext = {
 };
 
 export async function GET(request: Request, context: RouteContext) {
-  const blocked = adminWritesDisabledResponse();
-  if (blocked) return blocked;
+  const auth = await requireAdminApiAccess();
+  if (auth instanceof Response) return auth;
 
   const { id } = await context.params;
   const { searchParams } = new URL(request.url);
@@ -33,8 +33,8 @@ export async function GET(request: Request, context: RouteContext) {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const blocked = adminWritesDisabledResponse();
-  if (blocked) return blocked;
+  const auth = await requireAdminApiAccess();
+  if (auth instanceof Response) return auth;
 
   const { id } = await context.params;
 
@@ -61,8 +61,8 @@ export async function PATCH(request: Request, context: RouteContext) {
 }
 
 export async function DELETE(_request: Request, context: RouteContext) {
-  const blocked = adminWritesDisabledResponse();
-  if (blocked) return blocked;
+  const auth = await requireAdminApiAccess();
+  if (auth instanceof Response) return auth;
 
   const { id } = await context.params;
 

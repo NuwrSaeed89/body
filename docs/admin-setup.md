@@ -32,7 +32,34 @@ If you disabled **Automatically expose new tables**, run:
 
 Paste the full file contents and click **Run**. This fixes `permission denied (42501)` for `service_role`.
 
-## Promote admin user (optional, for future auth guard)
+## Admin authentication
+
+Staff use a **separate login** at `/[locale]/admin/login` (not the customer `/account/login` page).
+
+| Item | Detail |
+|------|--------|
+| Login URL | `/en/admin/login` |
+| Access | `profiles.role = 'admin'` only |
+| Session | Supabase Auth cookies (refreshed by middleware) |
+| API | `/api/admin/*` requires admin session before service-role writes |
+
+### Promote two full-access admin accounts
+
+1. Create two users in **Supabase → Authentication → Users** (email + password), or sign up once and promote.
+2. Run in SQL Editor:
+
+```sql
+-- database/011_promote_admin.sql
+update public.profiles
+set role = 'admin'
+where email in ('admin1@mbody.example', 'admin2@mbody.example');
+```
+
+3. Sign in at `/en/admin/login` with one of those accounts.
+
+Non-admin users who sign in on the admin page are signed out immediately with an error message.
+
+## Promote admin user (legacy one-liner)
 
 After you sign up via Supabase Auth:
 

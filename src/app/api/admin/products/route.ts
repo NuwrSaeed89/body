@@ -1,5 +1,5 @@
 import { revalidatePath } from "next/cache";
-import { adminWritesDisabledResponse } from "@/lib/admin/admin-api-guard";
+import { requireAdminApiAccess } from "@/lib/admin/admin-api-guard";
 import {
   createProduct,
   mapSupabaseCrudError,
@@ -7,8 +7,8 @@ import {
 import { parseProductWriteBody } from "@/lib/admin/products/validate";
 
 export async function POST(request: Request) {
-  const blocked = adminWritesDisabledResponse();
-  if (blocked) return blocked;
+  const auth = await requireAdminApiAccess();
+  if (auth instanceof Response) return auth;
 
   let body: unknown;
   try {

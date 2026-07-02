@@ -61,30 +61,84 @@ export function AuthForms() {
   const searchParams = useSearchParams();
   const { signIn, signUp } = useAuth();
   const [view, setView] = useState<AuthView>("login");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const redirectTo = searchParams.get("redirect") || "/account";
 
-  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const email = String(form.get("email") ?? "").trim();
-    if (!email) return;
-    signIn(email);
-    router.push(redirectTo);
+  const resolveAuthError = (message: string): string => {
+    const normalized = message.toLowerCase();
+    if (normalized.includes("invalid login credentials")) return t("errors.invalidCredentials");
+    if (normalized.includes("email not confirmed")) return t("errors.emailNotConfirmed");
+    if (normalized.includes("already registered")) return t("errors.emailInUse");
+    if (normalized.includes("password should be at least")) return t("errors.weakPassword");
+    return t("errors.generic");
   };
 
-  const handleRegister = (event: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError(null);
+    setSuccess(null);
     const form = new FormData(event.currentTarget);
     const email = String(form.get("email") ?? "").trim();
-    if (!email) return;
-    signUp({
-      email,
-      firstName: String(form.get("firstName") ?? "").trim() || undefined,
-      lastName: String(form.get("lastName") ?? "").trim() || undefined,
-    });
-    router.push(redirectTo);
+    const password = String(form.get("password") ?? "");
+    if (!email || !password) {
+      setError(t("errors.invalidCredentials"));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await signIn(email, password);
+      router.push(redirectTo);
+    } catch (caughtError) {
+      const message = caughtError instanceof Error ? caughtError.message : "";
+      setError(resolveAuthError(message));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+    setSuccess(null);
+    const form = new FormData(event.currentTarget);
+    const email = String(form.get("email") ?? "").trim();
+    const password = String(form.get("password") ?? "");
+    const acceptedTerms = form.get("terms") === "on";
+
+    if (!acceptedTerms) {
+      setError(t("errors.termsRequired"));
+      return;
+    }
+    if (!email || !password) {
+      setError(t("errors.generic"));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { sessionCreated } = await signUp({
+        email,
+        password,
+        firstName: String(form.get("firstName") ?? "").trim() || undefined,
+        lastName: String(form.get("lastName") ?? "").trim() || undefined,
+      });
+      if (sessionCreated) {
+        router.push(redirectTo);
+        return;
+      }
+      setSuccess(t("checkEmail"));
+      setView("login");
+    } catch (caughtError) {
+      const message = caughtError instanceof Error ? caughtError.message : "";
+      setError(resolveAuthError(message));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -151,7 +205,7 @@ export function AuthForms() {
                   placeholder="••••••••"
                   labelExtra={
                     <Link
-                      href="#"
+                      href="/account/forgot-password"
                       className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-secondary transition-colors hover:text-primary"
                     >
                       {t("forgotPassword")}
@@ -162,10 +216,13 @@ export function AuthForms() {
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full rounded-lg bg-primary py-5 text-xs font-semibold uppercase tracking-widest text-on-primary shadow-[0_10px_20px_rgba(0,0,0,0.1)] transition-all hover:bg-primary/90 active:scale-[0.98]"
               >
-                {t("logIn")}
+                {isSubmitting ? t("submitting") : t("logIn")}
               </button>
+              {error && <p className="text-sm text-error">{error}</p>}
+              {success && <p className="text-sm text-primary">{success}</p>}
 
               <div className="pt-8 text-center">
                 <p className="text-sm text-secondary">
@@ -233,7 +290,9 @@ export function AuthForms() {
               <div className="flex items-start gap-3 py-2">
                 <input
                   id="terms"
+                  name="terms"
                   type="checkbox"
+                  required
                   className="mt-1 h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary"
                 />
                 <label htmlFor="terms" className="text-sm leading-tight text-secondary">
@@ -241,15 +300,22 @@ export function AuthForms() {
                   <Link href={LEGAL_PATHS.terms} className="underline">
                     {t("terms")}
                   </Link>
+                  {" · "}
+                  <Link href={LEGAL_PATHS.privacy} className="underline">
+                    {t("privacy")}
+                  </Link>
                 </label>
               </div>
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full rounded-lg bg-primary py-5 text-xs font-semibold uppercase tracking-widest text-on-primary shadow-[0_10px_20px_rgba(0,0,0,0.1)] transition-all hover:bg-primary/90 active:scale-[0.98]"
               >
-                {t("becomeMember")}
+                {isSubmitting ? t("submitting") : t("becomeMember")}
               </button>
+              {error && <p className="text-sm text-error">{error}</p>}
+              {success && <p className="text-sm text-primary">{success}</p>}
 
               <div className="pt-8 text-center">
                 <p className="text-sm text-secondary">

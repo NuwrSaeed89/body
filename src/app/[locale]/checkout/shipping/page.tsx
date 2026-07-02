@@ -6,6 +6,7 @@ import { CheckoutLayout } from "@/components/checkout/checkout-layout";
 import { OrderSummary } from "@/components/checkout/order-summary";
 import { ShippingMethodOptions } from "@/components/checkout/shipping-method-options";
 import { Link } from "@/i18n/navigation";
+import { requireUser } from "@/lib/auth/require-user";
 
 type ShippingPageProps = {
   params: Promise<{ locale: string }>;
@@ -14,6 +15,7 @@ type ShippingPageProps = {
 export default async function ShippingPage({ params }: ShippingPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await requireUser(locale, `/${locale}/checkout/shipping`);
   const t = await getTranslations("checkout.shipping");
 
   return (
