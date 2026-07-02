@@ -1,6 +1,6 @@
 import { getProductRatingState } from "@/lib/product-ratings/get-product-rating-state";
 import { submitProductRating } from "@/lib/product-ratings/submit-product-rating";
-import { getProductBySlug } from "@/lib/shop-data";
+import { getStorefrontProductBySlug } from "@/lib/catalog/get-storefront-catalog";
 
 type RouteContext = {
   params: Promise<{ slug: string }>;
@@ -18,7 +18,7 @@ type RatingRequestBody = {
  */
 export async function GET(request: Request, context: RouteContext) {
   const { slug } = await context.params;
-  const product = getProductBySlug(slug);
+  const product = await getStorefrontProductBySlug(slug, "en");
 
   if (!product) {
     return Response.json({ error: "Product not found" }, { status: 404 });
@@ -27,7 +27,7 @@ export async function GET(request: Request, context: RouteContext) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
 
-  const state = getProductRatingState(slug, userId);
+  const state = await getProductRatingState(slug, userId, product.id);
   if (!state) {
     return Response.json({ error: "Product not found" }, { status: 404 });
   }
@@ -41,7 +41,7 @@ export async function GET(request: Request, context: RouteContext) {
 
 export async function POST(request: Request, context: RouteContext) {
   const { slug } = await context.params;
-  const product = getProductBySlug(slug);
+  const product = await getStorefrontProductBySlug(slug, "en");
 
   if (!product) {
     return Response.json({ error: "Product not found" }, { status: 404 });

@@ -24,6 +24,16 @@ export type ShopProduct = {
   colors?: string[];
 };
 
+export type ProductVariantOption = {
+  id: string;
+  sku: string;
+  size: string;
+  colorName: string;
+  colorHex: string;
+  stockQuantity: number;
+  isActive: boolean;
+};
+
 export type ProductDetail = Omit<ShopProduct, "colors"> & {
   series: string;
   description: string;
@@ -35,6 +45,8 @@ export type ProductDetail = Omit<ShopProduct, "colors"> & {
   modelGlbUrl?: string;
   sizes: string[];
   colors: Array<{ name: string; hex: string }>;
+  variants: ProductVariantOption[];
+  isTemporarilyUnavailable: boolean;
 };
 
 /** Placeholder GLB until per-product assets are uploaded. */
@@ -211,6 +223,8 @@ export const PRODUCT_DETAILS: Record<string, ProductDetail> = {
       { name: "Basalt Grey", hex: "#3D3E3F" },
       { name: "Stone", hex: "#E5E5E0" },
     ],
+    variants: [],
+    isTemporarilyUnavailable: false,
   },
 };
 
@@ -231,6 +245,8 @@ export function getProductBySlug(slug: string): ProductDetail | undefined {
     images: [{ src: shopProduct.image, alt: shopProduct.imageAlt }],
     sizes: ["XS", "S", "M", "L"],
     colors: [{ name: "Charcoal Black", hex: "#121212" }],
+    variants: [],
+    isTemporarilyUnavailable: false,
   };
 }
 

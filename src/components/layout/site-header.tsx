@@ -1,7 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { AccountHeaderLink } from "@/components/layout/account-header-link";
+import { CartHeaderLink } from "@/components/layout/cart-header-link";
 import { WishlistHeaderLink } from "@/components/layout/wishlist-header-link";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { MobileNav } from "./mobile-nav";
 import { UtilityBar } from "./utility-bar";
 
@@ -88,34 +90,23 @@ export async function SiteHeader({
                 const className = `relative transition-opacity hover:opacity-70 ${
                   isDark ? "text-white" : "text-primary"
                 }`;
-                const iconEl = (
-                  <>
-                    <span className="material-symbols-outlined">{icon}</span>
-                    {icon === "shopping_bag" && (
-                      <span
-                        className={`absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full text-[8px] font-semibold text-white md:h-2 md:w-2 ${
-                          isDark ? "bg-white text-primary" : "bg-primary"
-                        }`}
-                      >
-                        <span className="md:hidden">2</span>
-                      </span>
-                    )}
-                  </>
-                );
+                const iconEl =
+                  icon === "shopping_bag" ? (
+                    <MaterialIcon name={icon} />
+                  ) : (
+                    <>
+                      <MaterialIcon name={icon} />
+                    </>
+                  );
 
                 return icon === "person" ? (
                   <AccountHeaderLink key={icon} className={className}>
                     {iconEl}
                   </AccountHeaderLink>
                 ) : icon === "shopping_bag" ? (
-                  <Link
-                    key={icon}
-                    href="/cart"
-                    className={className}
-                    aria-label={t(`header.aria.${icon}`)}
-                  >
+                  <CartHeaderLink key={icon} className={className} isDark={isDark}>
                     {iconEl}
-                  </Link>
+                  </CartHeaderLink>
                 ) : icon === "favorite" ? (
                   <WishlistHeaderLink
                     key={icon}
@@ -142,7 +133,7 @@ export async function SiteHeader({
                   }`;
                   const iconEl = (
                     <>
-                      <span className="material-symbols-outlined">{icon}</span>
+                      <MaterialIcon name={icon} />
                     </>
                   );
 

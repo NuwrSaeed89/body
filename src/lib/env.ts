@@ -17,6 +17,8 @@ function readBooleanEnv(value: string | undefined, defaultValue: boolean): boole
 export const publicEnv = {
   appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   appEnv: readAppEnvironment(),
+  comingSoon: process.env.NEXT_PUBLIC_COMING_SOON !== "false",
+  launchAt: process.env.NEXT_PUBLIC_LAUNCH_AT ?? "2026-08-09T16:00:00.000Z",
   useMockData: readBooleanEnv(process.env.NEXT_PUBLIC_USE_MOCK_DATA, true),
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
   supabaseAnonKey:

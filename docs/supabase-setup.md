@@ -126,7 +126,7 @@ Until then, the app keeps using mock files (`shop-data.ts`, mock auth, etc.) eve
 | Issue | Fix |
 |-------|-----|
 | `relation "products" does not exist` | Run `database/mbody_init.sql` |
-| `permission denied` / empty data | If you disabled “Automatically expose new tables”, run GRANTs (see database README) |
+| `permission denied` / empty data / `42501` | Run `database/010_api_grants.sql` in SQL Editor (auto-expose tables was off) |
 | `Supabase is not configured` | Fill `.env.local` and restart `pnpm dev` |
 | Auth redirect loop | Match Site URL + Redirect URLs in Supabase dashboard |
 

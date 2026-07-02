@@ -1,11 +1,16 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { FormattedPrice } from "@/components/ui/formatted-price";
+import { ImageWithShimmer } from "@/components/ui/image-with-shimmer";
 import { Link } from "@/i18n/navigation";
-import { LATEST_DROP_PRODUCTS } from "@/lib/home-data";
+import { getStorefrontLatestDrops } from "@/lib/catalog/get-storefront-catalog";
 
-export async function LatestDropSection() {
+type LatestDropSectionProps = {
+  locale: string;
+};
+
+export async function LatestDropSection({ locale }: LatestDropSectionProps) {
   const t = await getTranslations("home.latestDrop");
+  const products = await getStorefrontLatestDrops(locale);
 
   return (
     <section id="new-drops" className="mx-auto max-w-[1440px] px-5 py-24 md:px-16">
@@ -27,19 +32,21 @@ export async function LatestDropSection() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
-        {LATEST_DROP_PRODUCTS.map((product) => (
+        {products.map((product) => (
           <Link
             key={product.id}
             href={product.href ?? "/shop"}
             className="group cursor-pointer"
           >
             <div className="image-zoom-container relative mb-4 aspect-[4/5] overflow-hidden rounded-lg bg-surface-container-low luxury-shadow">
-              <Image
+              <ImageWithShimmer
                 src={product.image}
                 alt={product.imageAlt}
                 fill
+                quality={85}
                 className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                 sizes="(max-width: 768px) 50vw, 25vw"
+                unoptimized={product.image.startsWith("http")}
               />
               {product.badgeKey === "limited" && (
                 <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold uppercase tracking-tighter text-white">

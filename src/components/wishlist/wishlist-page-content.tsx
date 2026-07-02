@@ -5,11 +5,16 @@ import { useTranslations } from "next-intl";
 import { AccountNav } from "@/components/account/account-nav";
 import { FormattedPrice } from "@/components/ui/formatted-price";
 import { Link, useRouter } from "@/i18n/navigation";
-import { getShopProductById } from "@/lib/shop-data";
+import { getStorefrontProducts } from "@/lib/catalog/get-storefront-catalog";
+import type { ShopProduct } from "@/lib/shop-data";
 import { useAuth } from "@/providers/auth-provider";
 import { useWishlist } from "@/providers/wishlist-provider";
 
-export function WishlistPageContent() {
+type WishlistPageContentProps = {
+  catalog: ShopProduct[];
+};
+
+export function WishlistPageContent({ catalog }: WishlistPageContentProps) {
   const t = useTranslations("wishlist");
   const router = useRouter();
   const { isAuthenticated, mounted: authMounted, signOut, user } = useAuth();
@@ -51,7 +56,7 @@ export function WishlistPageContent() {
   }
 
   const products = productIds
-    .map((id) => getShopProductById(id))
+    .map((id) => catalog.find((product) => product.id === id || product.slug === id))
     .filter((product) => product != null);
 
   return (

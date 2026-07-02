@@ -62,10 +62,13 @@
     "copyright": "© 2026 Mbody. Alla rättigheter förbehållna."
   },
   "hero": {
+    "eyebrow": "Mbody · Premium Activewear",
     "title": "Konsten att prestera",
     "description": "Designad i Sverige. Skapad för den globala atleten. Lyft din rörelse med arkitektonisk precision.",
     "shopNow": "Handla nu",
-    "imageAlt": "Kvinnlig atlet i minimalistiska kolprestationskläder"
+    "newDrops": "Nya drops",
+    "scrollHint": "Scrolla för att utforska",
+    "imageAlt": "Atlet i kol sculpt leggings — Mbody premium activewear"
   },
   "home": {
     "latestDrop": {
@@ -216,6 +219,7 @@
     "inclVat": "Inkl. moms",
     "limitedStock": "Begränsat lager",
     "outOfStock": "Slut i lager",
+    "temporarilyUnavailable": "Tillfälligt otillgänglig",
     "stockLeft": "Bara {count} kvar i din region",
     "color": "Färg",
     "selectSize": "Välj storlek",
@@ -223,6 +227,16 @@
     "addToBag": "Lägg i varukorg",
     "addToWishlist": "Lägg till önskelista",
     "removeFromWishlist": "Ta bort från önskelista",
+    "cart": {
+      "adding": "Lägger till…",
+      "added": "Tillagd i varukorgen.",
+      "signInRequired": "Logga in för att lägga varor i varukorgen.",
+      "signInCta": "Logga in",
+      "profileNotFound": "Ditt konto måste vara registrerat i butiken för att använda varukorgen.",
+      "outOfStock": "Denna variant är slut i lager.",
+      "variantUnavailable": "Denna storlek eller färg är inte tillgänglig.",
+      "error": "Kunde inte lägga till i varukorgen. Försök igen."
+    },
     "engagement": {
       "groupLabel": "Produktengagemang",
       "views": "{count} visningar",
@@ -265,9 +279,32 @@
   "launch": {
     "eyebrow": "Exklusiv säsongslansering",
     "title": "Droppet går live snart",
-    "description": "Vår mest efterlängtade kollektion är nästan här. Tillgången är begränsad.",
-    "emailPlaceholder": "Din e-post",
+    "description": "Vår mest efterlängtade kollektion är nästan här. Tillgången är begränsad och strikt först till kvarn. Gå med i innercirklan för direkt avisering.",
+    "emailPlaceholder": "DIN E-POST",
+    "notify": "MEDDELA MIG",
+    "shopCollection": "SHOPPA KOLLEKTIONEN",
+    "liveNow": "LIVE NU",
+    "success": "Du är med på listan. Vi hör av oss före droppet.",
+    "copyright": "© {year} Mbody Performance. Alla rättigheter förbehållna.",
+    "privacy": "Integritetspolicy",
+    "sustainability": "Hållbarhet",
+    "navShop": "Shop",
+    "navCollections": "Kollektioner",
+    "navPerformance": "Performance",
+    "navAbout": "Om oss",
+    "imageAlt": "Atlet i premium charcoal activewear i cinematiskt studiofoto"
+  },
+  "comingSoon": {
+    "metaTitle": "Mbody — Kommer snart",
+    "metaDescription": "Premium activewear för Sverige och EU. Butiken öppnar snart.",
+    "badge": "Kommer snart",
+    "title": "Precision Activewear, snart här",
+    "subtitle": "Mbody utvecklar nästa generations träningskläder för atleter som kräver mer — utvecklad i Europa, designad för rörelse.",
+    "launchNote": "Butiken öppnar om",
+    "emailPlaceholder": "Din e-postadress",
     "notify": "Meddela mig",
+    "success": "Du är med på listan. Vi hör av oss när vi öppnar.",
+    "footer": "Sverige & EU · Performance-first design · Lansering 2026",
     "imageAlt": "Atlet i premium activewear"
   },
   "checkout": {
@@ -314,6 +351,8 @@
   },
   "cart": {
     "title": "Din väska",
+    "loading": "Laddar din väska…",
+    "quantity": "Antal",
     "back": "Gå tillbaka",
     "itemsTotal": "{count} artiklar totalt",
     "selection": "Ditt urval ({count})",
@@ -388,6 +427,8 @@
       "crew-socks": { "name": "Flow Crew Socks" }
     },
     "empty": {
+      "message": "Din väska är tom.",
+      "continueShopping": "Fortsätt handla",
       "title": "Din väska är tom.",
       "titleMobile": "Din väska är tom",
       "description": "Utforska våra senaste performance-kollektioner för att hitta din nästa favorit. Våra tekniska material och arkitektoniska silhuetter är designade för din bästa rörelse.",

@@ -1,11 +1,16 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { FormattedPrice } from "@/components/ui/formatted-price";
+import { ImageWithShimmer } from "@/components/ui/image-with-shimmer";
 import { Link } from "@/i18n/navigation";
-import { BOUTIQUE_FAVORITES } from "@/lib/home-data";
+import { getStorefrontBestSellers } from "@/lib/catalog/get-storefront-catalog";
 
-export async function BoutiqueFavoritesSection() {
+type BoutiqueFavoritesSectionProps = {
+  locale: string;
+};
+
+export async function BoutiqueFavoritesSection({ locale }: BoutiqueFavoritesSectionProps) {
   const t = await getTranslations("home.boutiqueFavorites");
+  const products = await getStorefrontBestSellers(locale);
 
   return (
     <section id="best-sellers" className="mx-auto max-w-[1440px] px-5 py-24 md:px-16">
@@ -14,15 +19,17 @@ export async function BoutiqueFavoritesSection() {
       </h2>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-        {BOUTIQUE_FAVORITES.map((product) => (
+        {products.map((product) => (
           <Link key={product.id} href={product.href ?? "/shop"} className="group">
             <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-lg bg-surface-container-low luxury-shadow">
-              <Image
+              <ImageWithShimmer
                 src={product.image}
                 alt={product.imageAlt}
                 fill
+                quality={85}
                 className="object-cover"
                 sizes="(max-width: 768px) 50vw, 25vw"
+                unoptimized={product.image.startsWith("http")}
               />
             </div>
             <h3 className="mb-1 text-sm font-semibold text-primary">{product.name}</h3>

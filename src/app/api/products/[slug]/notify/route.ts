@@ -1,5 +1,5 @@
 import { subscribeStockNotification } from "@/lib/waiting-list/subscribe-stock-notification";
-import { getProductBySlug } from "@/lib/shop-data";
+import { getStorefrontProductBySlug } from "@/lib/catalog/get-storefront-catalog";
 
 type NotifyRequestBody = {
   email?: string;
@@ -19,7 +19,7 @@ type RouteContext = {
  */
 export async function POST(request: Request, context: RouteContext) {
   const { slug } = await context.params;
-  const product = getProductBySlug(slug);
+  const product = await getStorefrontProductBySlug(slug, "en");
 
   if (!product) {
     return Response.json({ error: "Product not found" }, { status: 404 });

@@ -62,10 +62,13 @@
     "copyright": "© 2026 Mbody. Todos los derechos reservados."
   },
   "hero": {
+    "eyebrow": "Mbody · Ropa premium",
     "title": "El arte del rendimiento",
     "description": "Diseñado en Suecia. Creado para la atleta global. Eleva tu movimiento con precisión arquitectónica.",
     "shopNow": "Comprar ahora",
-    "imageAlt": "Atleta femenina con ropa de rendimiento minimalista en carbón"
+    "newDrops": "Novedades",
+    "scrollHint": "Desplázate para explorar",
+    "imageAlt": "Atleta en leggings sculpt carbón — ropa premium Mbody"
   },
   "home": {
     "latestDrop": {
@@ -216,6 +219,7 @@
     "inclVat": "IVA incl.",
     "limitedStock": "Stock limitado",
     "outOfStock": "Agotado",
+    "temporarilyUnavailable": "Temporalmente no disponible",
     "stockLeft": "Solo quedan {count} en tu región",
     "color": "Color",
     "selectSize": "Elegir talla",
@@ -223,6 +227,16 @@
     "addToBag": "Añadir al carrito",
     "addToWishlist": "Añadir a favoritos",
     "removeFromWishlist": "Quitar de favoritos",
+    "cart": {
+      "adding": "Añadiendo…",
+      "added": "Añadido a tu bolsa.",
+      "signInRequired": "Inicia sesión para añadir artículos a tu bolsa.",
+      "signInCta": "Iniciar sesión",
+      "profileNotFound": "Tu cuenta debe estar registrada en la tienda para usar la bolsa.",
+      "outOfStock": "Esta variante está agotada.",
+      "variantUnavailable": "Esta talla o color no está disponible.",
+      "error": "No se pudo añadir a la bolsa. Inténtalo de nuevo."
+    },
     "engagement": {
       "groupLabel": "Interacción del producto",
       "views": "{count} vistas",
@@ -265,9 +279,32 @@
   "launch": {
     "eyebrow": "Lanzamiento exclusivo",
     "title": "El drop llega pronto",
-    "description": "Nuestra colección más esperada está casi aquí. El acceso es limitado.",
-    "emailPlaceholder": "Tu correo",
+    "description": "Nuestra colección más esperada está casi aquí. El acceso es limitado y estrictamente por orden de llegada. Únete al círculo interno para aviso instantáneo.",
+    "emailPlaceholder": "TU CORREO",
+    "notify": "AVÍSAME",
+    "shopCollection": "COMPRAR LA COLECCIÓN",
+    "liveNow": "EN VIVO",
+    "success": "Estás en la lista. Te avisaremos antes del drop.",
+    "copyright": "© {year} Mbody Performance. Todos los derechos reservados.",
+    "privacy": "Política de privacidad",
+    "sustainability": "Sostenibilidad",
+    "navShop": "Tienda",
+    "navCollections": "Colecciones",
+    "navPerformance": "Rendimiento",
+    "navAbout": "Nosotros",
+    "imageAlt": "Atleta con ropa premium en retrato de estudio cinematográfico"
+  },
+  "comingSoon": {
+    "metaTitle": "Mbody — Próximamente",
+    "metaDescription": "Ropa deportiva premium para Suecia y la UE. Nuestra tienda abre pronto.",
+    "badge": "Próximamente",
+    "title": "Activewear de precisión, muy pronto",
+    "subtitle": "Mbody crea ropa de rendimiento de nueva generación para atletas exigentes — desarrollada en Europa, diseñada para el movimiento.",
+    "launchNote": "La tienda abre en",
+    "emailPlaceholder": "Tu correo electrónico",
     "notify": "Avísame",
+    "success": "Estás en la lista. Te avisaremos cuando abramos.",
+    "footer": "Suecia y UE · Diseño performance-first · Lanzamiento 2026",
     "imageAlt": "Atleta con ropa premium"
   },
   "checkout": {
@@ -314,6 +351,8 @@
   },
   "cart": {
     "title": "Tu bolsa",
+    "loading": "Cargando tu bolsa…",
+    "quantity": "Cant.",
     "back": "Volver",
     "itemsTotal": "{count} artículos en total",
     "selection": "Tu selección ({count})",
@@ -388,6 +427,8 @@
       "crew-socks": { "name": "Flow Crew Socks" }
     },
     "empty": {
+      "message": "Tu bolsa está vacía.",
+      "continueShopping": "Seguir comprando",
       "title": "Tu bolsa está vacía.",
       "titleMobile": "Tu bolsa está vacía",
       "description": "Explora nuestras últimas colecciones de performance para encontrar tu próxima pieza favorita. Nuestros tejidos técnicos y siluetas arquitectónicas están diseñados para tu máximo rendimiento.",

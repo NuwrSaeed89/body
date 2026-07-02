@@ -62,10 +62,13 @@
     "copyright": "© 2026 Mbody. All rights reserved."
   },
   "hero": {
+    "eyebrow": "Mbody · Premium Activewear",
     "title": "The Art of Performance",
     "description": "Designed in Sweden. Crafted for the global athlete. Elevate your movement with architectural precision.",
     "shopNow": "Shop Now",
-    "imageAlt": "Female athlete in minimalist charcoal performance wear"
+    "newDrops": "New Drops",
+    "scrollHint": "Scroll to explore",
+    "imageAlt": "Athlete in charcoal sculpt leggings — Mbody premium performance wear"
   },
   "home": {
     "latestDrop": {
@@ -222,6 +225,7 @@
     "inclVat": "Incl. VAT",
     "limitedStock": "Limited Stock",
     "outOfStock": "Out of Stock",
+    "temporarilyUnavailable": "Temporarily unavailable",
     "stockLeft": "Only {count} left in your region",
     "color": "Color",
     "selectSize": "Select Size",
@@ -229,6 +233,16 @@
     "addToBag": "Add to Bag",
     "addToWishlist": "Add to Wishlist",
     "removeFromWishlist": "Remove from Wishlist",
+    "cart": {
+      "adding": "Adding…",
+      "added": "Added to your bag.",
+      "signInRequired": "Sign in to add items to your bag.",
+      "signInCta": "Sign in",
+      "profileNotFound": "Your account must be registered in the store to use the bag.",
+      "outOfStock": "This variant is out of stock.",
+      "variantUnavailable": "This size or color is not available.",
+      "error": "Could not add to bag. Please try again."
+    },
     "engagement": {
       "groupLabel": "Product engagement",
       "views": "{count} views",
@@ -271,9 +285,32 @@
   "launch": {
     "eyebrow": "Exclusive Seasonal Release",
     "title": "The Drop Goes Live Soon",
-    "description": "Our most anticipated performance collection is almost here. Access is limited and strictly on a first-come basis.",
-    "emailPlaceholder": "Enter your email",
+    "description": "Our most anticipated performance collection is almost here. Access is limited and strictly on a first-come basis. Join the inner circle for instant notification.",
+    "emailPlaceholder": "ENTER YOUR EMAIL",
+    "notify": "NOTIFY ME",
+    "shopCollection": "SHOP THE COLLECTION",
+    "liveNow": "LIVE NOW",
+    "success": "You're on the list. We'll be in touch before the drop.",
+    "copyright": "© {year} Mbody Performance. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "sustainability": "Sustainability",
+    "navShop": "Shop",
+    "navCollections": "Collections",
+    "navPerformance": "Performance",
+    "navAbout": "About",
+    "imageAlt": "A high-end cinematic studio portrait of a professional female fitness model in premium charcoal athletic apparel"
+  },
+  "comingSoon": {
+    "metaTitle": "Mbody — Coming Soon",
+    "metaDescription": "Premium performance activewear for Sweden and the EU. Our store opens soon.",
+    "badge": "Coming Soon",
+    "title": "Precision Activewear, Arriving Soon",
+    "subtitle": "Mbody is building next-generation performance wear for athletes who expect more — engineered in Europe, designed for movement.",
+    "launchNote": "The store opens in",
+    "emailPlaceholder": "Your email address",
     "notify": "Notify Me",
+    "success": "You're on the list. We'll email you when we open.",
+    "footer": "Sweden & EU · Performance-first design · Launching 2026",
     "imageAlt": "Athlete in premium charcoal performance gear"
   },
   "checkout": {
@@ -320,6 +357,8 @@
   },
   "cart": {
     "title": "Your Bag",
+    "loading": "Loading your bag…",
+    "quantity": "Qty",
     "back": "Go back",
     "itemsTotal": "{count} Items total",
     "selection": "Your Selection ({count})",
@@ -394,6 +433,8 @@
       "crew-socks": { "name": "Flow Crew Socks" }
     },
     "empty": {
+      "message": "Your bag is empty.",
+      "continueShopping": "Continue shopping",
       "title": "Your bag is currently empty.",
       "titleMobile": "Your bag is empty",
       "description": "Explore our latest performance collections to find your next favorite piece. Our technical fabrics and architectural silhouettes are designed for your peak motion.",

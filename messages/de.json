@@ -62,10 +62,13 @@
     "copyright": "© 2026 Mbody. Alle Rechte vorbehalten."
   },
   "hero": {
+    "eyebrow": "Mbody · Premium Activewear",
     "title": "Die Kunst der Performance",
     "description": "In Schweden designt. Für die globale Athletin gemacht. Hebe deine Bewegung mit architektonischer Präzision.",
     "shopNow": "Jetzt shoppen",
-    "imageAlt": "Sportlerin in minimalistischer Anthrazit-Performance-Bekleidung"
+    "newDrops": "Neue Drops",
+    "scrollHint": "Scrollen zum Entdecken",
+    "imageAlt": "Athletin in Anthrazit Sculpt Leggings — Mbody Premium Activewear"
   },
   "home": {
     "latestDrop": {
@@ -216,6 +219,7 @@
     "inclVat": "inkl. MwSt.",
     "limitedStock": "Limitierter Bestand",
     "outOfStock": "Nicht auf Lager",
+    "temporarilyUnavailable": "Vorübergehend nicht verfügbar",
     "stockLeft": "Nur noch {count} in deiner Region",
     "color": "Farbe",
     "selectSize": "Größe wählen",
@@ -223,6 +227,16 @@
     "addToBag": "In den Warenkorb",
     "addToWishlist": "Auf die Wunschliste",
     "removeFromWishlist": "Von Wunschliste entfernen",
+    "cart": {
+      "adding": "Wird hinzugefügt…",
+      "added": "Zur Tasche hinzugefügt.",
+      "signInRequired": "Melde dich an, um Artikel in die Tasche zu legen.",
+      "signInCta": "Anmelden",
+      "profileNotFound": "Dein Konto muss im Shop registriert sein, um die Tasche zu nutzen.",
+      "outOfStock": "Diese Variante ist ausverkauft.",
+      "variantUnavailable": "Diese Größe oder Farbe ist nicht verfügbar.",
+      "error": "Konnte nicht zur Tasche hinzugefügt werden. Bitte erneut versuchen."
+    },
     "engagement": {
       "groupLabel": "Produkt-Engagement",
       "views": "{count} Aufrufe",
@@ -265,9 +279,32 @@
   "launch": {
     "eyebrow": "Exklusives Saison-Release",
     "title": "Der Drop startet bald",
-    "description": "Unsere meisterwartete Kollektion ist fast da. Zugang ist limitiert.",
-    "emailPlaceholder": "E-Mail eingeben",
+    "description": "Unsere meisterwartete Kollektion ist fast da. Der Zugang ist limitiert und streng nach dem Prinzip first-come. Werde Teil des Inner Circle für sofortige Benachrichtigung.",
+    "emailPlaceholder": "DEINE E-MAIL",
+    "notify": "BENACHRICHTIGEN",
+    "shopCollection": "KOLLEKTION SHOPPEN",
+    "liveNow": "JETZT LIVE",
+    "success": "Du stehst auf der Liste. Wir melden uns vor dem Drop.",
+    "copyright": "© {year} Mbody Performance. Alle Rechte vorbehalten.",
+    "privacy": "Datenschutz",
+    "sustainability": "Nachhaltigkeit",
+    "navShop": "Shop",
+    "navCollections": "Kollektionen",
+    "navPerformance": "Performance",
+    "navAbout": "Über uns",
+    "imageAlt": "Sportlerin in Premium-Activewear im cinematischen Studio-Portrait"
+  },
+  "comingSoon": {
+    "metaTitle": "Mbody — Demnächst",
+    "metaDescription": "Premium-Activewear für Schweden und die EU. Unser Shop öffnet bald.",
+    "badge": "Demnächst",
+    "title": "Precision Activewear — bald verfügbar",
+    "subtitle": "Mbody entwickelt Performance-Wear der nächsten Generation für Athleten mit hohen Ansprüchen — entwickelt in Europa, designed für Bewegung.",
+    "launchNote": "Der Shop öffnet in",
+    "emailPlaceholder": "Deine E-Mail-Adresse",
     "notify": "Benachrichtigen",
+    "success": "Du stehst auf der Liste. Wir melden uns zum Start.",
+    "footer": "Schweden & EU · Performance-first Design · Start 2026",
     "imageAlt": "Sportlerin in Premium-Activewear"
   },
   "checkout": {
@@ -314,6 +351,8 @@
   },
   "cart": {
     "title": "Deine Tasche",
+    "loading": "Tasche wird geladen…",
+    "quantity": "Menge",
     "back": "Zurück",
     "itemsTotal": "{count} Artikel gesamt",
     "selection": "Deine Auswahl ({count})",
@@ -388,6 +427,8 @@
       "crew-socks": { "name": "Flow Crew Socks" }
     },
     "empty": {
+      "message": "Deine Tasche ist leer.",
+      "continueShopping": "Weiter einkaufen",
       "title": "Deine Tasche ist derzeit leer.",
       "titleMobile": "Deine Tasche ist leer",
       "description": "Entdecke unsere neuesten Performance-Kollektionen für dein nächstes Lieblingsstück. Unsere technischen Stoffe und architektonischen Silhouetten sind für deine Bewegung gemacht.",

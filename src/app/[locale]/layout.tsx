@@ -8,6 +8,7 @@ import { CURRENCY_COOKIE, parseCurrency } from "@/lib/currency";
 import { CurrencyProvider } from "@/providers/currency-provider";
 import { CookieConsentProvider } from "@/providers/cookie-consent-provider";
 import { AuthProvider } from "@/providers/auth-provider";
+import { CartProvider } from "@/providers/cart-provider";
 import { WishlistProvider } from "@/providers/wishlist-provider";
 import { SkipLink } from "@/components/a11y/skip-link";
 import { MobileLayoutShell } from "@/components/layout/mobile-layout-shell";
@@ -81,11 +82,13 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <CurrencyProvider initialCurrency={initialCurrency}>
             <AuthProvider>
-              <WishlistProvider>
-                <CookieConsentProvider>
-                  <MobileLayoutShell>{children}</MobileLayoutShell>
-                </CookieConsentProvider>
-              </WishlistProvider>
+              <CartProvider>
+                <WishlistProvider>
+                  <CookieConsentProvider>
+                    <MobileLayoutShell>{children}</MobileLayoutShell>
+                  </CookieConsentProvider>
+                </WishlistProvider>
+              </CartProvider>
             </AuthProvider>
           </CurrencyProvider>
         </NextIntlClientProvider>

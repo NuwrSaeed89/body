@@ -15,6 +15,7 @@ type NotifyWhenBackFormProps = {
   slug: string;
   size?: string | null;
   color?: string | null;
+  variantId?: string | null;
   variant?: "compact" | "panel";
   className?: string;
 };
@@ -24,13 +25,16 @@ export function NotifyWhenBackForm({
   slug,
   size = null,
   color = null,
+  variantId: variantIdProp = null,
   variant = "panel",
   className = "",
 }: NotifyWhenBackFormProps) {
   const t = useTranslations("stockNotify");
   const { user } = useAuth();
   const emailId = useId();
-  const variantId = buildVariantKey({ productId, size, color });
+  const variantId =
+    variantIdProp?.trim() ||
+    buildVariantKey({ productId, size, color });
 
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");

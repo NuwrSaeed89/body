@@ -6,7 +6,7 @@ import { ShopMobileHeader } from "@/components/shop/shop-mobile-header";
 import { ShopPageContent } from "@/components/shop/shop-page-content";
 import { PageContainer } from "@/components/ui/page-container";
 import { Link } from "@/i18n/navigation";
-import { SHOP_PRODUCTS } from "@/lib/shop-data";
+import { getStorefrontProducts } from "@/lib/catalog/get-storefront-catalog";
 
 type ShopPageProps = {
   params: Promise<{ locale: string }>;
@@ -16,6 +16,7 @@ export default async function ShopPage({ params }: ShopPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("shop");
+  const products = await getStorefrontProducts(locale);
 
   return (
     <>
@@ -32,7 +33,7 @@ export default async function ShopPage({ params }: ShopPageProps) {
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <span className="text-primary">{t("breadcrumb.shop")}</span>
         </nav>
-        <ShopPageContent products={SHOP_PRODUCTS} />
+        <ShopPageContent products={products} />
       </PageContainer>
 
       <div className="hidden md:block">

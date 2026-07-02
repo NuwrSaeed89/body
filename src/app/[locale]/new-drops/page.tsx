@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProductSection } from "@/components/home/product-section";
 import { PageContainer } from "@/components/ui/page-container";
-import { NEW_DROPS } from "@/lib/home-data";
+import { getStorefrontNewDropsGrid } from "@/lib/catalog/get-storefront-catalog";
 
 type NewDropsPageProps = {
   params: Promise<{ locale: string }>;
@@ -14,6 +14,7 @@ export default async function NewDropsPage({ params }: NewDropsPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("newDrops");
+  const products = await getStorefrontNewDropsGrid(locale);
 
   return (
     <>
@@ -35,7 +36,7 @@ export default async function NewDropsPage({ params }: NewDropsPageProps) {
           id="new-drops-grid"
           titleKey="home.latestDrop.title"
           descriptionKey="home.latestDrop.description"
-          products={NEW_DROPS}
+          products={products}
           ctaLabelKey="home.latestDrop.cta"
           layout="bento"
         />

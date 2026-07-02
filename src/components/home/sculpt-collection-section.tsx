@@ -1,11 +1,15 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { SCULPT_COLLECTION } from "@/lib/home-data";
+import { getStorefrontSculptCollection } from "@/lib/catalog/get-storefront-catalog";
 
-export async function SculptCollectionSection() {
+type SculptCollectionSectionProps = {
+  locale: string;
+};
+
+export async function SculptCollectionSection({ locale }: SculptCollectionSectionProps) {
   const t = await getTranslations("home.sculptCollection");
-  const collection = SCULPT_COLLECTION;
+  const collection = await getStorefrontSculptCollection(locale);
 
   return (
     <section className="bg-surface-container-low py-24">
@@ -21,6 +25,7 @@ export async function SculptCollectionSection() {
               fill
               className="object-cover transition-transform duration-1000 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, 66vw"
+              unoptimized={collection.image.startsWith("http")}
             />
             <div className="absolute bottom-8 left-5 text-white md:bottom-12 md:left-12">
               <h2 className="mb-4 max-w-md text-[32px] font-medium leading-[1.2] tracking-tight md:text-5xl md:leading-[1.1]">
@@ -59,6 +64,7 @@ export async function SculptCollectionSection() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 33vw"
+                unoptimized={collection.fabricImage.startsWith("http")}
               />
             </div>
           </div>

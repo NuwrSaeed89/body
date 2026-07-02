@@ -2,7 +2,7 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { FormattedPrice } from "@/components/ui/formatted-price";
 import { Link } from "@/i18n/navigation";
-import { PREMIUM_COLLECTION_EDITORIAL } from "@/lib/home-data";
+import { getStorefrontPremiumEditorial } from "@/lib/catalog/get-storefront-catalog";
 
 const aspectClass = {
   "3/4": "aspect-[3/4]",
@@ -11,8 +11,13 @@ const aspectClass = {
   "16/9": "aspect-[16/9]",
 } as const;
 
-export async function PremiumCollectionSection() {
+type PremiumCollectionSectionProps = {
+  locale: string;
+};
+
+export async function PremiumCollectionSection({ locale }: PremiumCollectionSectionProps) {
   const t = await getTranslations("home.premiumCollection");
+  const columns = await getStorefrontPremiumEditorial(locale);
 
   return (
     <section id="collections" className="bg-background py-24">
@@ -29,7 +34,7 @@ export async function PremiumCollectionSection() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {PREMIUM_COLLECTION_EDITORIAL.columns.map((column) => (
+          {columns.map((column) => (
             <div key={column.product.id} className="flex flex-col gap-6">
               <Link href={column.product.href ?? "/shop"} className="group cursor-pointer">
                 <div
@@ -41,6 +46,7 @@ export async function PremiumCollectionSection() {
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     sizes="(max-width: 768px) 100vw, 50vw"
+                    unoptimized={column.product.image.startsWith("http")}
                   />
                   <span className="absolute bottom-4 left-4 right-4 translate-y-4 rounded-lg bg-white/90 py-3 text-center text-xs font-semibold uppercase tracking-[0.1em] text-primary opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                     {t("viewProduct")}
@@ -63,6 +69,7 @@ export async function PremiumCollectionSection() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
+                  unoptimized={column.tile.image.startsWith("http")}
                 />
                 {column.tile.labelKey && (
                   <div className="absolute bottom-4 left-4 rounded bg-white/80 px-3 py-1 backdrop-blur-sm">

@@ -34,8 +34,12 @@ export type Product = {
   colSpan?: "feature" | "default";
 };
 
-export const HERO_IMAGE =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuDwruB1y1uBWIFYtkB7Fx_yKve7ln51ZL0y5dQQRIo1i-e7wkS-OIDcjLL-gdY7XgHmKO_ISYyaTF06txdWz8sXgUlmo2jv5S0D1aoJzn27q9YC_qy3e911r1pupxULgvAl0OklwsLsAmIszufuPGMNU47sp0Pud9nQYdLHOESxpQBdZE4pEqwhz2UZ4MxKl01qsm_P2z4RrAM1MOMFV-QpEplibGvi6HhpKTW7aX_ZAKF9b7hmKl9uTQIpmwR_7pF0ZwgTPScMCDU";
+/** Launch / homepage hero — local asset (avoids Google CDN timeouts in `/_next/image`). */
+export const HERO_IMAGE = "/images/home-hero.jpg";
+
+/** Subtle film grain for launch / coming-soon overlay. */
+export const LAUNCH_GRAIN_TEXTURE =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuCvm0RCHHzWUXUGywBVafY4FL-zrJUBDTCCA4ZgzKufkHkoD0UHinghgQdyaq3jhr3hAcMvmoqq6m0AsY5AHk2E2WQKHOT_bK8KtO66SgEM4XGFxDrMpvxGC1jhSQAupKzjXjWOf-OISBqDnfhuUpA9uKbG1d0MbLasx84yuVH15ytp4UwgT5Y3HoPtPN4G2yfSETG1al36bTxfnylE1yYMHX-qZVf3jimPpZK66Zf5FkXQ8UnTWr4dSB9hGhD4FEPnJFUNz9C01dY";
 
 export const HERO_IMAGE_DESKTOP = HERO_IMAGE;
 
@@ -367,5 +371,7 @@ export const BEST_SELLERS: Product[] = BOUTIQUE_FAVORITES.map((p) => ({
   href: p.href,
 }));
 
+import { LAUNCH_AT_ISO } from "./launch-config";
+
 /** Fixed drop target so server and client share the same countdown anchor. */
-export const DROP_TARGET_ISO = "2026-06-28T18:00:00.000Z";
+export const DROP_TARGET_ISO = LAUNCH_AT_ISO;

@@ -1,34 +1,62 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProductGallery } from "@/components/pdp/product-gallery";
-import {
-  ProductPurchasePanel,
-  ProductStickyBar,
-} from "@/components/pdp/product-purchase-panel";
+import { ProductPurchasePanel } from "@/components/pdp/product-purchase-panel";
 import { PageContainer } from "@/components/ui/page-container";
 import { Link } from "@/i18n/navigation";
+import {
+  getStorefrontProductBySlug,
+  getStorefrontProductSlugs,
+} from "@/lib/catalog/get-storefront-catalog";
 import { getProductRatingState } from "@/lib/product-ratings/get-product-rating-state";
-import { getAllProductSlugs, getProductBySlug } from "@/lib/shop-data";
+
+export const dynamic = "force-dynamic";
 
 type ProductPageProps = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
-export function generateStaticParams() {
-  return getAllProductSlugs().map((slug) => ({ slug }));
+export async function generateStaticParams() {
+  const slugs = await getStorefrontProductSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const product = await getStorefrontProductBySlug(slug, locale);
+
+  if (!product) {
+    return { title: "Product not found | Mbody" };
+  }
+
+  const description =
+    product.description.length > 160
+      ? `${product.description.slice(0, 157)}…`
+      : product.description;
+
+  return {
+    title: `${product.name} | Mbody`,
+    description,
+    openGraph: {
+      title: product.name,
+      description,
+      images: product.images[0]?.src ? [{ url: product.images[0].src }] : undefined,
+    },
+  };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
-  const product = getProductBySlug(slug);
+  const product = await getStorefrontProductBySlug(slug, locale);
   if (!product) notFound();
 
   const t = await getTranslations("pdp");
-  const ratingState = getProductRatingState(slug);
+  const ratingState = await getProductRatingState(slug, undefined, product.id);
   const initialRatingSummary = ratingState?.summary;
 
   return (
@@ -55,7 +83,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
           />
         </div>
       </PageContainer>
-      <ProductStickyBar product={product} />
       <SiteFooter />
     </>
   );

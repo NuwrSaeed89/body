@@ -15,10 +15,14 @@ export function isValidStarRating(stars: number): boolean {
 export async function submitProductRating(
   input: SubmitProductRatingInput,
 ): Promise<SubmitProductRatingResult> {
-  const product = getProductBySlug(input.slug);
   const summary = getProductRatingSummary(input.productId);
+  const mockProduct = getProductBySlug(input.slug);
 
-  if (!product || product.id !== input.productId) {
+  if (mockProduct && mockProduct.id !== input.productId) {
+    return { ok: false, error: "product_not_found", summary };
+  }
+
+  if (!input.productId?.trim()) {
     return { ok: false, error: "product_not_found", summary };
   }
 

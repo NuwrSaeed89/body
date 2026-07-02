@@ -29,8 +29,17 @@ export async function subscribeStockNotification(
     };
   }
 
-  const product = getProductBySlug(input.slug);
-  if (!product || product.id !== input.productId) {
+  const mockProduct = getProductBySlug(input.slug);
+  if (mockProduct && mockProduct.id !== input.productId) {
+    return {
+      ok: false,
+      alreadySubscribed: false,
+      waitingCount: 0,
+      error: "product_not_found",
+    };
+  }
+
+  if (!input.productId?.trim()) {
     return {
       ok: false,
       alreadySubscribed: false,
@@ -59,7 +68,7 @@ export async function subscribeStockNotification(
     });
 
     const waitingCount = countWaitingForProduct(input.productId);
-    const baseWaiting = product.stats.waitingCount;
+    const baseWaiting = mockProduct?.stats.waitingCount ?? 0;
     const displayCount = Math.max(baseWaiting, waitingCount);
 
     return {
@@ -75,7 +84,7 @@ export async function subscribeStockNotification(
   return {
     ok: false,
     alreadySubscribed: false,
-    waitingCount: product.stats.waitingCount,
+    waitingCount: mockProduct?.stats.waitingCount ?? 0,
     error: "supabase_not_wired",
   };
 }

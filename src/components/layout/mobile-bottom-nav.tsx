@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useAuth } from "@/providers/auth-provider";
+import { isComingSoonActive } from "@/lib/launch-config";
 
 const NAV_ITEMS = [
   {
@@ -36,6 +37,7 @@ const NAV_ITEMS = [
 export const MOBILE_NAV_HEIGHT = 72;
 
 export function shouldHideMobileBottomNav(pathname: string) {
+  if (isComingSoonActive() && pathname === "/") return true;
   return (
     pathname.startsWith("/admin") ||
     pathname.startsWith("/checkout") ||

@@ -2,11 +2,15 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { FormattedPrice } from "@/components/ui/formatted-price";
 import { Link } from "@/i18n/navigation";
-import { COMPLETE_THE_LOOK } from "@/lib/home-data";
+import { getStorefrontCompleteTheLook } from "@/lib/catalog/get-storefront-catalog";
 
-export async function CompleteTheLookSection() {
+type CompleteTheLookSectionProps = {
+  locale: string;
+};
+
+export async function CompleteTheLookSection({ locale }: CompleteTheLookSectionProps) {
   const t = await getTranslations("completeTheLook");
-  const look = COMPLETE_THE_LOOK;
+  const look = await getStorefrontCompleteTheLook(locale);
 
   return (
     <section className="border-y border-outline-variant/20 bg-white py-24">
@@ -15,10 +19,11 @@ export async function CompleteTheLookSection() {
           <div className="relative aspect-[3/4] overflow-hidden rounded-lg luxury-shadow">
             <Image
               src={look.image}
-              alt={t("imageAlt")}
+              alt={look.imageAlt}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 50vw"
+              unoptimized={look.image.startsWith("http")}
             />
           </div>
 
@@ -46,6 +51,7 @@ export async function CompleteTheLookSection() {
                         fill
                         className="object-cover"
                         sizes="80px"
+                        unoptimized={item.image.startsWith("http")}
                       />
                     </div>
                     <div className="flex-1">

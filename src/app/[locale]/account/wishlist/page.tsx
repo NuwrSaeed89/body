@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { PageContainer } from "@/components/ui/page-container";
 import { WishlistPageContent } from "@/components/wishlist/wishlist-page-content";
+import { getStorefrontProducts } from "@/lib/catalog/get-storefront-catalog";
 
 type WishlistPageProps = {
   params: Promise<{ locale: string }>;
@@ -26,6 +27,7 @@ export default async function WishlistPage({ params }: WishlistPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("wishlist");
+  const catalog = await getStorefrontProducts(locale);
 
   return (
     <>
@@ -34,7 +36,7 @@ export default async function WishlistPage({ params }: WishlistPageProps) {
         <h1 className="mb-8 text-2xl font-medium text-primary md:text-4xl">
           {t("title")}
         </h1>
-        <WishlistPageContent />
+        <WishlistPageContent catalog={catalog} />
       </PageContainer>
       <SiteFooter />
     </>
