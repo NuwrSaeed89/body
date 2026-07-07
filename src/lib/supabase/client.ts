@@ -1,7 +1,11 @@
 "use client";
 
 import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { hasSupabaseConfig, publicEnv } from "@/lib/env";
+import { supabaseBrowserAuthOptions } from "@/lib/supabase/ssr-options";
+
+let browserClient: SupabaseClient | null = null;
 
 export function createSupabaseBrowserClient() {
   if (!hasSupabaseConfig()) {
@@ -10,5 +14,13 @@ export function createSupabaseBrowserClient() {
     );
   }
 
-  return createBrowserClient(publicEnv.supabaseUrl, publicEnv.supabaseAnonKey);
+  if (!browserClient) {
+    browserClient = createBrowserClient(
+      publicEnv.supabaseUrl,
+      publicEnv.supabaseAnonKey,
+      supabaseBrowserAuthOptions,
+    );
+  }
+
+  return browserClient;
 }

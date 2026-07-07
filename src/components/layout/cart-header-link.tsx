@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { shouldUseCartMock } from "@/lib/cart/should-use-cart-mock";
 import { useAuth } from "@/providers/auth-provider";
 import { useCart } from "@/providers/cart-provider";
 
@@ -22,7 +23,7 @@ export function CartHeaderLink({
   const { itemCount, mounted: cartMounted } = useCart();
 
   const ready = authMounted && cartMounted;
-  const showBadge = ready && isAuthenticated && itemCount > 0;
+  const showBadge = ready && itemCount > 0 && (isAuthenticated || !shouldUseCartMock());
   const badgeLabel = itemCount > 9 ? "9+" : String(itemCount);
 
   return (

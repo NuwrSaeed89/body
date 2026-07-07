@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { LocaleHtmlAttributes } from "@/components/i18n/locale-html-attributes";
 import { CURRENCY_COOKIE, parseCurrency } from "@/lib/currency";
 import { CurrencyProvider } from "@/providers/currency-provider";
 import { CookieConsentProvider } from "@/providers/cookie-consent-provider";
@@ -14,13 +14,6 @@ import { SkipLink } from "@/components/a11y/skip-link";
 import { MobileLayoutShell } from "@/components/layout/mobile-layout-shell";
 import { routing } from "@/i18n/routing";
 import { publicEnv } from "@/lib/env";
-import "../globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 type LocaleLayoutProps = {
   children: React.ReactNode;
@@ -62,37 +55,20 @@ export default async function LocaleLayout({
   const initialCurrency = parseCurrency(cookieStore.get(CURRENCY_COOKIE)?.value);
 
   return (
-    <html
-      lang={locale}
-      className={`${inter.variable} h-full scroll-smooth`}
-      data-scroll-behavior="smooth"
-      suppressHydrationWarning
-    >
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0"
-          rel="stylesheet"
-        />
-      </head>
-      <body
-        className="min-h-full bg-surface text-on-surface antialiased"
-        suppressHydrationWarning
-      >
-        <SkipLink />
-        <NextIntlClientProvider messages={messages}>
-          <CurrencyProvider initialCurrency={initialCurrency}>
-            <AuthProvider>
-              <CartProvider>
-                <WishlistProvider>
-                  <CookieConsentProvider>
-                    <MobileLayoutShell>{children}</MobileLayoutShell>
-                  </CookieConsentProvider>
-                </WishlistProvider>
-              </CartProvider>
-            </AuthProvider>
-          </CurrencyProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      <LocaleHtmlAttributes />
+      <CurrencyProvider initialCurrency={initialCurrency}>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <CookieConsentProvider>
+                <SkipLink />
+                <MobileLayoutShell>{children}</MobileLayoutShell>
+              </CookieConsentProvider>
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
+      </CurrencyProvider>
+    </NextIntlClientProvider>
   );
 }

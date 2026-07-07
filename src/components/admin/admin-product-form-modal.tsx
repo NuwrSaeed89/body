@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { AdminCategoryOption } from "@/lib/admin/categories/types";
 import type { ProductStatus } from "@/lib/admin/products/constants";
 import { slugifyProductName } from "@/lib/admin/products/slug";
@@ -10,6 +10,8 @@ import {
   adminFieldClassName,
   adminLabelClassName,
 } from "./admin-form-styles";
+import { AdminProductModelUpload } from "./admin-product-model-upload";
+import type { ProductModelChangePayload } from "./admin-product-model-upload";
 
 export type ProductFormValues = {
   slug: string;
@@ -32,6 +34,9 @@ type AdminProductFormModalProps = {
   categories: AdminCategoryOption[];
   initial?: ProductDetail | null;
   imageUrl?: string | null;
+  modelGlbUrl?: string | null;
+  modelFileName?: string | null;
+  canMutate?: boolean;
   onClose: () => void;
   onSaved: () => void;
 };
@@ -69,37 +74,62 @@ function toFormValues(product?: ProductDetail | null): ProductFormValues {
 
 export function AdminProductFormModal({
   open,
-  mode,
+  mode: modeProp,
   locale,
   categories,
   initial,
   imageUrl,
+  modelGlbUrl,
+  modelFileName,
+  canMutate = true,
   onClose,
   onSaved,
 }: AdminProductFormModalProps) {
   const [form, setForm] = useState<ProductFormValues>(EMPTY_FORM);
+  const [mode, setMode] = useState<"create" | "edit">(modeProp);
+  const [activeProduct, setActiveProduct] = useState<ProductDetail | null>(initial ?? null);
+  const [activeModelUrl, setActiveModelUrl] = useState<string | null>(modelGlbUrl ?? null);
+  const [activeModelFileName, setActiveModelFileName] = useState<string | null>(
+    modelFileName ?? null,
+  );
   const [slugTouched, setSlugTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
+  const [modelUploading, setModelUploading] = useState(false);
 
   useEffect(() => {
     if (!open) return;
+    setMode(modeProp);
+    setActiveProduct(initial ?? null);
+    setActiveModelUrl(modelGlbUrl ?? null);
+    setActiveModelFileName(modelFileName ?? null);
     setForm(toFormValues(initial));
-    setSlugTouched(mode === "edit");
+    setSlugTouched(modeProp === "edit");
     setError(null);
     requestAnimationFrame(() => setVisible(true));
-  }, [open, initial, mode]);
+  }, [open, initial, modeProp, modelGlbUrl, modelFileName]);
 
   useEffect(() => {
     if (open) return;
     setVisible(false);
+    setModelUploading(false);
   }, [open]);
+
+  const requestClose = useCallback(() => {
+    if (modelUploading) {
+      const confirmed = window.confirm(
+        "3D model upload is in progress. Cancel the upload and close?",
+      );
+      if (!confirmed) return;
+    }
+    onClose();
+  }, [modelUploading, onClose]);
 
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") requestClose();
     };
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKeyDown);
@@ -107,7 +137,7 @@ export function AdminProductFormModal({
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [open, onClose]);
+  }, [open, requestClose]);
 
   if (!open) return null;
 
@@ -143,7 +173,9 @@ export function AdminProductFormModal({
     };
 
     const url =
-      mode === "create" ? "/api/admin/products" : `/api/admin/products/${initial?.id}`;
+      mode === "create"
+        ? "/api/admin/products"
+        : `/api/admin/products/${activeProduct?.id ?? initial?.id}`;
     const method = mode === "create" ? "POST" : "PATCH";
 
     try {
@@ -152,12 +184,22 @@ export function AdminProductFormModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const body = (await response.json()) as { error?: string };
+      const body = (await response.json()) as { error?: string; product?: ProductDetail };
       if (!response.ok) {
         setError(body.error ?? "Save failed");
         return;
       }
+
       onSaved();
+
+      if (mode === "create" && body.product) {
+        setMode("edit");
+        setActiveProduct(body.product);
+        setForm(toFormValues(body.product));
+        setSlugTouched(true);
+        return;
+      }
+
       onClose();
     } catch {
       setError("Network error — could not save product");
@@ -167,13 +209,26 @@ export function AdminProductFormModal({
   };
 
   const title = mode === "create" ? "Add Product" : "Product Details";
+  const productId = activeProduct?.id ?? initial?.id ?? null;
+  const productSlug = form.slug;
+
+  const handleModelChange = (model: ProductModelChangePayload) => {
+    if (model) {
+      setActiveModelUrl(model.publicUrl);
+      setActiveModelFileName(model.fileName);
+    } else {
+      setActiveModelUrl(null);
+      setActiveModelFileName(null);
+    }
+    onSaved();
+  };
 
   return (
     <div className="fixed inset-0 z-[60]" role="presentation">
       <button
         type="button"
         aria-label="Close product drawer"
-        onClick={onClose}
+        onClick={requestClose}
         className={`absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity duration-300 ${
           visible ? "opacity-100" : "opacity-0"
         }`}
@@ -192,7 +247,7 @@ export function AdminProductFormModal({
           </h3>
           <button
             type="button"
-            onClick={onClose}
+            onClick={requestClose}
             className="material-symbols-outlined rounded-full p-2 transition-colors hover:bg-surface-container"
             aria-label="Close"
           >
@@ -311,6 +366,16 @@ export function AdminProductFormModal({
               </p>
             </div>
 
+            <AdminProductModelUpload
+              productId={productId}
+              productSlug={productSlug}
+              modelUrl={activeModelUrl}
+              modelFileName={activeModelFileName}
+              disabled={!canMutate}
+              onModelChange={handleModelChange}
+              onUploadingChange={setModelUploading}
+            />
+
             <div className="space-y-4">
               <h4 className="text-xs font-semibold uppercase tracking-[0.1em] text-primary">
                 Inventory &amp; Variants
@@ -384,7 +449,7 @@ export function AdminProductFormModal({
             </button>
             <button
               type="button"
-              onClick={onClose}
+              onClick={requestClose}
               disabled={submitting}
               className="flex-1 rounded-lg border border-outline-variant py-3 text-xs font-semibold uppercase tracking-[0.1em] transition-colors hover:bg-surface-container disabled:opacity-60"
             >

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ShopGridCard } from "@/components/shop/shop-grid-card";
@@ -12,19 +12,67 @@ import {
 import type { ShopCategory, ShopProduct } from "@/lib/shop-data";
 
 type ShopPageContentProps = {
+  locale: string;
   products: ShopProduct[];
 };
 
-export function ShopPageContent({ products }: ShopPageContentProps) {
+function buildProductsUrl(locale: string, category: ShopCategory, sort: string): string {
+  const params = new URLSearchParams({ locale, sort });
+  if (category !== "all") {
+    params.set("category", category);
+  }
+  return `/api/products?${params.toString()}`;
+}
+
+export function ShopPageContent({ locale, products }: ShopPageContentProps) {
   const t = useTranslations("shop");
   const [category, setCategory] = useState<ShopCategory>("all");
   const [filterOpen, setFilterOpen] = useState(false);
   const [sort, setSort] = useState("newest");
+  const [displayedProducts, setDisplayedProducts] = useState(products);
+  const [loading, setLoading] = useState(false);
 
-  const filtered = useMemo(() => {
-    if (category === "all") return products;
-    return products.filter((p) => p.category === category);
-  }, [category, products]);
+  useEffect(() => {
+    setDisplayedProducts(products);
+  }, [products]);
+
+  useEffect(() => {
+    if (category === "all" && sort === "newest") {
+      setDisplayedProducts(products);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    async function loadProducts() {
+      setLoading(true);
+      try {
+        const response = await fetch(buildProductsUrl(locale, category, sort), {
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          throw new Error("Failed to load products");
+        }
+        const data = (await response.json()) as { items: ShopProduct[] };
+        setDisplayedProducts(data.items);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        console.error("[shop] product fetch failed:", error);
+        const fallback =
+          category === "all"
+            ? products
+            : products.filter((product) => product.category === category);
+        setDisplayedProducts(fallback);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadProducts();
+    return () => controller.abort();
+  }, [category, sort, locale, products]);
 
   return (
     <>
@@ -62,12 +110,12 @@ export function ShopPageContent({ products }: ShopPageContentProps) {
             </span>
           </button>
           <span className="text-xs font-semibold uppercase tracking-[0.1em] text-on-surface-variant">
-            {t("itemCount", { count: filtered.length })}
+            {loading ? "…" : t("itemCount", { count: displayedProducts.length })}
           </span>
         </section>
 
         <section className="grid grid-cols-2 gap-x-4 gap-y-8 px-5 pb-32">
-          {filtered.map((product) => (
+          {displayedProducts.map((product) => (
             <ShopGridCard key={product.id} product={product} />
           ))}
         </section>
@@ -102,10 +150,10 @@ export function ShopPageContent({ products }: ShopPageContentProps) {
           <ShopSidebarFilters />
           <div className="min-w-0 flex-1">
             <p className="mb-6 text-xs font-semibold uppercase tracking-[0.1em] text-on-surface-variant">
-              {t("itemCount", { count: filtered.length })}
+              {loading ? "…" : t("itemCount", { count: displayedProducts.length })}
             </p>
             <div className="grid grid-cols-3 gap-6 lg:grid-cols-4">
-              {filtered.map((product) => (
+              {displayedProducts.map((product) => (
                 <ShopGridCard key={product.id} product={product} />
               ))}
             </div>
@@ -116,7 +164,7 @@ export function ShopPageContent({ products }: ShopPageContentProps) {
       <FilterSheet
         open={filterOpen}
         onClose={() => setFilterOpen(false)}
-        resultCount={filtered.length}
+        resultCount={displayedProducts.length}
       />
     </>
   );

@@ -38,3 +38,13 @@ export async function requireAdminApiAccess(): Promise<
 
   return { user: { id: admin.id, email: admin.email } };
 }
+
+/** Read-only admin API access — allows mock data for browsing. */
+export async function requireAdminApiReadAccess(): Promise<
+  { user: AdminApiUser } | Response
+> {
+  if (shouldUseAdminMock()) {
+    return { user: { id: "mock-admin", email: "mock@local" } };
+  }
+  return requireAdminApiAccess();
+}

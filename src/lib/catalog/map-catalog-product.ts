@@ -76,7 +76,7 @@ function pickTranslation<T extends { locale: string }>(
   return rows.find((row) => row.locale === locale) ?? rows.find((row) => row.locale === "en");
 }
 
-function resolveCategorySlug(
+export function resolveCategorySlug(
   links: DbCatalogProduct["product_categories"],
   locale: string,
 ): ShopCategory {

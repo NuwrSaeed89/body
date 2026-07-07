@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { AccountHeaderLink } from "@/components/layout/account-header-link";
 
 const filledDesktopNav = [
   { labelKey: "nav.shop", href: "/shop" as const },
@@ -83,13 +84,7 @@ export function CartHeader({
                   shopping_bag
                 </span>
               </Link>
-              <Link
-                href="/account/login"
-                className="transition-opacity hover:opacity-70"
-                aria-label={t("header.aria.person")}
-              >
-                <span className="material-symbols-outlined text-primary">person</span>
-              </Link>
+              <AccountHeaderLink className="transition-opacity hover:opacity-70" />
             </div>
           </div>
         </nav>
@@ -124,13 +119,7 @@ export function CartHeader({
               >
                 <span className="material-symbols-outlined text-primary">shopping_bag</span>
               </Link>
-              <Link
-                href="/account/login"
-                className="transition-opacity hover:opacity-70"
-                aria-label={t("header.aria.person")}
-              >
-                <span className="material-symbols-outlined text-primary">person</span>
-              </Link>
+              <AccountHeaderLink className="transition-opacity hover:opacity-70" />
             </div>
           </div>
         </header>

@@ -173,6 +173,37 @@ body {
   width: 100%;
 }
 
+.input-underline input {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  box-shadow: none;
+}
+
+.input-underline input:focus,
+.input-underline input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.input-underline input:-webkit-autofill,
+.input-underline input:-webkit-autofill:hover,
+.input-underline input:-webkit-autofill:focus,
+.input-underline input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--color-primary);
+  caret-color: var(--color-primary);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface) inset;
+  box-shadow: 0 0 0 1000px var(--color-surface) inset;
+  transition: background-color 9999s ease-out 0s;
+}
+
+.input-underline input:-moz-autofill {
+  box-shadow: 0 0 0 1000px var(--color-surface) inset;
+  -moz-text-fill-color: var(--color-primary);
+}
+
 .auth-form-transition {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }

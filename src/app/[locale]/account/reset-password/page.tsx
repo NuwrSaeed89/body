@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
+import { AuthUnderlineField } from "@/components/auth/auth-underline-field";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { shouldUseAuthMock } from "@/lib/auth/should-use-auth-mock";
 
@@ -47,27 +48,29 @@ export default function ResetPasswordPage() {
       <div className="w-full rounded-xl border border-outline-variant/20 p-8">
         <h1 className="mb-2 text-2xl font-medium text-primary">{t("resetPasswordTitle")}</h1>
         <p className="mb-8 text-sm text-secondary">{t("resetPasswordDescription")}</p>
-        <form onSubmit={onSubmit} className="space-y-5">
-          <input
+        <form onSubmit={onSubmit} className="space-y-6">
+          <AuthUnderlineField
+            id="reset-password"
+            label={t("createPassword")}
             type="password"
             required
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            placeholder={t("createPassword")}
-            className="w-full border border-outline-variant bg-transparent px-4 py-3 text-sm focus:border-primary focus:outline-none"
+            placeholder={t("passwordHint")}
           />
-          <input
+          <AuthUnderlineField
+            id="reset-password-confirm"
+            label={t("confirmPassword")}
             type="password"
             required
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
             placeholder={t("confirmPassword")}
-            className="w-full border border-outline-variant bg-transparent px-4 py-3 text-sm focus:border-primary focus:outline-none"
           />
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-primary py-4 text-xs font-semibold uppercase tracking-[0.15em] text-white disabled:opacity-60"
+            className="w-full rounded-lg bg-primary py-5 text-xs font-semibold uppercase tracking-widest text-on-primary shadow-[0_10px_20px_rgba(0,0,0,0.1)] transition-all hover:bg-primary/90 active:scale-[0.98] disabled:opacity-60"
           >
             {loading ? t("submitting") : t("resetPasswordAction")}
           </button>

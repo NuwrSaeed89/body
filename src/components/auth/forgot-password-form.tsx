@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { AuthUnderlineField } from "@/components/auth/auth-underline-field";
 import { resolveAuthRedirectPath } from "@/lib/auth/resolve-auth-redirect";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { shouldUseAuthMock } from "@/lib/auth/should-use-auth-mock";
@@ -39,23 +40,20 @@ export function ForgotPasswordForm() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
-      <label htmlFor="forgot-email" className="text-xs font-semibold uppercase tracking-[0.1em] text-secondary">
-        {t("email")}
-      </label>
-      <input
+    <form onSubmit={onSubmit} className="space-y-8">
+      <AuthUnderlineField
         id="forgot-email"
+        label={t("email")}
         type="email"
         required
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         placeholder="name@example.com"
-        className="w-full border border-outline-variant bg-transparent px-4 py-3 text-sm focus:border-primary focus:outline-none"
       />
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-primary py-4 text-xs font-semibold uppercase tracking-[0.15em] text-white disabled:opacity-60"
+        className="w-full rounded-lg bg-primary py-5 text-xs font-semibold uppercase tracking-widest text-on-primary shadow-[0_10px_20px_rgba(0,0,0,0.1)] transition-all hover:bg-primary/90 active:scale-[0.98] disabled:opacity-60"
       >
         {loading ? t("submitting") : t("forgotPasswordAction")}
       </button>

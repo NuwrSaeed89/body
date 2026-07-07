@@ -1,16 +1,15 @@
-import {
-  addItemToCart,
-  resolveProfileIdByEmail,
-} from "@/lib/cart/cart-service";
-import { shouldUseCartMock } from "@/lib/cart/should-use-cart-mock";
+import { addItemToCart } from "@/lib/cart/cart-service";
+import { requireCartUser } from "@/lib/cart/cart-api-guard";
 
 type AddCartItemBody = {
-  email?: string;
   variantId?: string;
   quantity?: number;
 };
 
 export async function POST(request: Request) {
+  const auth = await requireCartUser();
+  if (auth instanceof Response) return auth;
+
   let body: AddCartItemBody;
   try {
     body = (await request.json()) as AddCartItemBody;
@@ -18,29 +17,19 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const email = body.email?.trim().toLowerCase();
   const variantId = body.variantId?.trim();
   const quantity = body.quantity ?? 1;
 
-  if (!email || !variantId) {
-    return Response.json({ error: "Email and variantId are required" }, { status: 400 });
+  if (!variantId) {
+    return Response.json({ error: "variantId is required" }, { status: 400 });
   }
 
   if (!Number.isInteger(quantity) || quantity < 1) {
     return Response.json({ error: "Quantity must be at least 1" }, { status: 400 });
   }
 
-  if (shouldUseCartMock()) {
-    return Response.json({ ok: false, error: "mock_mode" }, { status: 501 });
-  }
-
   try {
-    const profileId = await resolveProfileIdByEmail(email);
-    if (!profileId) {
-      return Response.json({ ok: false, error: "profile_not_found" }, { status: 404 });
-    }
-
-    const result = await addItemToCart(profileId, variantId, quantity);
+    const result = await addItemToCart(auth.userId, variantId, quantity);
     if (!result.ok) {
       return Response.json(result, { status: result.error === "out_of_stock" ? 409 : 404 });
     }

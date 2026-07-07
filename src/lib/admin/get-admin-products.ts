@@ -30,7 +30,7 @@ type DbProduct = {
       category_translations: { locale: string; name: string }[];
     }[] | null;
   }[];
-  product_media: { public_url: string; is_primary: boolean; sort_order: number }[];
+  product_media: { public_url: string; is_primary: boolean; sort_order: number; kind: string }[];
 };
 
 function formatProductStatus(status: string): string {
@@ -65,7 +65,7 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
           category_translations(locale, name)
         )
       ),
-      product_media(public_url, is_primary, sort_order)
+      product_media(public_url, is_primary, sort_order, kind)
     `,
     )
     .eq("product_translations.locale", contentLocale)
@@ -94,7 +94,15 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
       if (a.is_primary !== b.is_primary) return a.is_primary ? -1 : 1;
       return a.sort_order - b.sort_order;
     });
-    const imageUrl = sortedMedia[0]?.public_url ?? null;
+    const imageUrl =
+      sortedMedia.find((item) => item.kind === "image")?.public_url ??
+      sortedMedia[0]?.public_url ??
+      null;
+    const modelMedia = sortedMedia.find((item) => item.kind === "glb");
+    const modelGlbUrl = modelMedia?.public_url ?? null;
+    const modelFileName = modelMedia?.public_url
+      ? decodeURIComponent(modelMedia.public_url.split("/").pop() ?? "model")
+      : null;
 
     return {
       id: product.id,
@@ -117,6 +125,8 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
       categorySlug,
       categoryName,
       imageUrl,
+      modelGlbUrl,
+      modelFileName,
     };
   });
 

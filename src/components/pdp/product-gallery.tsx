@@ -3,7 +3,24 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useCallback, useRef, useState } from "react";
-import { ProductModelViewer } from "@/components/pdp/product-model-viewer";
+import dynamic from "next/dynamic";
+
+const ProductModelViewer = dynamic(
+  () =>
+    import("@/components/pdp/product-model-viewer").then(
+      (mod) => mod.ProductModelViewer,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full min-h-[inherit] w-full items-center justify-center bg-surface-container-low md:min-h-[600px] md:rounded-xl">
+        <span className="material-symbols-outlined animate-spin text-4xl text-secondary">
+          progress_activity
+        </span>
+      </div>
+    ),
+  },
+);
 import type { ProductDetail } from "@/lib/shop-data";
 
 type ProductGalleryProps = {

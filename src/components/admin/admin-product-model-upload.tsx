@@ -1,0 +1,338 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import {
+  formatProductModelFormatsLabel,
+  isAllowedProductModelFile,
+  PRODUCT_MODEL_ACCEPT,
+  PRODUCT_MODEL_MAX_BYTES,
+} from "@/lib/admin/products/model-formats";
+import {
+  deleteProductModel,
+  isUploadAbortError,
+  uploadProductModel,
+  type ProductModelUploadResult,
+} from "@/lib/admin/products/upload-product-model";
+import { adminLabelClassName } from "./admin-form-styles";
+import { AdminProductModelPreview } from "./admin-product-model-preview";
+
+export type ProductModelChangePayload = {
+  publicUrl: string;
+  fileName: string;
+} | null;
+
+type AdminProductModelUploadProps = {
+  productId: string | null;
+  productSlug: string;
+  modelUrl: string | null;
+  modelFileName: string | null;
+  disabled?: boolean;
+  onModelChange: (model: ProductModelChangePayload) => void;
+  onUploadingChange?: (uploading: boolean) => void;
+};
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+export function AdminProductModelUpload({
+  productId,
+  productSlug,
+  modelUrl,
+  modelFileName,
+  disabled = false,
+  onModelChange,
+  onUploadingChange,
+}: AdminProductModelUploadProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const uploadAbortRef = useRef<AbortController | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const dragDepthRef = useRef(0);
+
+  const canUpload = Boolean(productId) && !disabled;
+
+  useEffect(() => {
+    return () => {
+      uploadAbortRef.current?.abort();
+      uploadAbortRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    onUploadingChange?.(uploading);
+  }, [uploading, onUploadingChange]);
+
+  const uploadFile = async (file: File) => {
+    if (!productId || !canUpload || uploading || deleting) return;
+
+    if (!isAllowedProductModelFile(file)) {
+      setError(
+        `Invalid file. Use ${formatProductModelFormatsLabel()} up to ${formatFileSize(PRODUCT_MODEL_MAX_BYTES)}.`,
+      );
+      return;
+    }
+
+    uploadAbortRef.current?.abort();
+    const controller = new AbortController();
+    uploadAbortRef.current = controller;
+
+    setUploading(true);
+    setError(null);
+    setProgress(0);
+
+    try {
+      const result: ProductModelUploadResult = await uploadProductModel({
+        productId,
+        file,
+        signal: controller.signal,
+        onProgress: setProgress,
+      });
+      onModelChange({
+        publicUrl: result.publicUrl,
+        fileName: result.fileName,
+      });
+    } catch (uploadError) {
+      if (isUploadAbortError(uploadError)) return;
+      setError(uploadError instanceof Error ? uploadError.message : "Upload failed");
+    } finally {
+      if (uploadAbortRef.current === controller) {
+        uploadAbortRef.current = null;
+      }
+      setUploading(false);
+      setProgress(0);
+    }
+  };
+
+  const handlePickFile = () => {
+    if (!canUpload || uploading || deleting) return;
+    inputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    await uploadFile(file);
+  };
+
+  const handleDragEnter = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!canUpload || uploading || deleting) return;
+    dragDepthRef.current += 1;
+    setDragging(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+    if (dragDepthRef.current === 0) {
+      setDragging(false);
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!canUpload || uploading || deleting) return;
+    event.dataTransfer.dropEffect = "copy";
+  };
+
+  const handleDrop = async (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDepthRef.current = 0;
+    setDragging(false);
+
+    if (!canUpload || uploading || deleting) return;
+
+    const file = event.dataTransfer.files?.[0];
+    if (!file) return;
+    await uploadFile(file);
+  };
+
+  const handleDelete = async () => {
+    if (!productId || !modelUrl) return;
+    if (!window.confirm("Remove the 3D model from this product?")) return;
+
+    setDeleting(true);
+    setError(null);
+
+    try {
+      await deleteProductModel(productId);
+      onModelChange(null);
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : "Delete failed");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const dropZoneClassName = `flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 transition-colors ${
+    !canUpload || uploading
+      ? "cursor-not-allowed border-outline-variant bg-surface-container opacity-60"
+      : dragging
+        ? "border-primary bg-primary/10"
+        : "border-outline-variant bg-surface-container hover:border-primary hover:bg-surface-container-high"
+  }`;
+
+  return (
+    <div>
+      <label className={adminLabelClassName}>3D Model</label>
+      <p className="mb-3 text-xs text-on-surface-variant">
+        {formatProductModelFormatsLabel()} · max {formatFileSize(PRODUCT_MODEL_MAX_BYTES)}
+      </p>
+
+      {!productId && (
+        <p className="mb-3 rounded-lg border border-outline-variant bg-surface-container-high px-4 py-3 text-sm text-on-surface-variant">
+          Save the product first, then upload a 3D model.
+        </p>
+      )}
+
+      {modelUrl ? (
+        <div className="space-y-3">
+          <AdminProductModelPreview
+            src={modelUrl}
+            alt={modelFileName ?? `${productSlug} 3D model`}
+          />
+
+          <div className="rounded-lg border border-outline-variant bg-surface-container-low p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-secondary-container">
+                <span className="material-symbols-outlined text-on-secondary-container">
+                  view_in_ar
+                </span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-primary">
+                  {modelFileName ?? "3D model"}
+                </p>
+                <p className="mt-0.5 truncate font-mono text-xs text-on-surface-variant">
+                  {productSlug}
+                </p>
+                <a
+                  href={modelUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 inline-block text-xs font-semibold uppercase tracking-[0.08em] text-primary underline-offset-2 hover:underline"
+                >
+                  Preview file
+                </a>
+              </div>
+              {canUpload && (
+                <button
+                  type="button"
+                  onClick={() => void handleDelete()}
+                  disabled={deleting || uploading}
+                  className="material-symbols-outlined rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-error disabled:opacity-50"
+                  aria-label="Remove 3D model"
+                >
+                  {deleting ? "hourglass_empty" : "delete"}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {canUpload && (
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={handlePickFile}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  handlePickFile();
+                }
+              }}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              onDrop={(event) => void handleDrop(event)}
+              className={dropZoneClassName}
+            >
+              <span className="material-symbols-outlined text-2xl text-on-surface-variant">
+                {uploading ? "hourglass_top" : dragging ? "file_download" : "swap_horiz"}
+              </span>
+              <span className="text-xs font-semibold uppercase tracking-[0.1em] text-primary">
+                {uploading ? "Uploading…" : dragging ? "Drop to replace" : "Replace 3D model"}
+              </span>
+              <span className="text-xs text-on-surface-variant">
+                Drag & drop or click · {formatProductModelFormatsLabel()}
+              </span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div
+          role="button"
+          tabIndex={canUpload ? 0 : -1}
+          onClick={handlePickFile}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              handlePickFile();
+            }
+          }}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={(event) => void handleDrop(event)}
+          className={dropZoneClassName}
+        >
+          <span className="material-symbols-outlined text-3xl text-on-surface-variant">
+            {uploading ? "hourglass_top" : dragging ? "file_download" : "upload_file"}
+          </span>
+          <span className="text-xs font-semibold uppercase tracking-[0.1em] text-primary">
+            {uploading ? "Uploading…" : dragging ? "Drop file here" : "Upload 3D model"}
+          </span>
+          <span className="text-xs text-on-surface-variant">
+            Drag & drop or click · {formatProductModelFormatsLabel()}
+          </span>
+        </div>
+      )}
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept={PRODUCT_MODEL_ACCEPT}
+        className="sr-only"
+        disabled={!canUpload || uploading || deleting}
+        onChange={(event) => void handleFileChange(event)}
+      />
+
+      {uploading && (
+        <div className="mt-4">
+          <div className="mb-1 flex items-center justify-between text-xs text-on-surface-variant">
+            <span>Uploading to Supabase…</span>
+            <span>{progress}%</span>
+          </div>
+          <div
+            className="h-2 overflow-hidden rounded-full bg-surface-container-high"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progress}
+          >
+            <div
+              className="h-full rounded-full bg-primary transition-[width] duration-200"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <p className="mt-3 rounded-lg border border-outline-variant bg-surface-container-high px-4 py-3 text-sm text-primary">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}

@@ -74,6 +74,8 @@ export const MOCK_ADMIN_PRODUCTS: AdminProductRow[] = [
     categoryName: "Leggings",
     imageUrl:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuAKi6tjJouWa4BgbdkKhv-C3PAMsdW1-LYKU6mJTzdM-kCAbva8AoOix8BibarIzuPEXdxLAa9_Mb8PideBUgKfk-REhTv1hu2PoXaxovA33HGeiDjvVGgzpcCYEtctDTLJuUFsS4-dpGWLoQl4KwgRAdGJla3gBwQ6xbpzw6XtVEUYKKfm4TY-1LyRrd9qZg2R-ynXifBYAZ8kjfYsX7PMH3T0rNamaKBAawz7LQSrDWLN7mbcvkxGVG-F1b-Kc0bpHvWok_54PVY",
+    modelGlbUrl: "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
+    modelFileName: "Astronaut.glb",
   },
   {
     id: "p2",
@@ -97,6 +99,8 @@ export const MOCK_ADMIN_PRODUCTS: AdminProductRow[] = [
     categoryName: "Sports Bras",
     imageUrl:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuD8IePc5I5R2_kAa9EYUfRT5uQnYkfOU1VbgeJv5SNOEfv7Ev5UeGDiLJfJawpZw2wem5aCxGecYeFiFB57fVUMpUqEoBj3a_bPcdSjeDG-XEk5KqCaAF0xcC97xjr5HTwnRwweLuUvyxp-oz-k6P9CRV3WZD_o5Qh721y1skhaLIherjDv2Lb2yL9XkZxNJqhbaSYkfuIJPUFkf77oUWvqX8gV-zWBIdPV5R4ywk-Uuyr1xwAL83bkEnmwGgg_wPWJxjscp85W4fI",
+    modelGlbUrl: null,
+    modelFileName: null,
   },
   {
     id: "p3",
@@ -119,6 +123,8 @@ export const MOCK_ADMIN_PRODUCTS: AdminProductRow[] = [
     categorySlug: "sports-bras",
     categoryName: "Sports Bras",
     imageUrl: null,
+    modelGlbUrl: null,
+    modelFileName: null,
   },
 ];
 

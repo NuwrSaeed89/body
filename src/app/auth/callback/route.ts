@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const redirectPath = resolveAuthRedirectPath(
-    url.searchParams.get("redirect") ?? "/account",
+    url.searchParams.get("redirect") ?? "/",
   );
 
   if (!shouldUseAuthMock() && code) {

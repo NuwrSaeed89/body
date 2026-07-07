@@ -6,6 +6,8 @@ Phase 4 is **blocked** until the client returns a completed intake form:
 
 Discovery status: **TBD** — Swedish bank setup in progress (see `client-discovery-answers.md` §15).
 
+**Client decision guide:** [`client-deliverables/Mbody-Payment-Choices-and-SDK.md`](../../client-deliverables/Mbody-Payment-Choices-and-SDK.md)
+
 ---
 
 ## Provider options

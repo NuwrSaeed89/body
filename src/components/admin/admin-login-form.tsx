@@ -1,9 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useRouter } from "@/i18n/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { hasSupabaseConfig } from "@/lib/env";
 
@@ -15,10 +14,11 @@ const ERRORS = {
 
 export function AdminLoginForm() {
   const locale = useLocale();
-  const router = useRouter();
+  const t = useTranslations("account.login");
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +29,7 @@ export function AdminLoginForm() {
     setError(null);
 
     if (!hasSupabaseConfig()) {
-      router.push(`/${locale}/admin`);
+      window.location.assign(`/${locale}/admin`);
       return;
     }
 
@@ -68,8 +68,7 @@ export function AdminLoginForm() {
         return;
       }
 
-      router.push(redirectTo);
-      router.refresh();
+      window.location.assign(redirectTo);
     } catch {
       setError(ERRORS.generic);
     } finally {
@@ -105,16 +104,29 @@ export function AdminLoginForm() {
         >
           Password
         </label>
-        <input
-          id="admin-password"
-          type="password"
-          required
-          autoComplete="current-password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="••••••••"
-          className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-        />
+        <div className="relative">
+          <input
+            id="admin-password"
+            type={passwordVisible ? "text" : "password"}
+            required
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="••••••••"
+            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest py-3 pl-4 pr-11 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+          <button
+            type="button"
+            onClick={() => setPasswordVisible((current) => !current)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant transition-colors hover:text-primary"
+            aria-label={passwordVisible ? t("hidePassword") : t("showPassword")}
+            aria-pressed={passwordVisible}
+          >
+            <span className="material-symbols-outlined text-xl leading-none">
+              {passwordVisible ? "visibility_off" : "visibility"}
+            </span>
+          </button>
+        </div>
       </div>
 
       <button

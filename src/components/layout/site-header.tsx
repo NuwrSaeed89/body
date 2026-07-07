@@ -100,9 +100,7 @@ export async function SiteHeader({
                   );
 
                 return icon === "person" ? (
-                  <AccountHeaderLink key={icon} className={className}>
-                    {iconEl}
-                  </AccountHeaderLink>
+                  <AccountHeaderLink key={icon} className={className} />
                 ) : icon === "shopping_bag" ? (
                   <CartHeaderLink key={icon} className={className} isDark={isDark}>
                     {iconEl}
@@ -138,9 +136,7 @@ export async function SiteHeader({
                   );
 
                   return icon === "person" ? (
-                    <AccountHeaderLink key={icon} className={className}>
-                      {iconEl}
-                    </AccountHeaderLink>
+                    <AccountHeaderLink key={icon} className={className} />
                   ) : icon === "favorite" ? (
                     <WishlistHeaderLink
                       key={icon}

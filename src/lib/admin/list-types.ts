@@ -40,6 +40,8 @@ export type AdminProductRow = {
   categorySlug: string | null;
   categoryName: string | null;
   imageUrl: string | null;
+  modelGlbUrl: string | null;
+  modelFileName: string | null;
 };
 
 export type AdminProductsData = {

@@ -64,11 +64,6 @@ function useAddToBagFeedback() {
       return;
     }
 
-    if (!isAuthenticated) {
-      setFeedback(t("cart.signInRequired"));
-      return;
-    }
-
     setAdding(true);
     setFeedback(null);
 
@@ -80,6 +75,10 @@ function useAddToBagFeedback() {
       return;
     }
 
+    if (result.error === "not_signed_in") {
+      setFeedback(t("cart.signInRequired"));
+      return;
+    }
     if (result.error === "profile_not_found") {
       setFeedback(t("cart.profileNotFound"));
       return;

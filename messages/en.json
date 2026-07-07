@@ -10,6 +10,15 @@
     "footerNav": "Footer navigation",
     "siteFooter": "Site footer"
   },
+  "notFound": {
+    "metaTitle": "Page Not Found | Mbody",
+    "metaDescription": "The page you are looking for does not exist or has been moved.",
+    "eyebrow": "Error 404",
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or may have been moved. Head back home or explore the shop.",
+    "backHome": "Back to Home",
+    "shopNow": "Shop Now"
+  },
   "nav": {
     "new": "New",
     "shop": "Shop",
@@ -27,10 +36,13 @@
   },
   "header": {
     "currency": "EUR",
+    "viewProfile": "View profile",
     "aria": {
       "search": "Search",
       "favorite": "Wishlist",
       "person": "Account",
+      "personSignedIn": "Signed in — open account",
+      "accountMenu": "Account menu",
       "shopping_bag": "Cart",
       "menu": "Open menu",
       "close": "Close menu"
@@ -363,6 +375,8 @@
     "itemsTotal": "{count} Items total",
     "selection": "Your Selection ({count})",
     "remove": "Remove",
+    "outOfStock": "Not enough stock for this quantity.",
+    "updateError": "Could not update your bag. Please try again.",
     "shippingNoticeTitle": "Complimentary shipping applied.",
     "shippingNoticeBody": "You've reached the $150 minimum for premium delivery.",
     "shippingNoticeTitleFree": "Complimentary shipping applied.",
@@ -379,6 +393,7 @@
     "total": "Total",
     "klarna": "or 4 payments of {amount} with Klarna.",
     "proceedToCheckout": "Proceed to Checkout",
+    "signInToCheckout": "Sign in to checkout",
     "payWithPaypal": "Pay with PayPal",
     "promoCode": "Promo code",
     "apply": "Apply",
@@ -530,6 +545,8 @@
       "signInTitle": "Sign in to Mbody",
       "email": "Email Address",
       "password": "Password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
       "forgotPassword": "Forgot?",
       "forgotPasswordTitle": "Reset your password",
       "forgotPasswordDescription": "Enter your email and we'll send you a reset link.",

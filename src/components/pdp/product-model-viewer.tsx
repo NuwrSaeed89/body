@@ -18,7 +18,8 @@ export function ProductModelViewer({
 }: ProductModelViewerProps) {
   const t = useTranslations("pdp.viewer");
   const viewerRef = useRef<HTMLElement>(null);
-  const [ready, setReady] = useState(false);
+  const [moduleReady, setModuleReady] = useState(false);
+  const [modelLoaded, setModelLoaded] = useState(false);
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ export function ProductModelViewer({
 
     import("@google/model-viewer")
       .then(() => {
-        if (!cancelled) setReady(true);
+        if (!cancelled) setModuleReady(true);
       })
       .catch(() => {
         if (!cancelled) setError(true);
@@ -38,13 +39,27 @@ export function ProductModelViewer({
   }, []);
 
   useEffect(() => {
-    const el = viewerRef.current;
-    if (!el || !ready) return;
+    setModelLoaded(false);
+    setError(false);
+  }, [src]);
 
+  useEffect(() => {
+    const el = viewerRef.current;
+    if (!el || !moduleReady) return;
+
+    const onLoad = () => setModelLoaded(true);
     const onError = () => setError(true);
+
+    el.addEventListener("load", onLoad);
     el.addEventListener("error", onError);
-    return () => el.removeEventListener("error", onError);
-  }, [ready]);
+
+    return () => {
+      el.removeEventListener("load", onLoad);
+      el.removeEventListener("error", onError);
+    };
+  }, [moduleReady, src]);
+
+  const isLoading = !moduleReady || !modelLoaded;
 
   if (error) {
     return (
@@ -62,7 +77,7 @@ export function ProductModelViewer({
 
   return (
     <div className={`relative ${className}`}>
-      {!ready && (
+      {isLoading && (
         <div
           className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-surface-container-low"
           aria-live="polite"
@@ -77,14 +92,14 @@ export function ProductModelViewer({
         </div>
       )}
 
-      {ready && (
+      {moduleReady && (
         <model-viewer
           ref={viewerRef}
           src={src}
           alt={alt}
           poster={poster}
-          loading="lazy"
-          reveal="interaction"
+          loading="eager"
+          reveal="auto"
           camera-controls
           touch-action="pan-y"
           shadow-intensity="1"
@@ -96,7 +111,7 @@ export function ProductModelViewer({
         />
       )}
 
-      {ready && (
+      {moduleReady && modelLoaded && (
         <p className="pointer-events-none absolute bottom-4 left-1/2 z-10 hidden max-w-[90%] -translate-x-1/2 rounded-lg bg-primary/80 px-4 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-white md:block">
           {t("hint")}
         </p>

@@ -16,6 +16,8 @@ type AdminShellProps = {
 function activeKey(pathname: string): AdminNavKey {
   if (pathname.startsWith("/admin/orders")) return "orders";
   if (pathname.startsWith("/admin/products")) return "products";
+  if (pathname.startsWith("/admin/categories")) return "categories";
+  if (pathname.startsWith("/admin/media")) return "media";
   if (pathname.startsWith("/admin/customers")) return "customers";
   if (pathname.startsWith("/admin/settings")) return "settings";
   return "dashboard";
@@ -67,6 +69,15 @@ export function AdminShell({
             );
           })}
         </nav>
+        <div className="mb-4 border-t border-outline-variant pt-4">
+          <Link
+            href="/"
+            className="flex items-center gap-3 rounded-lg px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aa-focus-ring"
+          >
+            <span className="material-symbols-outlined">storefront</span>
+            View Store
+          </Link>
+        </div>
         <div className="mt-auto flex items-center gap-3 border-t border-outline-variant px-2 pt-4">
           <div className="flex size-10 items-center justify-center overflow-hidden rounded-full bg-secondary-container">
             <span className="material-symbols-outlined text-on-surface-variant">person</span>
@@ -93,7 +104,16 @@ export function AdminShell({
                 Management Portal
               </p>
             </div>
-            <AdminSourceBadge source={source} />
+            <div className="flex items-center gap-2">
+              <Link
+                href="/"
+                className="flex size-9 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aa-focus-ring"
+                aria-label="View store"
+              >
+                <span className="material-symbols-outlined text-[20px]">storefront</span>
+              </Link>
+              <AdminSourceBadge source={source} />
+            </div>
           </div>
           <nav
             className="flex gap-2 overflow-x-auto px-4 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"

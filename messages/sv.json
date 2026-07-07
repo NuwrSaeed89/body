@@ -10,6 +10,15 @@
     "footerNav": "Sidfotsnavigering",
     "siteFooter": "Sidfot"
   },
+  "notFound": {
+    "metaTitle": "Sidan hittades inte | Mbody",
+    "metaDescription": "Sidan du söker finns inte eller har flyttats.",
+    "eyebrow": "Fel 404",
+    "title": "Sidan hittades inte",
+    "description": "Sidan du söker finns inte eller kan ha flyttats. Gå tillbaka till startsidan eller utforska butiken.",
+    "backHome": "Till startsidan",
+    "shopNow": "Handla nu"
+  },
   "nav": {
     "new": "Nytt",
     "shop": "Butik",
@@ -27,10 +36,13 @@
   },
   "header": {
     "currency": "EUR",
+    "viewProfile": "Visa profil",
     "aria": {
       "search": "Sök",
       "favorite": "Önskelista",
       "person": "Konto",
+      "personSignedIn": "Inloggad — öppna konto",
+      "accountMenu": "Kontomeny",
       "shopping_bag": "Varukorg",
       "menu": "Öppna meny",
       "close": "Stäng meny"
@@ -357,6 +369,8 @@
     "itemsTotal": "{count} artiklar totalt",
     "selection": "Ditt urval ({count})",
     "remove": "Ta bort",
+    "outOfStock": "Inte tillräckligt många i lager för denna mängd.",
+    "updateError": "Kunde inte uppdatera varukorgen. Försök igen.",
     "shippingNoticeTitle": "Fri frakt tillämpas.",
     "shippingNoticeBody": "Du har nått minimibeloppet på $150 för premiumleverans.",
     "shippingNoticeTitleFree": "Fri frakt tillämpas.",
@@ -373,6 +387,7 @@
     "total": "Totalt",
     "klarna": "eller 4 betalningar på {amount} med Klarna.",
     "proceedToCheckout": "Fortsätt till kassan",
+    "signInToCheckout": "Logga in för att gå till kassan",
     "payWithPaypal": "Betala med PayPal",
     "promoCode": "Rabattkod",
     "apply": "Använd",
@@ -512,6 +527,8 @@
       "signInTitle": "Logga in på Mbody",
       "email": "E-postadress",
       "password": "Lösenord",
+      "showPassword": "Visa lösenord",
+      "hidePassword": "Dölj lösenord",
       "forgotPassword": "Glömt?",
       "forgotPasswordTitle": "Återställ ditt lösenord",
       "forgotPasswordDescription": "Ange din e-post så skickar vi en återställningslänk.",

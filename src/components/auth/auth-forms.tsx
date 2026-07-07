@@ -1,72 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { Link, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
+import { AuthUnderlineField } from "@/components/auth/auth-underline-field";
 import { LEGAL_PATHS } from "@/lib/legal-pages";
 import { useAuth } from "@/providers/auth-provider";
 
 type AuthView = "login" | "register";
 
-function UnderlineField({
-  id,
-  name,
-  label,
-  type = "text",
-  placeholder,
-  labelExtra,
-}: {
-  id: string;
-  name?: string;
-  label: string;
-  type?: string;
-  placeholder?: string;
-  labelExtra?: ReactNode;
-}) {
-  return (
-    <div className="input-underline border-b border-outline-variant/50">
-      {labelExtra ? (
-        <div className="flex items-end justify-between">
-          <label
-            htmlFor={id}
-            className="text-[10px] font-semibold uppercase tracking-widest text-secondary"
-          >
-            {label}
-          </label>
-          {labelExtra}
-        </div>
-      ) : (
-        <label
-          htmlFor={id}
-          className="text-[10px] font-semibold uppercase tracking-widest text-secondary"
-        >
-          {label}
-        </label>
-      )}
-      <input
-        id={id}
-        name={name ?? id}
-        type={type}
-        placeholder={placeholder}
-        className="w-full border-none bg-transparent px-0 py-3 text-base text-primary placeholder:text-outline-variant/60 focus:ring-0"
-      />
-    </div>
-  );
-}
-
 export function AuthForms() {
   const t = useTranslations("account.login");
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { signIn, signUp } = useAuth();
   const [view, setView] = useState<AuthView>("login");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const redirectTo = searchParams.get("redirect") || "/account";
 
   const resolveAuthError = (message: string): string => {
     const normalized = message.toLowerCase();
@@ -92,7 +44,9 @@ export function AuthForms() {
     setIsSubmitting(true);
     try {
       await signIn(email, password);
-      router.push(redirectTo);
+      router.replace("/");
+      router.refresh();
+      return;
     } catch (caughtError) {
       const message = caughtError instanceof Error ? caughtError.message : "";
       setError(resolveAuthError(message));
@@ -128,7 +82,8 @@ export function AuthForms() {
         lastName: String(form.get("lastName") ?? "").trim() || undefined,
       });
       if (sessionCreated) {
-        router.push(redirectTo);
+        router.replace("/");
+        router.refresh();
         return;
       }
       setSuccess(t("checkEmail"));
@@ -188,21 +143,25 @@ export function AuthForms() {
               </h1>
             </div>
 
-            <form className="space-y-8" onSubmit={handleLogin}>
+            <form className="space-y-8" onSubmit={handleLogin} autoComplete="off">
               <div className="space-y-6">
-                <UnderlineField
+                <AuthUnderlineField
                   id="login-email"
                   name="email"
                   label={t("email")}
                   type="email"
                   placeholder="name@example.com"
+                  autoComplete="username"
+                  suppressInitialAutofill
                 />
-                <UnderlineField
+                <AuthUnderlineField
                   id="login-password"
                   name="password"
                   label={t("password")}
                   type="password"
                   placeholder="••••••••"
+                  autoComplete="current-password"
+                  suppressInitialAutofill
                   labelExtra={
                     <Link
                       href="/account/forgot-password"
@@ -259,27 +218,27 @@ export function AuthForms() {
 
             <form className="space-y-6" onSubmit={handleRegister}>
               <div className="grid grid-cols-2 gap-4">
-                <UnderlineField
+                <AuthUnderlineField
                   id="reg-first"
                   name="firstName"
                   label={t("firstName")}
                   placeholder="Jane"
                 />
-                <UnderlineField
+                <AuthUnderlineField
                   id="reg-last"
                   name="lastName"
                   label={t("lastName")}
                   placeholder="Doe"
                 />
               </div>
-              <UnderlineField
+              <AuthUnderlineField
                 id="reg-email"
                 name="email"
                 label={t("email")}
                 type="email"
                 placeholder="name@example.com"
               />
-              <UnderlineField
+              <AuthUnderlineField
                 id="reg-password"
                 name="password"
                 label={t("createPassword")}

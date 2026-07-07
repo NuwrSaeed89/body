@@ -10,6 +10,15 @@
     "footerNav": "Fußzeilennavigation",
     "siteFooter": "Website-Fußzeile"
   },
+  "notFound": {
+    "metaTitle": "Seite nicht gefunden | Mbody",
+    "metaDescription": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
+    "eyebrow": "Fehler 404",
+    "title": "Seite nicht gefunden",
+    "description": "Die gesuchte Seite existiert nicht oder wurde möglicherweise verschoben. Zurück zur Startseite oder zum Shop.",
+    "backHome": "Zur Startseite",
+    "shopNow": "Jetzt shoppen"
+  },
   "nav": {
     "new": "Neu",
     "shop": "Shop",
@@ -27,10 +36,13 @@
   },
   "header": {
     "currency": "EUR",
+    "viewProfile": "Profil anzeigen",
     "aria": {
       "search": "Suchen",
       "favorite": "Wunschliste",
       "person": "Konto",
+      "personSignedIn": "Angemeldet — Konto öffnen",
+      "accountMenu": "Kontomenü",
       "shopping_bag": "Warenkorb",
       "menu": "Menü öffnen",
       "close": "Menü schließen"
@@ -357,6 +369,8 @@
     "itemsTotal": "{count} Artikel gesamt",
     "selection": "Deine Auswahl ({count})",
     "remove": "Entfernen",
+    "outOfStock": "Nicht genug Lagerbestand für diese Menge.",
+    "updateError": "Tasche konnte nicht aktualisiert werden. Bitte erneut versuchen.",
     "shippingNoticeTitle": "Kostenloser Versand angewendet.",
     "shippingNoticeBody": "Du hast das Minimum von $150 für Premium-Lieferung erreicht.",
     "shippingNoticeTitleFree": "Kostenloser Versand angewendet.",
@@ -373,6 +387,7 @@
     "total": "Gesamt",
     "klarna": "oder 4 Zahlungen à {amount} mit Klarna.",
     "proceedToCheckout": "Zur Kasse",
+    "signInToCheckout": "Zum Checkout anmelden",
     "payWithPaypal": "Mit PayPal bezahlen",
     "promoCode": "Aktionscode",
     "apply": "Anwenden",
@@ -512,6 +527,8 @@
       "signInTitle": "Bei Mbody anmelden",
       "email": "E-Mail-Adresse",
       "password": "Passwort",
+      "showPassword": "Passwort anzeigen",
+      "hidePassword": "Passwort verbergen",
       "forgotPassword": "Vergessen?",
       "forgotPasswordTitle": "Passwort zurücksetzen",
       "forgotPasswordDescription": "Gib deine E-Mail ein, wir senden dir einen Link zum Zurücksetzen.",

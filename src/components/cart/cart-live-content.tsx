@@ -2,21 +2,130 @@
 
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { CartShippingNotice } from "@/components/cart/cart-shipping-notice";
 import type { CartItem } from "@/lib/cart/types";
 import { calculateCartSummary } from "@/lib/currency";
+import { useCart } from "@/providers/cart-provider";
 import { useCurrency } from "@/providers/currency-provider";
 
 type CartLiveContentProps = {
   items: CartItem[];
 };
 
+function QuantityControl({
+  quantity,
+  disabled,
+  onDecrease,
+  onIncrease,
+}: {
+  quantity: number;
+  disabled?: boolean;
+  onDecrease: () => void;
+  onIncrease: () => void;
+}) {
+  return (
+    <div className="flex items-center rounded-full border border-outline/20 bg-surface-container-lowest px-4 py-2">
+      <button
+        type="button"
+        onClick={onDecrease}
+        disabled={disabled}
+        className="transition-opacity hover:opacity-50 disabled:cursor-not-allowed disabled:opacity-40"
+        aria-label="Decrease quantity"
+      >
+        <span className="material-symbols-outlined text-xs">remove</span>
+      </button>
+      <span className="mx-6 text-xs font-semibold uppercase tracking-widest">{quantity}</span>
+      <button
+        type="button"
+        onClick={onIncrease}
+        disabled={disabled}
+        className="transition-opacity hover:opacity-50 disabled:cursor-not-allowed disabled:opacity-40"
+        aria-label="Increase quantity"
+      >
+        <span className="material-symbols-outlined text-xs">add</span>
+      </button>
+    </div>
+  );
+}
+
+function LiveCartItemRow({
+  item,
+  pending,
+  onDecrease,
+  onIncrease,
+  onRemove,
+}: {
+  item: CartItem;
+  pending: boolean;
+  onDecrease: () => void;
+  onIncrease: () => void;
+  onRemove: () => void;
+}) {
+  const t = useTranslations("cart");
+  const { formatFromSek } = useCurrency();
+
+  return (
+    <div className="group flex flex-col gap-8 border-b border-surface-variant pb-12 md:flex-row">
+      <Link
+        href={`/shop/${item.productSlug}`}
+        className="aspect-[4/5] w-full overflow-hidden rounded-lg bg-surface-container-low md:w-48"
+      >
+        <Image
+          src={item.image}
+          alt={item.imageAlt}
+          width={192}
+          height={240}
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+      </Link>
+      <div className="flex flex-1 flex-col">
+        <div className="mb-2 flex items-start justify-between gap-4">
+          <div>
+            <Link
+              href={`/shop/${item.productSlug}`}
+              className="mb-1 text-lg font-semibold tracking-wide text-primary hover:underline"
+            >
+              {item.productName}
+            </Link>
+            <p className="text-sm text-secondary">
+              {[item.colorName, item.size].filter(Boolean).join(" / ")}
+            </p>
+          </div>
+          <p className="text-lg font-semibold tracking-wide text-primary">
+            {formatFromSek(item.priceSek * item.quantity)}
+          </p>
+        </div>
+        <div className="mt-auto flex items-center justify-between pt-8">
+          <QuantityControl
+            quantity={item.quantity}
+            disabled={pending}
+            onDecrease={onDecrease}
+            onIncrease={onIncrease}
+          />
+          <button
+            type="button"
+            onClick={onRemove}
+            disabled={pending}
+            className="flex items-center text-xs font-semibold uppercase tracking-widest text-secondary transition-colors hover:text-error disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {t("remove")}
+            <span className="material-symbols-outlined ml-2 text-sm">close</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function CartLiveContent({ items }: CartLiveContentProps) {
   const t = useTranslations("cart");
   const { currency, formatFromSek } = useCurrency();
   const locale = useLocale();
+  const { updateItemQuantity, removeItem, isGuestCart } = useCart();
+  const [pendingItemId, setPendingItemId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const subtotalSek = useMemo(
     () => items.reduce((sum, item) => sum + item.priceSek * item.quantity, 0),
@@ -32,6 +141,21 @@ export function CartLiveContent({ items }: CartLiveContentProps) {
   );
   const klarnaAmount = formatFromSek(summary.grandTotalSek / 4);
 
+  const handleMutation = async (itemId: string, action: () => Promise<{ ok: boolean; error?: string }>) => {
+    setErrorMessage(null);
+    setPendingItemId(itemId);
+    const result = await action();
+    setPendingItemId(null);
+
+    if (!result.ok) {
+      if (result.error === "out_of_stock") {
+        setErrorMessage(t("outOfStock"));
+      } else {
+        setErrorMessage(t("updateError"));
+      }
+    }
+  };
+
   return (
     <div className="mx-auto min-h-screen max-w-[1440px] px-5 py-12 md:px-16 md:py-20">
       <div className="mb-12">
@@ -41,49 +165,37 @@ export function CartLiveContent({ items }: CartLiveContentProps) {
         <p className="text-xs font-semibold uppercase tracking-widest text-secondary">
           {t("itemsTotal", { count })}
         </p>
+        {errorMessage ? (
+          <p className="mt-4 text-sm text-error" role="alert">
+            {errorMessage}
+          </p>
+        ) : null}
       </div>
 
       <div className="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-24">
         <div className="space-y-12 lg:col-span-8">
           {items.map((item) => (
-            <div
+            <LiveCartItemRow
               key={item.id}
-              className="group flex flex-col gap-8 border-b border-surface-variant pb-12 md:flex-row"
-            >
-              <Link
-                href={`/shop/${item.productSlug}`}
-                className="aspect-[4/5] w-full overflow-hidden rounded-lg bg-surface-container-low md:w-48"
-              >
-                <Image
-                  src={item.image}
-                  alt={item.imageAlt}
-                  width={192}
-                  height={240}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </Link>
-              <div className="flex flex-1 flex-col">
-                <div className="mb-2 flex items-start justify-between gap-4">
-                  <div>
-                    <Link
-                      href={`/shop/${item.productSlug}`}
-                      className="mb-1 text-lg font-semibold tracking-wide text-primary hover:underline"
-                    >
-                      {item.productName}
-                    </Link>
-                    <p className="text-sm text-secondary">
-                      {[item.colorName, item.size].filter(Boolean).join(" / ")}
-                    </p>
-                  </div>
-                  <p className="text-lg font-semibold tracking-wide text-primary">
-                    {formatFromSek(item.priceSek * item.quantity)}
-                  </p>
-                </div>
-                <p className="mt-auto text-xs font-semibold uppercase tracking-widest text-secondary">
-                  {t("quantity")}: {item.quantity}
-                </p>
-              </div>
-            </div>
+              item={item}
+              pending={pendingItemId === item.id}
+              onDecrease={() => {
+                const nextQuantity = item.quantity - 1;
+                void handleMutation(item.id, () =>
+                  nextQuantity <= 0
+                    ? removeItem(item.id)
+                    : updateItemQuantity(item.id, nextQuantity),
+                );
+              }}
+              onIncrease={() => {
+                void handleMutation(item.id, () =>
+                  updateItemQuantity(item.id, item.quantity + 1),
+                );
+              }}
+              onRemove={() => {
+                void handleMutation(item.id, () => removeItem(item.id));
+              }}
+            />
           ))}
 
           <CartShippingNotice summary={summary} />
@@ -124,10 +236,10 @@ export function CartLiveContent({ items }: CartLiveContentProps) {
               </div>
             </div>
             <Link
-              href="/checkout/shipping"
+              href={isGuestCart ? "/account/login" : "/checkout/shipping"}
               className="block w-full rounded-lg bg-primary py-5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-on-primary transition-all hover:bg-on-primary-container active:scale-[0.98]"
             >
-              {t("proceedToCheckout")}
+              {isGuestCart ? t("signInToCheckout") : t("proceedToCheckout")}
             </Link>
           </div>
         </div>

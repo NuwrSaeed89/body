@@ -65,6 +65,7 @@ type AdminProductsTableProps = {
   emptyMessage: string;
   canMutate: boolean;
   deletingId: string | null;
+  onView: (product: AdminProductRow) => void;
   onEdit: (product: AdminProductRow) => void;
   onDelete: (product: AdminProductRow) => void;
 };
@@ -74,6 +75,7 @@ export function AdminProductsTable({
   emptyMessage,
   canMutate,
   deletingId,
+  onView,
   onEdit,
   onDelete,
 }: AdminProductsTableProps) {
@@ -135,33 +137,46 @@ export function AdminProductsTable({
                   <AdminProductStockBadge product={product} />
                 </td>
                 <td className={`${TABLE_CELL_CLASS} text-right`}>
-                  {canMutate && (
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          onEdit(product);
-                        }}
-                        className="material-symbols-outlined rounded-full p-1 text-[20px] text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
-                        aria-label={`Edit ${product.name}`}
-                      >
-                        edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          onDelete(product);
-                        }}
-                        disabled={deletingId === product.id}
-                        className="material-symbols-outlined rounded-full p-1 text-[20px] text-on-surface-variant transition-colors hover:bg-surface-container hover:text-error disabled:opacity-50"
-                        aria-label={`Delete ${product.name}`}
-                      >
-                        {deletingId === product.id ? "hourglass_empty" : "delete"}
-                      </button>
-                    </div>
-                  )}
+                  <div className="flex items-center justify-end gap-1">
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onView(product);
+                      }}
+                      className="material-symbols-outlined rounded-full p-1 text-[20px] text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+                      aria-label={`View ${product.name}`}
+                    >
+                      open_in_new
+                    </button>
+                    {canMutate && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onEdit(product);
+                          }}
+                          className="material-symbols-outlined rounded-full p-1 text-[20px] text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+                          aria-label={`Edit ${product.name}`}
+                        >
+                          edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onDelete(product);
+                          }}
+                          disabled={deletingId === product.id}
+                          className="material-symbols-outlined rounded-full p-1 text-[20px] text-on-surface-variant transition-colors hover:bg-surface-container hover:text-error disabled:opacity-50"
+                          aria-label={`Delete ${product.name}`}
+                        >
+                          {deletingId === product.id ? "hourglass_empty" : "delete"}
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))

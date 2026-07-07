@@ -92,6 +92,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const supabase = createSupabaseBrowserClient();
     let isActive = true;
+    let keepAliveInFlight = false;
+    let keepAliveTimer: number | null = null;
 
     const toMockUser = (
       authUser: { id: string; email?: string | null; user_metadata?: Record<string, unknown> } | null,
@@ -106,22 +108,47 @@ export function AuthProvider({ children }: AuthProviderProps) {
       };
     };
 
-    void supabase.auth.getSession().then(({ data }) => {
-      if (!isActive) return;
-      setUser(toMockUser(data.session?.user ?? null));
-      setMounted(true);
-    });
+    const keepAlive = () => {
+      if (keepAliveInFlight) return;
+      if (keepAliveTimer) return;
+
+      keepAliveTimer = window.setTimeout(() => {
+        keepAliveTimer = null;
+        keepAliveInFlight = true;
+        void fetch("/api/auth/session", { credentials: "include", cache: "no-store" })
+          .catch(() => undefined)
+          .finally(() => {
+            keepAliveInFlight = false;
+          });
+      }, 250);
+    };
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (!isActive) return;
       setUser(toMockUser(session?.user ?? null));
+      if (event === "INITIAL_SESSION") {
+        setMounted(true);
+      }
     });
+
+    const onFocus = () => keepAlive();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") keepAlive();
+    };
+
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisible);
+    const keepAliveInterval = window.setInterval(keepAlive, 4 * 60 * 1000);
 
     return () => {
       isActive = false;
       subscription.unsubscribe();
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.clearInterval(keepAliveInterval);
+      if (keepAliveTimer) window.clearTimeout(keepAliveTimer);
     };
   }, []);
 

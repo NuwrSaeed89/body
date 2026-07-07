@@ -63,6 +63,8 @@ export function AdminProductsClient({
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [editingProduct, setEditingProduct] = useState<ProductDetail | null>(null);
   const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
+  const [editingModelUrl, setEditingModelUrl] = useState<string | null>(null);
+  const [editingModelFileName, setEditingModelFileName] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -116,6 +118,8 @@ export function AdminProductsClient({
     setFormMode("create");
     setEditingProduct(null);
     setEditingImageUrl(null);
+    setEditingModelUrl(null);
+    setEditingModelFileName(null);
     setFormOpen(true);
     setActionError(null);
   };
@@ -124,8 +128,14 @@ export function AdminProductsClient({
     setFormMode("edit");
     setEditingProduct(rowToProductDetail(product, locale));
     setEditingImageUrl(product.imageUrl);
+    setEditingModelUrl(product.modelGlbUrl);
+    setEditingModelFileName(product.modelFileName);
     setFormOpen(true);
     setActionError(null);
+  };
+
+  const openStoreProduct = (product: AdminProductRow) => {
+    window.open(`/${locale}/shop/${product.slug}`, "_blank", "noopener,noreferrer");
   };
 
   const handleDelete = async (product: AdminProductRow) => {
@@ -314,33 +324,46 @@ export function AdminProductsClient({
                       <AdminProductStockBadge product={product} />
                     </div>
                   </div>
-                  {canMutate && (
-                    <div className="flex shrink-0 gap-1">
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          openEdit(product);
-                        }}
-                        className="material-symbols-outlined rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
-                        aria-label={`Edit ${product.name}`}
-                      >
-                        edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          void handleDelete(product);
-                        }}
-                        disabled={deletingId === product.id}
-                        className="material-symbols-outlined rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-error disabled:opacity-50"
-                        aria-label={`Delete ${product.name}`}
-                      >
-                        {deletingId === product.id ? "hourglass_empty" : "delete"}
-                      </button>
-                    </div>
-                  )}
+                  <div className="flex shrink-0 gap-1">
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        openStoreProduct(product);
+                      }}
+                      className="material-symbols-outlined rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+                      aria-label={`View ${product.name}`}
+                    >
+                      open_in_new
+                    </button>
+                    {canMutate && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openEdit(product);
+                          }}
+                          className="material-symbols-outlined rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+                          aria-label={`Edit ${product.name}`}
+                        >
+                          edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            void handleDelete(product);
+                          }}
+                          disabled={deletingId === product.id}
+                          className="material-symbols-outlined rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-error disabled:opacity-50"
+                          aria-label={`Delete ${product.name}`}
+                        >
+                          {deletingId === product.id ? "hourglass_empty" : "delete"}
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </li>
             ))
@@ -353,6 +376,7 @@ export function AdminProductsClient({
             emptyMessage={emptyMessage}
             canMutate={canMutate}
             deletingId={deletingId}
+            onView={openStoreProduct}
             onEdit={openEdit}
             onDelete={(product) => void handleDelete(product)}
           />
@@ -366,6 +390,9 @@ export function AdminProductsClient({
         categories={categories}
         initial={editingProduct}
         imageUrl={editingImageUrl}
+        modelGlbUrl={editingModelUrl}
+        modelFileName={editingModelFileName}
+        canMutate={canMutate}
         onClose={() => setFormOpen(false)}
         onSaved={() => router.refresh()}
       />

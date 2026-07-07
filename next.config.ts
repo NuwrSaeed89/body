@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_USE_MOCK_DATA: String(publicEnv.useMockData),
   },
   images: {
+    qualities: [75, 85, 90],
     remotePatterns: [
       {
         protocol: "https",

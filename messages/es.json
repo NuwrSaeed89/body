@@ -10,6 +10,15 @@
     "footerNav": "Navegación del pie de página",
     "siteFooter": "Pie de página del sitio"
   },
+  "notFound": {
+    "metaTitle": "Página no encontrada | Mbody",
+    "metaDescription": "La página que buscas no existe o ha sido movida.",
+    "eyebrow": "Error 404",
+    "title": "Página no encontrada",
+    "description": "La página que buscas no existe o puede haber sido movida. Vuelve al inicio o explora la tienda.",
+    "backHome": "Volver al inicio",
+    "shopNow": "Comprar ahora"
+  },
   "nav": {
     "new": "Nuevo",
     "shop": "Tienda",
@@ -27,10 +36,13 @@
   },
   "header": {
     "currency": "EUR",
+    "viewProfile": "Ver perfil",
     "aria": {
       "search": "Buscar",
       "favorite": "Lista de deseos",
       "person": "Cuenta",
+      "personSignedIn": "Sesión iniciada — abrir cuenta",
+      "accountMenu": "Menú de cuenta",
       "shopping_bag": "Carrito",
       "menu": "Abrir menú",
       "close": "Cerrar menú"
@@ -357,6 +369,8 @@
     "itemsTotal": "{count} artículos en total",
     "selection": "Tu selección ({count})",
     "remove": "Eliminar",
+    "outOfStock": "No hay suficiente stock para esta cantidad.",
+    "updateError": "No se pudo actualizar tu bolsa. Inténtalo de nuevo.",
     "shippingNoticeTitle": "Envío gratuito aplicado.",
     "shippingNoticeBody": "Has alcanzado el mínimo de $150 para entrega premium.",
     "shippingNoticeTitleFree": "Envío gratuito aplicado.",
@@ -373,6 +387,7 @@
     "total": "Total",
     "klarna": "o 4 pagos de {amount} con Klarna.",
     "proceedToCheckout": "Ir al pago",
+    "signInToCheckout": "Inicia sesión para pagar",
     "payWithPaypal": "Pagar con PayPal",
     "promoCode": "Código promocional",
     "apply": "Aplicar",
@@ -512,6 +527,8 @@
       "signInTitle": "Inicia sesión en Mbody",
       "email": "Correo electrónico",
       "password": "Contraseña",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
       "forgotPassword": "¿Olvidaste?",
       "forgotPasswordTitle": "Restablece tu contraseña",
       "forgotPasswordDescription": "Introduce tu correo y te enviaremos un enlace de restablecimiento.",

@@ -33,7 +33,7 @@ export default async function ShopPage({ params }: ShopPageProps) {
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <span className="text-primary">{t("breadcrumb.shop")}</span>
         </nav>
-        <ShopPageContent products={products} />
+        <ShopPageContent locale={locale} products={products} />
       </PageContainer>
 
       <div className="hidden md:block">

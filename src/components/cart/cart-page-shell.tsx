@@ -16,6 +16,7 @@ import {
 } from "@/lib/cart-data";
 import { useAuth } from "@/providers/auth-provider";
 import { useCart } from "@/providers/cart-provider";
+import { shouldUseCartMock } from "@/lib/cart/should-use-cart-mock";
 
 type Quantities = Record<string, number>;
 
@@ -108,7 +109,7 @@ export function CartPageShell() {
   const { items, itemCount, mounted: cartMounted, loading } = useCart();
 
   const ready = authMounted && cartMounted;
-  const useLiveCart = ready && isAuthenticated;
+  const useLiveCart = ready && (isAuthenticated || !shouldUseCartMock());
   const liveEmpty = useLiveCart && items.length === 0;
 
   if (!ready || (useLiveCart && loading)) {

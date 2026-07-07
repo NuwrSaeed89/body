@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
+import { Link } from "@/i18n/navigation";
 import { getServerAdminUser } from "@/lib/auth/get-session";
 import { hasSupabaseConfig } from "@/lib/env";
 
@@ -43,8 +44,18 @@ export default async function AdminLoginPage({ params }: AdminLoginPageProps) {
           <AdminLoginForm />
         </Suspense>
 
-        <p className="mt-8 text-center text-[10px] uppercase tracking-widest text-on-surface-variant/70">
-          Session secured via Supabase Auth
+        <p className="mt-8 text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-on-surface-variant transition-colors hover:text-primary"
+          >
+            <span className="material-symbols-outlined text-[16px]">storefront</span>
+            View Store
+          </Link>
+        </p>
+
+        <p className="mt-4 text-center text-[10px] uppercase tracking-widest text-on-surface-variant/70">
+          Session secured
         </p>
       </div>
     </div>
