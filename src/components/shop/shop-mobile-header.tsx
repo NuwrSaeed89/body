@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { SearchOverlayTrigger } from "@/components/search/search-overlay-trigger";
 
 export function ShopMobileHeader() {
   const t = useTranslations();
@@ -14,13 +15,10 @@ export function ShopMobileHeader() {
       <div className="text-lg font-bold uppercase tracking-tighter text-primary">Mbody</div>
 
       <div className="flex items-center gap-4">
-        <button
-          type="button"
+        <SearchOverlayTrigger
           className="text-primary transition-opacity active:opacity-60"
-          aria-label={t("header.aria.search")}
-        >
-          <span className="material-symbols-outlined text-[24px]">search</span>
-        </button>
+          ariaLabel={t("header.aria.search")}
+        />
         <Link
           href="/cart"
           className="relative text-primary transition-opacity active:opacity-60"

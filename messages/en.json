@@ -286,7 +286,9 @@
       "loading": "Loading 3D model…",
       "error": "Could not load 3D model",
       "hint": "Drag to rotate · Pinch to zoom · Two fingers to pan",
-      "backToImages": "Images"
+      "backToImages": "Images",
+      "fullscreen": "Fullscreen",
+      "exitFullscreen": "Exit full screen"
     }
   },
   "newDrops": {
@@ -439,13 +441,27 @@
       }
     },
     "crossSell": {
-      "cloud-hoodie": { "name": "Cloud Cropped Hoodie" },
-      "ankle-sock": { "name": "Performance Ankle Sock" },
-      "core-flask": { "name": "Core 500ml Flask" },
-      "yoga-mat": { "name": "Grip Motion Yoga Mat" },
-      "aero-jacket": { "name": "Aero Shell Jacket" },
-      "studio-tote": { "name": "Core Studio Tote" },
-      "crew-socks": { "name": "Flow Crew Socks" }
+      "cloud-hoodie": {
+        "name": "Cloud Cropped Hoodie"
+      },
+      "ankle-sock": {
+        "name": "Performance Ankle Sock"
+      },
+      "core-flask": {
+        "name": "Core 500ml Flask"
+      },
+      "yoga-mat": {
+        "name": "Grip Motion Yoga Mat"
+      },
+      "aero-jacket": {
+        "name": "Aero Shell Jacket"
+      },
+      "studio-tote": {
+        "name": "Core Studio Tote"
+      },
+      "crew-socks": {
+        "name": "Flow Crew Socks"
+      }
     },
     "empty": {
       "message": "Your bag is empty.",
@@ -481,13 +497,31 @@
         "account": "Account"
       },
       "products": {
-        "aero-sculpt-legging": { "name": "Aero-Sculpt Legging", "color": "Carbon Black" },
-        "precision-bra": { "name": "Precision Support Bra", "color": "Slate Grey" },
-        "vapor-shell": { "name": "Vapor Shell Jacket", "color": "Oyster White" },
-        "ribbed-short": { "name": "Ribbed Core Short", "color": "Moss Green" },
-        "sculpt-legging-mh": { "name": "Sculpt High-Rise Legging" },
-        "ribbed-bra-mh": { "name": "Ribbed Core Bra" },
-        "studio-parka-mh": { "name": "Over-Sized Studio Parka" }
+        "aero-sculpt-legging": {
+          "name": "Aero-Sculpt Legging",
+          "color": "Carbon Black"
+        },
+        "precision-bra": {
+          "name": "Precision Support Bra",
+          "color": "Slate Grey"
+        },
+        "vapor-shell": {
+          "name": "Vapor Shell Jacket",
+          "color": "Oyster White"
+        },
+        "ribbed-short": {
+          "name": "Ribbed Core Short",
+          "color": "Moss Green"
+        },
+        "sculpt-legging-mh": {
+          "name": "Sculpt High-Rise Legging"
+        },
+        "ribbed-bra-mh": {
+          "name": "Ribbed Core Bra"
+        },
+        "studio-parka-mh": {
+          "name": "Over-Sized Studio Parka"
+        }
       }
     }
   },
@@ -521,16 +555,82 @@
     "removed": "Removed from your wishlist",
     "remove": "Remove",
     "viewProduct": "View Product",
-    "membersOnly": "Sign in to save items to your wishlist"
+    "membersOnly": "Sign in to save items to your wishlist",
+    "mobile": {
+      "openMenu": "Open menu",
+      "title": "Wishlist",
+      "savedItems": "Saved Items",
+      "collection": "Your Collection",
+      "itemPill": "{count, plural, one {# Item} other {# Items}}",
+      "sortedNewest": "Sorted: Newest",
+      "quickAdd": "Quick add"
+    }
   },
   "account": {
     "title": "My Account",
+    "mobileTitle": "Account",
+    "subtitle": "Manage your orders, wishlist, and personal preferences.",
     "welcome": "Welcome back",
     "welcomeNamed": "Welcome back, {name}",
     "signOut": "Sign Out",
     "welcomeDescription": "Track orders, manage your wishlist, and update your preferences.",
     "continueShopping": "Continue Shopping",
     "recentOrders": "Recent Orders",
+    "savedItems": "Saved Items",
+    "viewAllWishlist": "View All",
+    "tabs": {
+      "ariaLabel": "Account sections",
+      "orders": "Order History",
+      "wishlist": "Wishlist",
+      "profile": "Profile Details"
+    },
+    "orders": {
+      "found": "{count, plural, one {# Order Found} other {# Orders Found}}",
+      "orderNumber": "Order #{id}",
+      "date": "Date",
+      "items": "Items",
+      "itemCount": "{count, plural, one {# Product} other {# Products}}",
+      "total": "Total",
+      "estDelivery": "Est. Delivery",
+      "statusLabel": "Status",
+      "trackOrder": "Track Order",
+      "details": "Details",
+      "buyAgain": "Buy Again",
+      "returnItem": "Return",
+      "status": {
+        "inTransit": "In Transit",
+        "delivered": "Delivered",
+        "shipped": "Shipped"
+      }
+    },
+    "profile": {
+      "personalInfo": "Personal Information",
+      "saveChanges": "Save Changes",
+      "savedAddresses": "Saved Addresses",
+      "addAddress": "+ Add New",
+      "default": "Default",
+      "home": "Home",
+      "studio": "Studio",
+      "unitedStates": "United States",
+      "placeholderName": "Member"
+    },
+    "mobile": {
+      "eliteMember": "Elite Member",
+      "recentOrder": "Recent Order",
+      "viewAll": "View All",
+      "orderStatus": "{status} • Arriving {delivery}",
+      "management": "Management",
+      "managementLinks": {
+        "wishlist": "Wishlist",
+        "shippingAddresses": "Shipping Addresses",
+        "payment": "Payment",
+        "support": "Support"
+      },
+      "accountSettings": "Account Settings",
+      "privacyPreferences": "Privacy & Preferences",
+      "logOut": "Log Out",
+      "avatarAlt": "Profile photo of {name}"
+    },
     "nav": {
       "overview": "Overview",
       "orders": "Orders",

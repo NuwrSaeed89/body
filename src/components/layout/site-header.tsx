@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { AccountHeaderLink } from "@/components/layout/account-header-link";
 import { CartHeaderLink } from "@/components/layout/cart-header-link";
+import { SearchOverlayTrigger } from "@/components/search/search-overlay-trigger";
 import { WishlistHeaderLink } from "@/components/layout/wishlist-header-link";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { MobileNav } from "./mobile-nav";
@@ -111,12 +112,18 @@ export async function SiteHeader({
                     className={className}
                     isDark={isDark}
                   />
+                ) : icon === "search" ? (
+                  <SearchOverlayTrigger
+                    key={icon}
+                    className={className}
+                    ariaLabel={t(`header.aria.${icon}`)}
+                  />
                 ) : (
                   <button
                     key={icon}
                     type="button"
                     className={className}
-                    aria-label={t(`header.aria.${icon}`)}
+                    aria-label={t("a11y.primaryNav")}
                   >
                     {iconEl}
                   </button>

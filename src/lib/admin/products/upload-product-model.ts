@@ -121,4 +121,22 @@ export async function deleteProductModel(productId: string): Promise<void> {
   }
 }
 
+export async function registerProductModelUrl(
+  productId: string,
+  publicUrl: string,
+): Promise<ProductModelUploadResult> {
+  const response = await fetch(`/api/admin/products/${productId}/model`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ publicUrl: publicUrl.trim() }),
+  });
+
+  const body = (await response.json()) as RegisterResponse;
+  if (!response.ok || !body.model) {
+    throw new Error(body.error ?? "Could not save model URL");
+  }
+
+  return body.model;
+}
+
 export { isUploadAbortError };

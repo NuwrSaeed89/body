@@ -16,6 +16,8 @@ export type ProductWriteInput = {
   lowStockThreshold?: number;
   locale?: string;
   categoryId?: string | null;
+  /** When false, product PATCH does not redistribute stock across variants (matrix API owns stock). */
+  syncVariantStock?: boolean;
 };
 
 export type ProductDetail = ProductWriteInput & {

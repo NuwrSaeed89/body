@@ -180,7 +180,10 @@
     "itemCount": "{count} artículos",
     "outOfStock": "Agotado",
     "notifyMe": "Avísame",
-    "breadcrumb": { "home": "Inicio", "shop": "Tienda" },
+    "breadcrumb": {
+      "home": "Inicio",
+      "shop": "Tienda"
+    },
     "categories": {
       "all": "Todos",
       "leggings": "Leggings",
@@ -226,7 +229,10 @@
     }
   },
   "pdp": {
-    "breadcrumb": { "home": "Inicio", "shop": "Tienda" },
+    "breadcrumb": {
+      "home": "Inicio",
+      "shop": "Tienda"
+    },
     "socialProof": "Elegido por {count} atletas este mes",
     "inclVat": "IVA incl.",
     "limitedStock": "Stock limitado",
@@ -280,7 +286,9 @@
       "loading": "Cargando modelo 3D…",
       "error": "No se pudo cargar el modelo 3D",
       "hint": "Arrastra para rotar · Pellizca para zoom · Dos dedos para desplazar",
-      "backToImages": "Imágenes"
+      "backToImages": "Imágenes",
+      "fullscreen": "Pantalla completa",
+      "exitFullscreen": "Salir de pantalla completa"
     }
   },
   "newDrops": {
@@ -433,13 +441,27 @@
       }
     },
     "crossSell": {
-      "cloud-hoodie": { "name": "Cloud Cropped Hoodie" },
-      "ankle-sock": { "name": "Performance Ankle Sock" },
-      "core-flask": { "name": "Core 500ml Flask" },
-      "yoga-mat": { "name": "Grip Motion Yoga Mat" },
-      "aero-jacket": { "name": "Aero Shell Jacket" },
-      "studio-tote": { "name": "Core Studio Tote" },
-      "crew-socks": { "name": "Flow Crew Socks" }
+      "cloud-hoodie": {
+        "name": "Cloud Cropped Hoodie"
+      },
+      "ankle-sock": {
+        "name": "Performance Ankle Sock"
+      },
+      "core-flask": {
+        "name": "Core 500ml Flask"
+      },
+      "yoga-mat": {
+        "name": "Grip Motion Yoga Mat"
+      },
+      "aero-jacket": {
+        "name": "Aero Shell Jacket"
+      },
+      "studio-tote": {
+        "name": "Core Studio Tote"
+      },
+      "crew-socks": {
+        "name": "Flow Crew Socks"
+      }
     },
     "empty": {
       "message": "Tu bolsa está vacía.",
@@ -459,17 +481,47 @@
       "footerTagline": "Elevando el rendimiento humano mediante diseño arquitectónico e innovación técnica sin compromisos.",
       "newsletterHint": "Únete para acceso exclusivo a lanzamientos e insights atléticos.",
       "copyright": "© 2024 Mbody. Todos los derechos reservados.",
-      "badges": { "newArrival": "Novedad", "limited": "Limited" },
-      "categories": { "compression": "Compresión", "essentials": "Esenciales", "outerwear": "Outerwear" },
-      "bottomNav": { "shop": "Tienda", "discover": "Descubrir", "bag": "Bolsa", "account": "Cuenta" },
+      "badges": {
+        "newArrival": "Novedad",
+        "limited": "Limited"
+      },
+      "categories": {
+        "compression": "Compresión",
+        "essentials": "Esenciales",
+        "outerwear": "Outerwear"
+      },
+      "bottomNav": {
+        "shop": "Tienda",
+        "discover": "Descubrir",
+        "bag": "Bolsa",
+        "account": "Cuenta"
+      },
       "products": {
-        "aero-sculpt-legging": { "name": "Aero-Sculpt Legging", "color": "Carbon Black" },
-        "precision-bra": { "name": "Precision Support Bra", "color": "Slate Grey" },
-        "vapor-shell": { "name": "Vapor Shell Jacket", "color": "Oyster White" },
-        "ribbed-short": { "name": "Ribbed Core Short", "color": "Moss Green" },
-        "sculpt-legging-mh": { "name": "Sculpt High-Rise Legging" },
-        "ribbed-bra-mh": { "name": "Ribbed Core Bra" },
-        "studio-parka-mh": { "name": "Over-Sized Studio Parka" }
+        "aero-sculpt-legging": {
+          "name": "Aero-Sculpt Legging",
+          "color": "Carbon Black"
+        },
+        "precision-bra": {
+          "name": "Precision Support Bra",
+          "color": "Slate Grey"
+        },
+        "vapor-shell": {
+          "name": "Vapor Shell Jacket",
+          "color": "Oyster White"
+        },
+        "ribbed-short": {
+          "name": "Ribbed Core Short",
+          "color": "Moss Green"
+        },
+        "sculpt-legging-mh": {
+          "name": "Sculpt High-Rise Legging"
+        },
+        "ribbed-bra-mh": {
+          "name": "Ribbed Core Bra"
+        },
+        "studio-parka-mh": {
+          "name": "Over-Sized Studio Parka"
+        }
       }
     }
   },
@@ -507,12 +559,69 @@
   },
   "account": {
     "title": "Mi cuenta",
+    "mobileTitle": "Mi cuenta",
+    "subtitle": "Gestiona pedidos, favoritos y preferencias personales.",
     "welcome": "Bienvenida de nuevo",
     "welcomeNamed": "Bienvenida de nuevo, {name}",
     "signOut": "Cerrar sesión",
     "welcomeDescription": "Sigue pedidos, gestiona favoritos y actualiza preferencias.",
     "continueShopping": "Seguir comprando",
     "recentOrders": "Pedidos recientes",
+    "savedItems": "Artículos guardados",
+    "viewAllWishlist": "Ver todo",
+    "tabs": {
+      "ariaLabel": "Secciones de la cuenta",
+      "orders": "Historial de pedidos",
+      "wishlist": "Favoritos",
+      "profile": "Detalles del perfil"
+    },
+    "orders": {
+      "found": "{count, plural, one {# pedido encontrado} other {# pedidos encontrados}}",
+      "orderNumber": "Pedido #{id}",
+      "date": "Fecha",
+      "items": "Artículos",
+      "itemCount": "{count, plural, one {# producto} other {# productos}}",
+      "total": "Total",
+      "estDelivery": "Entrega est.",
+      "statusLabel": "Estado",
+      "trackOrder": "Rastrear pedido",
+      "details": "Detalles",
+      "buyAgain": "Comprar de nuevo",
+      "returnItem": "Devolver",
+      "status": {
+        "inTransit": "En tránsito",
+        "delivered": "Entregado",
+        "shipped": "Enviado"
+      }
+    },
+    "profile": {
+      "personalInfo": "Información personal",
+      "saveChanges": "Guardar cambios",
+      "savedAddresses": "Direcciones guardadas",
+      "addAddress": "+ Añadir nueva",
+      "default": "Predeterminada",
+      "home": "Casa",
+      "studio": "Estudio",
+      "unitedStates": "Estados Unidos",
+      "placeholderName": "Miembro"
+    },
+    "mobile": {
+      "eliteMember": "Miembro Elite",
+      "recentOrder": "Pedido reciente",
+      "viewAll": "Ver todo",
+      "orderStatus": "{status} • Llega {delivery}",
+      "management": "Gestión",
+      "managementLinks": {
+        "wishlist": "Favoritos",
+        "shippingAddresses": "Direcciones de envío",
+        "payment": "Pago",
+        "support": "Soporte"
+      },
+      "accountSettings": "Ajustes de cuenta",
+      "privacyPreferences": "Privacidad y preferencias",
+      "logOut": "Cerrar sesión",
+      "avatarAlt": "Foto de perfil de {name}"
+    },
     "nav": {
       "overview": "Resumen",
       "orders": "Pedidos",

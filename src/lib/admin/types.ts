@@ -9,7 +9,8 @@ export type AdminMetric = {
 
 export type AdminRevenueBar = {
   month: string;
-  amountSek: number;
+  amount: number;
+  amountLabel: string;
   heightPercent: number;
 };
 
@@ -27,6 +28,16 @@ export type AdminRecentOrder = {
   total: string;
 };
 
+export type AdminLowStockAlert = {
+  id: string;
+  name: string;
+  slug: string;
+  stock: number;
+  lowStockThreshold: number;
+  imageUrl: string | null;
+  status: "low" | "out";
+};
+
 export type AdminDashboardData = {
   source: "supabase" | "mock";
   managerName: string;
@@ -35,4 +46,5 @@ export type AdminDashboardData = {
   revenueTrends: AdminRevenueBar[];
   topCollections: AdminTopCollection[];
   recentOrders: AdminRecentOrder[];
+  lowStockAlerts: AdminLowStockAlert[];
 };

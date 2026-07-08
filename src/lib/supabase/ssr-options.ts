@@ -16,15 +16,6 @@ export const supabaseSsrAuthOptions = {
   },
 } as const;
 
-/** Node route handlers — may refresh tokens and write cookies. */
-export const supabaseNodeRefreshAuthOptions = {
-  auth: {
-    autoRefreshToken: true,
-    detectSessionInUrl: false,
-    persistSession: false,
-  },
-} as const;
-
 /** Browser — keep users signed in until explicit sign-out. */
 export const supabaseBrowserAuthOptions = {
   auth: {

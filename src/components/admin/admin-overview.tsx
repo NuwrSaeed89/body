@@ -5,13 +5,14 @@ import {
   adminTableHeadCellClass,
 } from "./admin-layout-styles";
 import { AdminPageHeader } from "./admin-page-header";
+import { Link } from "@/i18n/navigation";
 
 type AdminOverviewProps = {
   data: AdminDashboardData;
 };
 
 export function AdminOverview({ data }: AdminOverviewProps) {
-  const { source, metrics, revenueTrends, topCollections, recentOrders } = data;
+  const { source, metrics, revenueTrends, topCollections, recentOrders, lowStockAlerts } = data;
 
   const maxBarIndex = revenueTrends.reduce(
     (best, bar, index) =>
@@ -23,9 +24,17 @@ export function AdminOverview({ data }: AdminOverviewProps) {
     <section className={adminPageSectionClass}>
       <AdminPageHeader
         title="Sales Overview"
-        description="Real-time performance tracking for Mbody Sweden."
+        description="Real-time performance tracking for Mbody."
         source={source}
-      />
+      >
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-primary transition-colors hover:bg-surface-container"
+        >
+          <span className="material-symbols-outlined text-[16px]">home</span>
+          View Home
+        </Link>
+      </AdminPageHeader>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {metrics.map((metric) => (
@@ -52,6 +61,65 @@ export function AdminOverview({ data }: AdminOverviewProps) {
         ))}
       </div>
 
+      {lowStockAlerts.length > 0 && (
+        <article className="mt-8 overflow-hidden rounded-xl border border-error/30 bg-error/5">
+          <div className="flex flex-col gap-3 border-b border-error/20 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-error">inventory_2</span>
+              <div>
+                <h3 className="text-lg font-semibold text-primary">Low-stock alerts</h3>
+                <p className="text-sm text-on-surface-variant">
+                  {lowStockAlerts.length} product{lowStockAlerts.length === 1 ? "" : "s"} need attention
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/admin/products"
+              className="inline-flex items-center justify-center rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-primary transition-colors hover:bg-surface-container"
+            >
+              Manage inventory
+            </Link>
+          </div>
+          <ul className="divide-y divide-error/10">
+            {lowStockAlerts.map((alert) => (
+              <li key={alert.id} className="flex items-center gap-3 px-4 py-3 sm:px-5">
+                <div className="h-10 w-8 shrink-0 overflow-hidden rounded bg-surface-container">
+                  {alert.imageUrl ? (
+                    <img
+                      src={alert.imageUrl}
+                      alt=""
+                      className="size-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex size-full items-center justify-center">
+                      <span className="material-symbols-outlined text-sm text-on-surface-variant">
+                        image
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-primary">{alert.name}</p>
+                  <p className="text-xs text-on-surface-variant">
+                    {alert.stock} in stock · alert at ≤ {alert.lowStockThreshold}
+                  </p>
+                </div>
+                <span
+                  className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                    alert.status === "out"
+                      ? "bg-surface-variant text-on-surface"
+                      : "bg-error/15 text-error"
+                  }`}
+                >
+                  {alert.status === "out" ? "Out of stock" : "Low stock"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </article>
+      )}
+
       <div className="mt-8 grid grid-cols-1 gap-4 xl:grid-cols-3">
         <article className="rounded-xl border border-outline-variant bg-surface-container-low p-4 sm:p-6 xl:col-span-2">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -73,7 +141,7 @@ export function AdminOverview({ data }: AdminOverviewProps) {
                       index === maxBarIndex ? "bg-primary/30" : "bg-primary/15"
                     }`}
                     style={{ height: `${bar.heightPercent}%` }}
-                    title={`${bar.month}: ${bar.amountSek} SEK`}
+                    title={`${bar.month}: ${bar.amountLabel}`}
                   />
                 ))}
               </div>

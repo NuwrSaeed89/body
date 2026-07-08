@@ -180,7 +180,10 @@
     "itemCount": "{count} artiklar",
     "outOfStock": "Slut i lager",
     "notifyMe": "Meddela mig",
-    "breadcrumb": { "home": "Hem", "shop": "Shop" },
+    "breadcrumb": {
+      "home": "Hem",
+      "shop": "Shop"
+    },
     "categories": {
       "all": "Alla",
       "leggings": "Leggings",
@@ -226,7 +229,10 @@
     }
   },
   "pdp": {
-    "breadcrumb": { "home": "Hem", "shop": "Shop" },
+    "breadcrumb": {
+      "home": "Hem",
+      "shop": "Shop"
+    },
     "socialProof": "Vald av {count} atleter denna månad",
     "inclVat": "Inkl. moms",
     "limitedStock": "Begränsat lager",
@@ -280,7 +286,9 @@
       "loading": "Laddar 3D-modell…",
       "error": "Kunde inte ladda 3D-modellen",
       "hint": "Dra för att rotera · Nyp för att zooma · Två fingrar för att panorera",
-      "backToImages": "Bilder"
+      "backToImages": "Bilder",
+      "fullscreen": "Helskärm",
+      "exitFullscreen": "Avsluta helskärm"
     }
   },
   "newDrops": {
@@ -433,13 +441,27 @@
       }
     },
     "crossSell": {
-      "cloud-hoodie": { "name": "Cloud Cropped Hoodie" },
-      "ankle-sock": { "name": "Performance Ankle Sock" },
-      "core-flask": { "name": "Core 500ml Flask" },
-      "yoga-mat": { "name": "Grip Motion Yoga Mat" },
-      "aero-jacket": { "name": "Aero Shell Jacket" },
-      "studio-tote": { "name": "Core Studio Tote" },
-      "crew-socks": { "name": "Flow Crew Socks" }
+      "cloud-hoodie": {
+        "name": "Cloud Cropped Hoodie"
+      },
+      "ankle-sock": {
+        "name": "Performance Ankle Sock"
+      },
+      "core-flask": {
+        "name": "Core 500ml Flask"
+      },
+      "yoga-mat": {
+        "name": "Grip Motion Yoga Mat"
+      },
+      "aero-jacket": {
+        "name": "Aero Shell Jacket"
+      },
+      "studio-tote": {
+        "name": "Core Studio Tote"
+      },
+      "crew-socks": {
+        "name": "Flow Crew Socks"
+      }
     },
     "empty": {
       "message": "Din väska är tom.",
@@ -459,17 +481,47 @@
       "footerTagline": "Höjer mänsklig prestation genom arkitektonisk design och kompromisslös teknisk innovation.",
       "newsletterHint": "Gå med för exklusiv tillgång till lanseringar och athletic insights.",
       "copyright": "© 2024 Mbody. Alla rättigheter förbehållna.",
-      "badges": { "newArrival": "Nyhet", "limited": "Limited" },
-      "categories": { "compression": "Compression", "essentials": "Essentials", "outerwear": "Ytterplagg" },
-      "bottomNav": { "shop": "Butik", "discover": "Upptäck", "bag": "Väska", "account": "Konto" },
+      "badges": {
+        "newArrival": "Nyhet",
+        "limited": "Limited"
+      },
+      "categories": {
+        "compression": "Compression",
+        "essentials": "Essentials",
+        "outerwear": "Ytterplagg"
+      },
+      "bottomNav": {
+        "shop": "Butik",
+        "discover": "Upptäck",
+        "bag": "Väska",
+        "account": "Konto"
+      },
       "products": {
-        "aero-sculpt-legging": { "name": "Aero-Sculpt Legging", "color": "Carbon Black" },
-        "precision-bra": { "name": "Precision Support Bra", "color": "Slate Grey" },
-        "vapor-shell": { "name": "Vapor Shell Jacket", "color": "Oyster White" },
-        "ribbed-short": { "name": "Ribbed Core Short", "color": "Moss Green" },
-        "sculpt-legging-mh": { "name": "Sculpt High-Rise Legging" },
-        "ribbed-bra-mh": { "name": "Ribbed Core Bra" },
-        "studio-parka-mh": { "name": "Over-Sized Studio Parka" }
+        "aero-sculpt-legging": {
+          "name": "Aero-Sculpt Legging",
+          "color": "Carbon Black"
+        },
+        "precision-bra": {
+          "name": "Precision Support Bra",
+          "color": "Slate Grey"
+        },
+        "vapor-shell": {
+          "name": "Vapor Shell Jacket",
+          "color": "Oyster White"
+        },
+        "ribbed-short": {
+          "name": "Ribbed Core Short",
+          "color": "Moss Green"
+        },
+        "sculpt-legging-mh": {
+          "name": "Sculpt High-Rise Legging"
+        },
+        "ribbed-bra-mh": {
+          "name": "Ribbed Core Bra"
+        },
+        "studio-parka-mh": {
+          "name": "Over-Sized Studio Parka"
+        }
       }
     }
   },
@@ -507,12 +559,69 @@
   },
   "account": {
     "title": "Mitt konto",
+    "mobileTitle": "Mitt konto",
+    "subtitle": "Hantera beställningar, önskelista och personliga inställningar.",
     "welcome": "Välkommen tillbaka",
     "welcomeNamed": "Välkommen tillbaka, {name}",
     "signOut": "Logga ut",
     "welcomeDescription": "Följ beställningar, hantera önskelista och uppdatera inställningar.",
     "continueShopping": "Fortsätt shoppa",
     "recentOrders": "Senaste beställningar",
+    "savedItems": "Sparade artiklar",
+    "viewAllWishlist": "Visa alla",
+    "tabs": {
+      "ariaLabel": "Kontosektioner",
+      "orders": "Orderhistorik",
+      "wishlist": "Önskelista",
+      "profile": "Profiluppgifter"
+    },
+    "orders": {
+      "found": "{count, plural, one {# beställning hittad} other {# beställningar hittade}}",
+      "orderNumber": "Order #{id}",
+      "date": "Datum",
+      "items": "Artiklar",
+      "itemCount": "{count, plural, one {# produkt} other {# produkter}}",
+      "total": "Totalt",
+      "estDelivery": "Ber. leverans",
+      "statusLabel": "Status",
+      "trackOrder": "Spåra order",
+      "details": "Detaljer",
+      "buyAgain": "Köp igen",
+      "returnItem": "Retur",
+      "status": {
+        "inTransit": "Under transport",
+        "delivered": "Levererad",
+        "shipped": "Skickad"
+      }
+    },
+    "profile": {
+      "personalInfo": "Personuppgifter",
+      "saveChanges": "Spara ändringar",
+      "savedAddresses": "Sparade adresser",
+      "addAddress": "+ Lägg till",
+      "default": "Standard",
+      "home": "Hem",
+      "studio": "Studio",
+      "unitedStates": "USA",
+      "placeholderName": "Medlem"
+    },
+    "mobile": {
+      "eliteMember": "Elitmedlem",
+      "recentOrder": "Senaste order",
+      "viewAll": "Visa alla",
+      "orderStatus": "{status} • Anländer {delivery}",
+      "management": "Hantering",
+      "managementLinks": {
+        "wishlist": "Önskelista",
+        "shippingAddresses": "Leveransadresser",
+        "payment": "Betalning",
+        "support": "Support"
+      },
+      "accountSettings": "Kontoinställningar",
+      "privacyPreferences": "Integritet & preferenser",
+      "logOut": "Logga ut",
+      "avatarAlt": "Profilbild av {name}"
+    },
     "nav": {
       "overview": "Översikt",
       "orders": "Beställningar",

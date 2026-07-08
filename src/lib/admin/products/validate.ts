@@ -1,3 +1,4 @@
+import { DEFAULT_PRODUCT_CURRENCY } from "@/lib/currency";
 import { PRODUCT_CURRENCIES, PRODUCT_STATUSES } from "./constants";
 import type { ProductWriteInput } from "./types";
 
@@ -70,9 +71,9 @@ export function parseProductWriteBody(body: unknown): ProductValidationResult {
     return { ok: false, error: "Compare-at price must be non-negative" };
   }
 
-  const currency = readString(raw.currency, "currency") ?? "SEK";
+  const currency = readString(raw.currency, "currency") ?? DEFAULT_PRODUCT_CURRENCY;
   if (!PRODUCT_CURRENCIES.includes(currency as (typeof PRODUCT_CURRENCIES)[number])) {
-    return { ok: false, error: "Currency must be SEK, USD, or EUR" };
+    return { ok: false, error: "Currency must be USD, EUR, or SEK" };
   }
 
   const lowStockThreshold = readNumber(raw.lowStockThreshold);
@@ -105,6 +106,7 @@ export function parseProductWriteBody(body: unknown): ProductValidationResult {
       lowStockThreshold: lowStockThreshold ?? 5,
       locale,
       categoryId,
+      syncVariantStock: raw.syncVariantStock === false ? false : true,
     },
   };
 }

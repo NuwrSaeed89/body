@@ -1,4 +1,14 @@
+export { ADMIN_DISPLAY_CURRENCY } from "@/lib/currency";
+
 import type { AdminMetricTrend } from "./types";
+import {
+  ADMIN_DISPLAY_CURRENCY,
+  amountToSek,
+  convertFromSek,
+  formatCurrency,
+  isCurrency,
+  type Currency,
+} from "@/lib/currency";
 
 const COMPLETED_ORDER_STATUSES = new Set([
   "paid",
@@ -18,13 +28,33 @@ export function formatOrderStatusLabel(status: string): string {
     .join(" ");
 }
 
+function intlLocale(locale: string): string {
+  if (locale === "sv") return "sv-SE";
+  if (locale === "de") return "de-DE";
+  return "en-US";
+}
+
+export function formatAdminAmount(
+  amount: number,
+  locale: string,
+  currency: Currency = ADMIN_DISPLAY_CURRENCY,
+): string {
+  return formatCurrency(amount, currency, intlLocale(locale));
+}
+
+export function formatAdminDisplayAmount(
+  amount: number,
+  fromCurrency: string,
+  locale: string,
+): string {
+  const currency = isCurrency(fromCurrency) ? fromCurrency : "SEK";
+  const displayAmount = convertFromSek(amountToSek(amount, currency), ADMIN_DISPLAY_CURRENCY);
+  return formatAdminAmount(displayAmount, locale, ADMIN_DISPLAY_CURRENCY);
+}
+
+/** @deprecated Use formatAdminAmount or formatAdminDisplayAmount */
 export function formatSekAmount(amount: number, locale: string): string {
-  const intlLocale = locale === "sv" ? "sv-SE" : locale === "de" ? "de-DE" : "en-SE";
-  return new Intl.NumberFormat(intlLocale, {
-    style: "currency",
-    currency: "SEK",
-    maximumFractionDigits: 0,
-  }).format(amount);
+  return formatAdminDisplayAmount(amount, "SEK", locale);
 }
 
 export function formatCompactCount(value: number): string {
@@ -34,8 +64,8 @@ export function formatCompactCount(value: number): string {
 }
 
 export function formatInteger(value: number, locale: string): string {
-  const intlLocale = locale === "sv" ? "sv-SE" : "en-SE";
-  return new Intl.NumberFormat(intlLocale).format(value);
+  const intl = locale === "sv" ? "sv-SE" : "en-US";
+  return new Intl.NumberFormat(intl).format(value);
 }
 
 export function formatPercent(value: number, digits = 1): string {
@@ -59,8 +89,7 @@ export function formatDelta(current: number, previous: number): {
 }
 
 export function formatOrderDate(iso: string, locale: string): string {
-  const intlLocale = locale === "sv" ? "sv-SE" : locale === "de" ? "de-DE" : "en-US";
-  return new Intl.DateTimeFormat(intlLocale, {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -83,4 +112,14 @@ export function lastNMonthBuckets(n: number): { key: string; label: string; star
     });
   }
   return buckets;
+}
+
+export function sumInAdminDisplayCurrency(
+  rows: { amount: number; currency?: string | null }[],
+): number {
+  return rows.reduce((sum, row) => {
+    const currency: Currency = isCurrency(row.currency ?? "") ? (row.currency as Currency) : "SEK";
+    const amountSek = amountToSek(Number(row.amount), currency);
+    return sum + convertFromSek(amountSek, ADMIN_DISPLAY_CURRENCY);
+  }, 0);
 }

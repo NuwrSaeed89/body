@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { ProductCardWishlistAction } from "@/components/product/product-card-wishlist-action";
 import { FormattedPrice } from "@/components/ui/formatted-price";
 import { ImageWithShimmer } from "@/components/ui/image-with-shimmer";
 import { Link } from "@/i18n/navigation";
@@ -21,16 +22,17 @@ export async function BoutiqueFavoritesSection({ locale }: BoutiqueFavoritesSect
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
         {products.map((product) => (
           <Link key={product.id} href={product.href ?? "/shop"} className="group">
-            <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-lg bg-surface-container-low luxury-shadow">
+            <div className="image-zoom-container relative mb-4 aspect-[4/5] overflow-hidden rounded-lg bg-surface-container-low luxury-shadow">
               <ImageWithShimmer
                 src={product.image}
                 alt={product.imageAlt}
                 fill
                 quality={85}
-                className="object-cover"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                 sizes="(max-width: 768px) 50vw, 25vw"
                 unoptimized={product.image.startsWith("http")}
               />
+              <ProductCardWishlistAction productId={product.id} />
             </div>
             <h3 className="mb-1 text-sm font-semibold text-primary">{product.name}</h3>
             <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-on-surface-variant">

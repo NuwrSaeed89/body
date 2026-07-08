@@ -1,9 +1,16 @@
 import {
+  formatAdminDisplayAmount,
   formatOrderDate,
   formatOrderStatusLabel,
-  formatSekAmount,
 } from "./format";
 import type { AdminOrdersData } from "./list-types";
+import {
+  DEFAULT_ADMIN_ORDER_FILTERS,
+  endOfDayIso,
+  filterMockOrders,
+  startOfDayIso,
+  type AdminOrderFilters,
+} from "./orders/filters";
 import { MOCK_ADMIN_ORDERS } from "./mock-list-data";
 import { shouldUseAdminMock } from "./should-use-mock";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -45,17 +52,37 @@ function resolveCustomer(
   return { name: email, email };
 }
 
-async function fetchOrders(locale: string): Promise<AdminOrdersData> {
+async function fetchOrders(
+  locale: string,
+  filters: AdminOrderFilters,
+): Promise<AdminOrdersData> {
   const supabase = createSupabaseAdminClient();
   const contentLocale = ["en", "sv", "es", "de"].includes(locale) ? locale : "en";
 
-  const { data: orders, error } = await supabase
+  let query = supabase
     .from("orders")
     .select(
       "id, order_number, user_id, status, grand_total, currency, is_cod, created_at, shipping_address",
     )
     .order("created_at", { ascending: false })
     .limit(100);
+
+  if (filters.status !== "all") {
+    query = query.eq("status", filters.status);
+  }
+  if (filters.payment === "cod") {
+    query = query.eq("is_cod", true);
+  } else if (filters.payment === "online") {
+    query = query.eq("is_cod", false);
+  }
+  if (filters.dateFrom) {
+    query = query.gte("created_at", startOfDayIso(filters.dateFrom));
+  }
+  if (filters.dateTo) {
+    query = query.lte("created_at", endOfDayIso(filters.dateTo));
+  }
+
+  const { data: orders, error } = await query;
 
   if (error) throw error;
 
@@ -79,9 +106,10 @@ async function fetchOrders(locale: string): Promise<AdminOrdersData> {
         customer: customer.name,
         email: customer.email,
         date: formatOrderDate(order.created_at, contentLocale),
+        createdAt: order.created_at,
         status: formatOrderStatusLabel(order.status),
         statusRaw: order.status,
-        total: formatSekAmount(Number(order.grand_total), contentLocale),
+        total: formatAdminDisplayAmount(Number(order.grand_total), order.currency, contentLocale),
         currency: order.currency,
         isCod: order.is_cod,
       };
@@ -89,14 +117,19 @@ async function fetchOrders(locale: string): Promise<AdminOrdersData> {
   };
 }
 
-export async function getAdminOrdersData(locale: string): Promise<AdminOrdersData> {
+export async function getAdminOrdersData(
+  locale: string,
+  filters: AdminOrderFilters = DEFAULT_ADMIN_ORDER_FILTERS,
+): Promise<AdminOrdersData> {
   if (shouldUseAdminMock()) {
-    return { source: "mock", orders: MOCK_ADMIN_ORDERS, totalCount: MOCK_ADMIN_ORDERS.length };
+    const orders = filterMockOrders(MOCK_ADMIN_ORDERS, filters);
+    return { source: "mock", orders, totalCount: orders.length };
   }
   try {
-    return await fetchOrders(locale);
+    return await fetchOrders(locale, filters);
   } catch (error) {
     console.error("[admin] orders fetch failed:", error);
-    return { source: "mock", orders: MOCK_ADMIN_ORDERS, totalCount: MOCK_ADMIN_ORDERS.length };
+    const orders = filterMockOrders(MOCK_ADMIN_ORDERS, filters);
+    return { source: "mock", orders, totalCount: orders.length };
   }
 }

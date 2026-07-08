@@ -1,4 +1,4 @@
-import { getServerAdminUser } from "@/lib/auth/get-session";
+import { resolveAdminUserFromCookies } from "@/lib/auth/get-session";
 import { hasSupabaseConfig } from "@/lib/env";
 import { shouldUseAdminMock } from "@/lib/admin/should-use-mock";
 
@@ -31,7 +31,7 @@ export async function requireAdminApiAccess(): Promise<
     return { user: { id: "dev-admin", email: "dev@localhost" } };
   }
 
-  const admin = await getServerAdminUser();
+  const admin = await resolveAdminUserFromCookies();
   if (!admin) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }

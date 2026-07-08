@@ -55,6 +55,7 @@ export function parseProductListQuery(searchParams: URLSearchParams): ProductLis
 
   return {
     locale: searchParams.get("locale") ?? "en",
+    q: searchParams.get("q")?.trim() || searchParams.get("query")?.trim() || undefined,
     category: category ?? undefined,
     collection: searchParams.get("collection")?.trim() || undefined,
     size: searchParams.get("size")?.trim().toUpperCase() || undefined,

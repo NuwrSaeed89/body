@@ -10,10 +10,12 @@ import { getStorefrontProducts } from "@/lib/catalog/get-storefront-catalog";
 
 type ShopPageProps = {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ q?: string }>;
 };
 
-export default async function ShopPage({ params }: ShopPageProps) {
+export default async function ShopPage({ params, searchParams }: ShopPageProps) {
   const { locale } = await params;
+  const { q = "" } = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("shop");
   const products = await getStorefrontProducts(locale);
@@ -33,7 +35,7 @@ export default async function ShopPage({ params }: ShopPageProps) {
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <span className="text-primary">{t("breadcrumb.shop")}</span>
         </nav>
-        <ShopPageContent locale={locale} products={products} />
+        <ShopPageContent locale={locale} products={products} initialQuery={q} />
       </PageContainer>
 
       <div className="hidden md:block">

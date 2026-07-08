@@ -1,5 +1,6 @@
 import { Shimmer } from "@/components/ui/shimmer";
 import { adminCardToolbarClass, adminPageSectionClass } from "./admin-layout-styles";
+import { AdminPageHeaderSkeleton } from "./admin-page-header-skeleton";
 
 function FolderCardSkeleton() {
   return (
@@ -65,15 +66,7 @@ export function AdminMediaContentSkeleton({
 export function AdminMediaListSkeleton() {
   return (
     <section className={adminPageSectionClass} aria-busy="true" aria-label="Loading media">
-      <header className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
-        <div className="min-w-0 space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <Shimmer className="h-7 w-24 sm:h-8" />
-            <Shimmer className="h-5 w-20 rounded-full" />
-          </div>
-          <Shimmer className="h-4 w-full max-w-2xl" />
-        </div>
-      </header>
+      <AdminPageHeaderSkeleton />
 
       <article className="overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest shadow-[0_30px_50px_-12px_rgba(18,18,18,0.03)]">
         <div className={adminCardToolbarClass}>

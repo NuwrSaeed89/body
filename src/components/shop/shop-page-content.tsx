@@ -14,21 +14,35 @@ import type { ShopCategory, ShopProduct } from "@/lib/shop-data";
 type ShopPageContentProps = {
   locale: string;
   products: ShopProduct[];
+  initialQuery?: string;
 };
 
-function buildProductsUrl(locale: string, category: ShopCategory, sort: string): string {
+function buildProductsUrl(
+  locale: string,
+  category: ShopCategory,
+  sort: string,
+  query: string,
+): string {
   const params = new URLSearchParams({ locale, sort });
   if (category !== "all") {
     params.set("category", category);
   }
+  if (query.trim()) {
+    params.set("q", query.trim());
+  }
   return `/api/products?${params.toString()}`;
 }
 
-export function ShopPageContent({ locale, products }: ShopPageContentProps) {
+export function ShopPageContent({
+  locale,
+  products,
+  initialQuery = "",
+}: ShopPageContentProps) {
   const t = useTranslations("shop");
   const [category, setCategory] = useState<ShopCategory>("all");
   const [filterOpen, setFilterOpen] = useState(false);
   const [sort, setSort] = useState("newest");
+  const [query, setQuery] = useState(initialQuery.trim());
   const [displayedProducts, setDisplayedProducts] = useState(products);
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +51,7 @@ export function ShopPageContent({ locale, products }: ShopPageContentProps) {
   }, [products]);
 
   useEffect(() => {
-    if (category === "all" && sort === "newest") {
+    if (category === "all" && sort === "newest" && !query.trim()) {
       setDisplayedProducts(products);
       return;
     }
@@ -47,7 +61,7 @@ export function ShopPageContent({ locale, products }: ShopPageContentProps) {
     async function loadProducts() {
       setLoading(true);
       try {
-        const response = await fetch(buildProductsUrl(locale, category, sort), {
+        const response = await fetch(buildProductsUrl(locale, category, sort, query), {
           signal: controller.signal,
         });
         if (!response.ok) {
@@ -58,10 +72,15 @@ export function ShopPageContent({ locale, products }: ShopPageContentProps) {
       } catch (error) {
         if (controller.signal.aborted) return;
         console.error("[shop] product fetch failed:", error);
-        const fallback =
-          category === "all"
-            ? products
-            : products.filter((product) => product.category === category);
+        const normalizedQuery = query.trim().toLowerCase();
+        const fallback = products.filter((product) => {
+          const matchesCategory = category === "all" || product.category === category;
+          const matchesQuery =
+            !normalizedQuery ||
+            product.name.toLowerCase().includes(normalizedQuery) ||
+            product.slug.toLowerCase().includes(normalizedQuery);
+          return matchesCategory && matchesQuery;
+        });
         setDisplayedProducts(fallback);
       } finally {
         if (!controller.signal.aborted) {
@@ -72,7 +91,7 @@ export function ShopPageContent({ locale, products }: ShopPageContentProps) {
 
     void loadProducts();
     return () => controller.abort();
-  }, [category, sort, locale, products]);
+  }, [category, sort, query, locale, products]);
 
   return (
     <>
@@ -99,6 +118,15 @@ export function ShopPageContent({ locale, products }: ShopPageContentProps) {
         <CategoryTabs active={category} onChange={setCategory} sticky />
 
         <section className="flex items-center justify-between px-5 py-6">
+          <div className="mr-2 flex-1">
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search in shop…"
+              className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-sm text-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
           <button
             type="button"
             onClick={() => setFilterOpen(true)}
@@ -127,6 +155,13 @@ export function ShopPageContent({ locale, products }: ShopPageContentProps) {
           <div className="flex flex-col gap-4">
             <h1 className="text-5xl font-medium tracking-tight text-primary">{t("title")}</h1>
             <CategoryTabs active={category} onChange={setCategory} />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search products…"
+              className="w-full max-w-sm rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-sm text-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
           </div>
 
           <div className="flex items-center gap-4">

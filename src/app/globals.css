@@ -58,6 +58,12 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
+@layer base {
+  button {
+    border-radius: 0.5rem;
+  }
+}
+
 /* Keyboard focus — WCAG 2.1 AA visible focus indicator */
 *:focus:not(:focus-visible) {
   outline: none;
@@ -103,6 +109,10 @@ body {
 .material-symbols-outlined {
   font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
   vertical-align: middle;
+}
+
+.material-symbols-outlined.material-symbols-filled {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
 }
 
 .timer-glow {
@@ -252,9 +262,39 @@ body {
   }
 }
 
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom);
+@keyframes cartItemExit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 480px;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-16px);
+    max-height: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom-width: 0;
+  }
 }
+
+.cart-item-exit {
+  animation: cartItemExit 0.35s ease forwards;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cart-summary-value {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.cart-summary-value-updating {
+  opacity: 0.55;
+  transform: translateY(2px);
+}
+
 
 @keyframes heroKenBurns {
   from {

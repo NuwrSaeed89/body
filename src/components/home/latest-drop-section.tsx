@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { ProductCardWishlistAction } from "@/components/product/product-card-wishlist-action";
 import { FormattedPrice } from "@/components/ui/formatted-price";
 import { ImageWithShimmer } from "@/components/ui/image-with-shimmer";
 import { Link } from "@/i18n/navigation";
@@ -53,6 +54,7 @@ export async function LatestDropSection({ locale }: LatestDropSectionProps) {
                   {t("limitedBadge")}
                 </span>
               )}
+              <ProductCardWishlistAction productId={product.id} />
               <span className="absolute bottom-4 left-4 right-4 translate-y-4 rounded-lg bg-white/90 py-3 text-center text-xs font-semibold uppercase tracking-[0.1em] text-primary opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                 {t("quickAdd")}
               </span>

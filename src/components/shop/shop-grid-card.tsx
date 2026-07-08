@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { FormattedPrice } from "@/components/ui/formatted-price";
-import { WishlistToggleButton } from "@/components/wishlist/wishlist-toggle-button";
+import { ProductCardWishlistAction } from "@/components/product/product-card-wishlist-action";
 import { NotifyWhenBackForm } from "@/components/stock-notify/notify-when-back-form";
 import { Link } from "@/i18n/navigation";
 import type { ShopProduct } from "@/lib/shop-data";
@@ -59,13 +59,7 @@ export function ShopGridCard({ product }: ShopGridCardProps) {
             <ProductBadge product={product} />
           </div>
         )}
-        {!isOutOfStock && (
-          <WishlistToggleButton
-            productId={product.id}
-            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm backdrop-blur-sm transition-transform active:scale-90"
-            iconClassName="text-[20px]"
-          />
-        )}
+        {!isOutOfStock && <ProductCardWishlistAction productId={product.id} />}
         {isOutOfStock && (
           <div
             className="absolute inset-0 flex items-end justify-center bg-black/5 p-3"

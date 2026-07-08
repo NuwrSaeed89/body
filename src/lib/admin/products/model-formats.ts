@@ -62,3 +62,35 @@ export function buildProductModelPublicUrl(supabaseUrl: string, storagePath: str
 export function formatProductModelFormatsLabel(): string {
   return PRODUCT_MODEL_EXTENSIONS.map((ext) => ext.slice(1).toUpperCase()).join(", ");
 }
+
+export const EXTERNAL_MODEL_STORAGE_PREFIX = "external/";
+
+export function isExternalProductModelStoragePath(storagePath: string): boolean {
+  return storagePath.startsWith(EXTERNAL_MODEL_STORAGE_PREFIX);
+}
+
+export function isAllowedProductModelUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
+    return getProductModelExtension(parsed.pathname) !== null;
+  } catch {
+    return false;
+  }
+}
+
+export function fileNameFromModelUrl(url: string): string {
+  try {
+    const segment = new URL(url).pathname.split("/").pop() ?? "model.glb";
+    return decodeURIComponent(segment) || "model.glb";
+  } catch {
+    return "model.glb";
+  }
+}
+
+export function buildExternalProductModelStoragePath(productSlug: string, url: string): string {
+  const safeSlug = productSlug.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+  const ext = getProductModelExtension(fileNameFromModelUrl(url)) ?? ".glb";
+  const stamp = Date.now();
+  return `${EXTERNAL_MODEL_STORAGE_PREFIX}${safeSlug}/model-${stamp}${ext}`;
+}

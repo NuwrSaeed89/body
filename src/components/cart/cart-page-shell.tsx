@@ -112,7 +112,7 @@ export function CartPageShell() {
   const useLiveCart = ready && (isAuthenticated || !shouldUseCartMock());
   const liveEmpty = useLiveCart && items.length === 0;
 
-  if (!ready || (useLiveCart && loading)) {
+  if (!ready || (useLiveCart && loading && items.length === 0)) {
     return (
       <main
         id="main-content"

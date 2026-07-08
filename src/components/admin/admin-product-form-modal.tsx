@@ -5,11 +5,14 @@ import type { AdminCategoryOption } from "@/lib/admin/categories/types";
 import type { ProductStatus } from "@/lib/admin/products/constants";
 import { slugifyProductName } from "@/lib/admin/products/slug";
 import type { ProductDetail } from "@/lib/admin/products/types";
+import { DEFAULT_PRODUCT_CURRENCY } from "@/lib/currency";
+import type { ProductImageItem } from "@/lib/admin/products/upload-product-image";
 import {
   adminCheckboxClassName,
   adminFieldClassName,
   adminLabelClassName,
 } from "./admin-form-styles";
+import { AdminProductImageUpload } from "./admin-product-image-upload";
 import { AdminProductModelUpload } from "./admin-product-model-upload";
 import type { ProductModelChangePayload } from "./admin-product-model-upload";
 
@@ -20,6 +23,7 @@ export type ProductFormValues = {
   status: ProductStatus;
   basePrice: string;
   stock: string;
+  lowStockThreshold: string;
   isLatestDrop: boolean;
   isPremium: boolean;
   isBestSeller: boolean;
@@ -33,7 +37,7 @@ type AdminProductFormModalProps = {
   locale: string;
   categories: AdminCategoryOption[];
   initial?: ProductDetail | null;
-  imageUrl?: string | null;
+  images?: ProductImageItem[];
   modelGlbUrl?: string | null;
   modelFileName?: string | null;
   canMutate?: boolean;
@@ -48,6 +52,7 @@ const EMPTY_FORM: ProductFormValues = {
   status: "draft",
   basePrice: "",
   stock: "0",
+  lowStockThreshold: "5",
   isLatestDrop: false,
   isPremium: false,
   isBestSeller: false,
@@ -64,6 +69,7 @@ function toFormValues(product?: ProductDetail | null): ProductFormValues {
     status: product.status,
     basePrice: String(product.basePrice),
     stock: String(product.stock),
+    lowStockThreshold: String(product.lowStockThreshold ?? 5),
     isLatestDrop: product.isLatestDrop,
     isPremium: product.isPremium,
     isBestSeller: product.isBestSeller,
@@ -78,7 +84,7 @@ export function AdminProductFormModal({
   locale,
   categories,
   initial,
-  imageUrl,
+  images = [],
   modelGlbUrl,
   modelFileName,
   canMutate = true,
@@ -96,6 +102,7 @@ export function AdminProductFormModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   const [modelUploading, setModelUploading] = useState(false);
 
   useEffect(() => {
@@ -114,17 +121,20 @@ export function AdminProductFormModal({
     if (open) return;
     setVisible(false);
     setModelUploading(false);
+    setImageUploading(false);
   }, [open]);
 
   const requestClose = useCallback(() => {
-    if (modelUploading) {
+    if (modelUploading || imageUploading) {
       const confirmed = window.confirm(
-        "3D model upload is in progress. Cancel the upload and close?",
+        modelUploading
+          ? "3D model upload is in progress. Cancel the upload and close?"
+          : "Image upload is in progress. Cancel the upload and close?",
       );
       if (!confirmed) return;
     }
     onClose();
-  }, [modelUploading, onClose]);
+  }, [modelUploading, imageUploading, onClose]);
 
   useEffect(() => {
     if (!open) return;
@@ -164,12 +174,15 @@ export function AdminProductFormModal({
       status: form.status,
       basePrice: Number(form.basePrice),
       stock: Number(form.stock),
+      lowStockThreshold: Number(form.lowStockThreshold),
       isLatestDrop: form.isLatestDrop,
       isPremium: form.isPremium,
       isBestSeller: form.isBestSeller,
       isTemporarilyUnavailable: form.isTemporarilyUnavailable,
       categoryId: form.categoryId || null,
+      currency: DEFAULT_PRODUCT_CURRENCY,
       locale,
+      ...(mode === "edit" ? { syncVariantStock: false } : {}),
     };
 
     const url =
@@ -327,7 +340,7 @@ export function AdminProductFormModal({
               </div>
               <div>
                 <label className={adminLabelClassName} htmlFor="product-price">
-                  Price (SEK)
+                  Price ({DEFAULT_PRODUCT_CURRENCY})
                 </label>
                 <input
                   id="product-price"
@@ -342,29 +355,13 @@ export function AdminProductFormModal({
               </div>
             </div>
 
-            <div>
-              <label className={adminLabelClassName}>Product Images</label>
-              <div className="mt-2 grid grid-cols-3 gap-3 sm:grid-cols-4 sm:gap-4">
-                <div className="flex aspect-[3/4] cursor-not-allowed items-center justify-center rounded-lg border-2 border-dashed border-outline-variant bg-surface-container opacity-60">
-                  <span className="material-symbols-outlined text-on-surface-variant">
-                    add_a_photo
-                  </span>
-                </div>
-                {imageUrl && (
-                  <div className="group relative aspect-[3/4] overflow-hidden rounded-lg bg-surface-container">
-                    <img
-                      src={imageUrl}
-                      alt=""
-                      className="size-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                )}
-              </div>
-              <p className="mt-2 text-xs text-on-surface-variant">
-                Image upload will be available in a future release.
-              </p>
-            </div>
+            <AdminProductImageUpload
+              productId={productId}
+              images={images}
+              disabled={!canMutate}
+              onImagesChange={onSaved}
+              onUploadingChange={setImageUploading}
+            />
 
             <AdminProductModelUpload
               productId={productId}
@@ -391,11 +388,44 @@ export function AdminProductFormModal({
                     min={0}
                     step={1}
                     required
+                    readOnly={mode === "edit" && Boolean(productId)}
                     value={form.stock}
                     onChange={(event) => updateField("stock", event.target.value)}
+                    className={`${adminFieldClassName}${
+                      mode === "edit" && productId ? " bg-surface-container text-on-surface-variant" : ""
+                    }`}
+                  />
+                  {mode === "edit" && productId && (
+                    <p className="mt-2 text-xs text-on-surface-variant">
+                      For size × color matrix, use the{" "}
+                      <span className="font-semibold text-primary">variants</span> action (
+                      <span className="material-symbols-outlined align-middle text-[14px]">
+                        view_module
+                      </span>
+                      ) in the product list.
+                    </p>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <label className={adminLabelClassName} htmlFor="product-low-stock-threshold">
+                    Low-stock alert
+                  </label>
+                  <input
+                    id="product-low-stock-threshold"
+                    type="number"
+                    min={0}
+                    step={1}
+                    required
+                    value={form.lowStockThreshold}
+                    onChange={(event) => updateField("lowStockThreshold", event.target.value)}
                     className={adminFieldClassName}
                   />
+                  <p className="mt-2 text-xs text-on-surface-variant">
+                    Alert when total stock is at or below this number.
+                  </p>
                 </div>
+              </div>
+              <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="flex-1">
                   <label className={adminLabelClassName} htmlFor="product-status">
                     Status

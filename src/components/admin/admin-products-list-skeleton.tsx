@@ -1,5 +1,6 @@
 import { Shimmer } from "@/components/ui/shimmer";
 import { adminCardToolbarClass, adminPageSectionClass } from "./admin-layout-styles";
+import { AdminPageHeaderSkeleton } from "./admin-page-header-skeleton";
 
 const TABLE_HEAD_CLASS =
   "px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest text-on-surface-variant";
@@ -61,13 +62,7 @@ function ProductTableRowSkeleton() {
 export function AdminProductsListSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <section className={adminPageSectionClass} aria-busy="true" aria-label="Loading products">
-      <header className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
-        <div className="min-w-0 space-y-2">
-          <Shimmer className="h-7 w-48 sm:h-8" />
-          <Shimmer className="h-4 w-full max-w-md" />
-        </div>
-        <Shimmer className="h-12 w-full rounded-lg sm:w-44" />
-      </header>
+      <AdminPageHeaderSkeleton showBadge={false} showAction />
 
       <article className="mb-6 overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest shadow-[0_30px_50px_-12px_rgba(18,18,18,0.03)] sm:mb-8">
         <div className={adminCardToolbarClass}>

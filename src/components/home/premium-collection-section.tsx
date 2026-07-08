@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
+import { ProductCardWishlistAction } from "@/components/product/product-card-wishlist-action";
 import { FormattedPrice } from "@/components/ui/formatted-price";
 import { Link } from "@/i18n/navigation";
 import { getStorefrontPremiumEditorial } from "@/lib/catalog/get-storefront-catalog";
@@ -48,6 +49,7 @@ export async function PremiumCollectionSection({ locale }: PremiumCollectionSect
                     sizes="(max-width: 768px) 100vw, 50vw"
                     unoptimized={column.product.image.startsWith("http")}
                   />
+                  <ProductCardWishlistAction productId={column.product.id} />
                   <span className="absolute bottom-4 left-4 right-4 translate-y-4 rounded-lg bg-white/90 py-3 text-center text-xs font-semibold uppercase tracking-[0.1em] text-primary opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                     {t("viewProduct")}
                   </span>

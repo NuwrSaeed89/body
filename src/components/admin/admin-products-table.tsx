@@ -1,4 +1,6 @@
 import type { AdminProductRow } from "@/lib/admin/list-types";
+import { getInventoryStatus } from "@/lib/admin/inventory/status";
+import { AdminInventoryStockEditor } from "./admin-inventory-stock-editor";
 
 type ProductThumbnailProps = {
   imageUrl: string | null;
@@ -20,13 +22,8 @@ export function AdminProductThumbnail({ imageUrl, alt }: ProductThumbnailProps) 
   );
 }
 
-export function stockStatus(product: AdminProductRow): {
-  label: string;
-  tone: "primary" | "error" | "muted";
-} {
-  if (product.stock === 0) return { label: "Out of Stock", tone: "muted" };
-  if (product.stock <= 5) return { label: "Low Stock", tone: "error" };
-  return { label: "In Stock", tone: "primary" };
+export function stockStatus(product: AdminProductRow) {
+  return getInventoryStatus(product.stock, product.lowStockThreshold);
 }
 
 export function AdminProductStockBadge({ product }: { product: AdminProductRow }) {
@@ -65,9 +62,15 @@ type AdminProductsTableProps = {
   emptyMessage: string;
   canMutate: boolean;
   deletingId: string | null;
+  savingInventoryId: string | null;
   onView: (product: AdminProductRow) => void;
+  onVariants: (product: AdminProductRow) => void;
   onEdit: (product: AdminProductRow) => void;
   onDelete: (product: AdminProductRow) => void;
+  onInventorySave: (
+    productId: string,
+    values: { stock: number; lowStockThreshold: number },
+  ) => void;
 };
 
 export function AdminProductsTable({
@@ -75,19 +78,22 @@ export function AdminProductsTable({
   emptyMessage,
   canMutate,
   deletingId,
+  savingInventoryId,
   onView,
+  onVariants,
   onEdit,
   onDelete,
+  onInventorySave,
 }: AdminProductsTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full table-fixed border-collapse text-left">
         <colgroup>
-          <col style={{ width: "34%" }} />
-          <col style={{ width: "18%" }} />
+          <col style={{ width: "30%" }} />
+          <col style={{ width: "16%" }} />
           <col style={{ width: "14%" }} />
           <col style={{ width: "12%" }} />
-          <col style={{ width: "12%" }} />
+          <col style={{ width: "18%" }} />
           <col style={{ width: "10%" }} />
         </colgroup>
         <thead className="bg-surface-container-low">
@@ -121,7 +127,10 @@ export function AdminProductsTable({
                 <td className={TABLE_CELL_CLASS}>
                   <div className="flex min-w-0 items-center gap-3">
                     <AdminProductThumbnail imageUrl={product.imageUrl} alt={product.name} />
-                    <span className="min-w-0 truncate font-medium text-primary">{product.name}</span>
+                    <div className="min-w-0">
+                      <span className="block truncate font-medium text-primary">{product.name}</span>
+                      <AdminProductStockBadge product={product} />
+                    </div>
                   </div>
                 </td>
                 <td className={`${TABLE_CELL_CLASS} truncate font-mono text-xs text-on-surface-variant`}>
@@ -133,8 +142,17 @@ export function AdminProductsTable({
                 <td className={`${TABLE_CELL_CLASS} whitespace-nowrap font-bold text-primary`}>
                   {product.price}
                 </td>
-                <td className={TABLE_CELL_CLASS}>
-                  <AdminProductStockBadge product={product} />
+                <td
+                  className={TABLE_CELL_CLASS}
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <AdminInventoryStockEditor
+                    product={product}
+                    canMutate={canMutate}
+                    saving={savingInventoryId === product.id}
+                    onSave={onInventorySave}
+                    onVariants={onVariants}
+                  />
                 </td>
                 <td className={`${TABLE_CELL_CLASS} text-right`}>
                   <div className="flex items-center justify-end gap-1">
@@ -151,6 +169,18 @@ export function AdminProductsTable({
                     </button>
                     {canMutate && (
                       <>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onVariants(product);
+                          }}
+                          className="material-symbols-outlined rounded-full p-1 text-[20px] text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+                          aria-label={`Variants for ${product.name}`}
+                          title="Manage variants"
+                        >
+                          view_module
+                        </button>
                         <button
                           type="button"
                           onClick={(event) => {

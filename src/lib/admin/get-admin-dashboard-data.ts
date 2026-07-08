@@ -1,19 +1,24 @@
 import { MOCK_ADMIN_DASHBOARD } from "./mock-dashboard-data";
 import {
-  formatCompactCount,
+  ADMIN_DISPLAY_CURRENCY,
+  formatAdminAmount,
+  formatAdminDisplayAmount,
   formatDelta,
+  formatCompactCount,
   formatInteger,
   formatOrderDate,
   formatOrderStatusLabel,
   formatPercent,
-  formatSekAmount,
   isCompletedOrderStatus,
   lastNMonthBuckets,
   monthKey,
+  sumInAdminDisplayCurrency,
 } from "./format";
 import type { AdminDashboardData, AdminRecentOrder, AdminTopCollection } from "./types";
 import { shouldUseAdminMock } from "./should-use-mock";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { buildLowStockAlerts } from "./inventory/alerts";
+import { getAdminProductsData } from "./get-admin-products";
 
 type OrderRow = {
   id: string;
@@ -21,6 +26,7 @@ type OrderRow = {
   user_id: string;
   status: string;
   grand_total: number;
+  currency: string;
   created_at: string;
 };
 
@@ -64,7 +70,7 @@ async function fetchDashboardFromSupabase(locale: string): Promise<AdminDashboar
   const [ordersResult, profilesResult, productsResult] = await Promise.all([
     supabase
       .from("orders")
-      .select("id, order_number, user_id, status, grand_total, created_at, shipping_address")
+      .select("id, order_number, user_id, status, grand_total, currency, created_at, shipping_address")
       .order("created_at", { ascending: false }),
     supabase.from("profiles").select("id, full_name, email"),
     supabase
@@ -107,22 +113,32 @@ async function fetchDashboardFromSupabase(locale: string): Promise<AdminDashboar
     return d >= sixtyDaysAgo && d < thirtyDaysAgo;
   });
 
-  const totalSalesSek = completedOrders.reduce((sum, o) => sum + Number(o.grand_total), 0);
-  const currentSales = currentPeriod.reduce((sum, o) => sum + Number(o.grand_total), 0);
-  const previousSales = previousPeriod.reduce((sum, o) => sum + Number(o.grand_total), 0);
+  const totalSales = sumInAdminDisplayCurrency(
+    completedOrders.map((o) => ({ amount: Number(o.grand_total), currency: o.currency })),
+  );
+  const currentSales = sumInAdminDisplayCurrency(
+    currentPeriod.map((o) => ({ amount: Number(o.grand_total), currency: o.currency })),
+  );
+  const previousSales = sumInAdminDisplayCurrency(
+    previousPeriod.map((o) => ({ amount: Number(o.grand_total), currency: o.currency })),
+  );
   const salesDelta = formatDelta(currentSales, previousSales);
 
   const orderCount = completedOrders.length;
   const ordersDelta = formatDelta(currentPeriod.length, previousPeriod.length);
 
-  const avgOrderValue = orderCount > 0 ? totalSalesSek / orderCount : 0;
+  const avgOrderValue = orderCount > 0 ? totalSales / orderCount : 0;
   const currentAov =
     currentPeriod.length > 0
-      ? currentPeriod.reduce((s, o) => s + Number(o.grand_total), 0) / currentPeriod.length
+      ? sumInAdminDisplayCurrency(
+          currentPeriod.map((o) => ({ amount: Number(o.grand_total), currency: o.currency })),
+        ) / currentPeriod.length
       : 0;
   const previousAov =
     previousPeriod.length > 0
-      ? previousPeriod.reduce((s, o) => s + Number(o.grand_total), 0) / previousPeriod.length
+      ? sumInAdminDisplayCurrency(
+          previousPeriod.map((o) => ({ amount: Number(o.grand_total), currency: o.currency })),
+        ) / previousPeriod.length
       : 0;
   const aovDelta = formatDelta(currentAov, previousAov);
 
@@ -136,7 +152,10 @@ async function fetchDashboardFromSupabase(locale: string): Promise<AdminDashboar
   for (const order of completedOrders) {
     const key = monthKey(new Date(order.created_at));
     if (revenueByMonth.has(key)) {
-      revenueByMonth.set(key, (revenueByMonth.get(key) ?? 0) + Number(order.grand_total));
+      const amount = sumInAdminDisplayCurrency([
+        { amount: Number(order.grand_total), currency: order.currency },
+      ]);
+      revenueByMonth.set(key, (revenueByMonth.get(key) ?? 0) + amount);
     }
   }
   const revenueAmounts = monthBuckets.map((b) => revenueByMonth.get(b.key) ?? 0);
@@ -162,9 +181,12 @@ async function fetchDashboardFromSupabase(locale: string): Promise<AdminDashboar
       customer: customerName(profile, order.shipping_address),
       date: formatOrderDate(order.created_at, contentLocale),
       status: formatOrderStatusLabel(order.status),
-      total: formatSekAmount(Number(order.grand_total), contentLocale),
+      total: formatAdminDisplayAmount(Number(order.grand_total), order.currency, contentLocale),
     };
   });
+
+  const productsData = await getAdminProductsData(contentLocale);
+  const lowStockAlerts = buildLowStockAlerts(productsData.products).slice(0, 8);
 
   return {
     source: "supabase",
@@ -172,8 +194,8 @@ async function fetchDashboardFromSupabase(locale: string): Promise<AdminDashboar
     managerRole: "Live store data",
     metrics: [
       {
-        label: "Total Sales (SEK)",
-        value: formatInteger(Math.round(totalSalesSek), contentLocale),
+        label: `Total Sales (${ADMIN_DISPLAY_CURRENCY})`,
+        value: formatAdminAmount(totalSales, contentLocale, ADMIN_DISPLAY_CURRENCY),
         delta: salesDelta.delta,
         trend: salesDelta.trend,
       },
@@ -191,21 +213,23 @@ async function fetchDashboardFromSupabase(locale: string): Promise<AdminDashboar
       },
       {
         label: "Avg Order Value",
-        value: formatSekAmount(Math.round(avgOrderValue), contentLocale),
+        value: formatAdminAmount(avgOrderValue, contentLocale, ADMIN_DISPLAY_CURRENCY),
         delta: aovDelta.delta,
         trend: aovDelta.trend,
       },
     ],
     revenueTrends: monthBuckets.map((bucket, index) => {
-      const amountSek = revenueAmounts[index] ?? 0;
+      const amount = revenueAmounts[index] ?? 0;
       return {
         month: bucket.label,
-        amountSek,
-        heightPercent: Math.max(8, Math.round((amountSek / maxRevenue) * 100)),
+        amount,
+        amountLabel: formatAdminAmount(amount, contentLocale, ADMIN_DISPLAY_CURRENCY),
+        heightPercent: Math.max(8, Math.round((amount / maxRevenue) * 100)),
       };
     }),
     topCollections,
     recentOrders,
+    lowStockAlerts,
   };
 }
 

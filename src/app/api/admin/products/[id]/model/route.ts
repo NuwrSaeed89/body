@@ -4,6 +4,7 @@ import {
   deleteProductModelMedia,
   getProductModelMedia,
   mapProductModelError,
+  registerExternalProductModelUrl,
   registerProductModelMedia,
 } from "@/lib/admin/products/product-model-media";
 
@@ -46,12 +47,14 @@ export async function POST(request: Request, context: RouteContext) {
   const storagePath = typeof raw.storagePath === "string" ? raw.storagePath.trim() : "";
   const publicUrl = typeof raw.publicUrl === "string" ? raw.publicUrl.trim() : "";
 
-  if (!storagePath || !publicUrl) {
-    return Response.json({ error: "storagePath and publicUrl are required" }, { status: 400 });
+  if (!publicUrl) {
+    return Response.json({ error: "publicUrl is required" }, { status: 400 });
   }
 
   try {
-    const model = await registerProductModelMedia(id, storagePath, publicUrl);
+    const model = storagePath
+      ? await registerProductModelMedia(id, storagePath, publicUrl)
+      : await registerExternalProductModelUrl(id, publicUrl);
     revalidatePath("/[locale]/admin/products", "page");
     revalidatePath("/[locale]/shop", "page");
     return Response.json({ model }, { status: 201 });

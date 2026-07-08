@@ -48,14 +48,14 @@ export default async function PaymentPage({ params }: PaymentPageProps) {
               {t("billing")}
             </legend>
             <label className="flex items-center gap-3">
-              <input type="checkbox" defaultChecked className="rounded-none text-primary" />
+              <input type="checkbox" defaultChecked className="rounded text-primary" />
               <span className="text-sm text-secondary">{t("sameAsShipping")}</span>
             </label>
           </fieldset>
 
           <button
             type="submit"
-            className="w-full bg-primary py-4 text-xs font-semibold uppercase tracking-[0.15em] text-white sm:w-auto sm:px-12"
+            className="w-full rounded-lg bg-primary py-4 text-xs font-semibold uppercase tracking-[0.15em] text-white transition-opacity hover:opacity-90 sm:w-auto sm:px-12"
           >
             {t("placeOrder")}
           </button>

@@ -1,5 +1,7 @@
+import { DEFAULT_PRODUCT_CURRENCY } from "@/lib/currency";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { DEFAULT_COLOR_CODE, DEFAULT_SIZE_CODE } from "./constants";
+import { buildVariantSku } from "./variant-sku";
 import { resolvePrimaryCategoryFromLinks } from "./resolve-category";
 import type { ProductDetail, ProductWriteInput } from "./types";
 
@@ -33,7 +35,7 @@ type DbProductRow = {
 };
 
 function buildSku(slug: string): string {
-  return `${slug.replace(/-/g, "_").toUpperCase()}-${DEFAULT_SIZE_CODE}-${DEFAULT_COLOR_CODE.replace(/-/g, "_").toUpperCase()}`;
+  return buildVariantSku(slug, DEFAULT_SIZE_CODE, DEFAULT_COLOR_CODE);
 }
 
 async function resolveDefaultSizeAndColor(supabase: ReturnType<typeof createSupabaseAdminClient>) {
@@ -224,7 +226,7 @@ export async function createProduct(input: ProductWriteInput): Promise<ProductDe
       status: input.status,
       base_price: input.basePrice,
       compare_at_price: input.compareAtPrice ?? null,
-      currency: input.currency ?? "SEK",
+      currency: input.currency ?? DEFAULT_PRODUCT_CURRENCY,
       is_latest_drop: input.isLatestDrop,
       is_premium: input.isPremium,
       is_best_seller: input.isBestSeller,
@@ -278,7 +280,7 @@ export async function updateProduct(
       status: input.status,
       base_price: input.basePrice,
       compare_at_price: input.compareAtPrice ?? null,
-      currency: input.currency ?? "SEK",
+      currency: input.currency ?? DEFAULT_PRODUCT_CURRENCY,
       is_latest_drop: input.isLatestDrop,
       is_premium: input.isPremium,
       is_best_seller: input.isBestSeller,
@@ -300,7 +302,9 @@ export async function updateProduct(
   );
   if (translationError) throw translationError;
 
-  await upsertDefaultVariantStock(supabase, id, input.slug, input.stock);
+  if (input.syncVariantStock !== false) {
+    await upsertDefaultVariantStock(supabase, id, input.slug, input.stock);
+  }
   await syncProductCategory(supabase, id, input.categoryId);
 
   const detail = await getProductById(id, locale);

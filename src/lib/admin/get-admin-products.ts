@@ -1,4 +1,5 @@
-import { formatInteger, formatSekAmount } from "./format";
+import { isCurrency, type Currency } from "@/lib/currency";
+import { formatInteger, formatAdminAmount } from "./format";
 import type { AdminProductsData } from "./list-types";
 import { MOCK_ADMIN_PRODUCTS } from "./mock-list-data";
 import { resolvePrimaryCategoryFromLinks } from "./products/resolve-category";
@@ -10,6 +11,7 @@ type DbProduct = {
   slug: string;
   status: string;
   base_price: number;
+  currency: string;
   units_sold: number;
   view_count: number;
   is_latest_drop: boolean;
@@ -17,6 +19,7 @@ type DbProduct = {
   is_best_seller: boolean;
   is_temporarily_unavailable: boolean;
   product_translations: { name: string; locale: string; description: string | null }[];
+  low_stock_threshold: number;
   product_variants: { stock_quantity: number; is_active: boolean }[];
   product_categories: {
     is_primary: boolean;
@@ -30,7 +33,13 @@ type DbProduct = {
       category_translations: { locale: string; name: string }[];
     }[] | null;
   }[];
-  product_media: { public_url: string; is_primary: boolean; sort_order: number; kind: string }[];
+  product_media: {
+    id: string;
+    public_url: string;
+    is_primary: boolean;
+    sort_order: number;
+    kind: string;
+  }[];
 };
 
 function formatProductStatus(status: string): string {
@@ -49,12 +58,14 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
       slug,
       status,
       base_price,
+      currency,
       units_sold,
       view_count,
       is_latest_drop,
       is_premium,
       is_best_seller,
       is_temporarily_unavailable,
+      low_stock_threshold,
       product_translations!inner(name, locale, description),
       product_variants(stock_quantity, is_active),
       product_categories(
@@ -65,7 +76,7 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
           category_translations(locale, name)
         )
       ),
-      product_media(public_url, is_primary, sort_order, kind)
+      product_media(id, public_url, is_primary, sort_order, kind)
     `,
     )
     .eq("product_translations.locale", contentLocale)
@@ -79,9 +90,10 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
       product.product_translations[0];
     const name = translation?.name ?? product.slug;
     const description = translation?.description ?? null;
-    const stock = product.product_variants
-      .filter((v) => v.is_active)
-      .reduce((sum, v) => sum + Number(v.stock_quantity ?? 0), 0);
+    const activeVariants = product.product_variants.filter((v) => v.is_active);
+    const stock = activeVariants.reduce((sum, v) => sum + Number(v.stock_quantity ?? 0), 0);
+    const variantCount = activeVariants.length;
+    const lowStockThreshold = Number(product.low_stock_threshold ?? 5);
     const flags: string[] = [];
     if (product.is_latest_drop) flags.push("Latest Drop");
     if (product.is_premium) flags.push("Premium");
@@ -94,10 +106,16 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
       if (a.is_primary !== b.is_primary) return a.is_primary ? -1 : 1;
       return a.sort_order - b.sort_order;
     });
-    const imageUrl =
-      sortedMedia.find((item) => item.kind === "image")?.public_url ??
-      sortedMedia[0]?.public_url ??
-      null;
+    const imageItems = sortedMedia
+      .filter((item) => item.kind === "image")
+      .map((item) => ({
+        id: item.id,
+        publicUrl: item.public_url,
+        fileName: decodeURIComponent(item.public_url.split("/").pop() ?? "image"),
+        isPrimary: item.is_primary,
+        sortOrder: item.sort_order,
+      }));
+    const imageUrl = imageItems.find((item) => item.isPrimary)?.publicUrl ?? imageItems[0]?.publicUrl ?? null;
     const modelMedia = sortedMedia.find((item) => item.kind === "glb");
     const modelGlbUrl = modelMedia?.public_url ?? null;
     const modelFileName = modelMedia?.public_url
@@ -111,9 +129,15 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
       description,
       status: formatProductStatus(product.status),
       statusRaw: product.status,
-      price: formatSekAmount(Number(product.base_price), contentLocale),
+      price: formatAdminAmount(
+        Number(product.base_price),
+        contentLocale,
+        isCurrency(product.currency) ? (product.currency as Currency) : "SEK",
+      ),
       basePrice: Number(product.base_price),
       stock,
+      lowStockThreshold,
+      variantCount,
       unitsSold: Number(product.units_sold ?? 0),
       views: Number(product.view_count ?? 0),
       flags,
@@ -125,6 +149,7 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
       categorySlug,
       categoryName,
       imageUrl,
+      images: imageItems,
       modelGlbUrl,
       modelFileName,
     };

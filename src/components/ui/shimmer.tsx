@@ -1,11 +1,12 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 type ShimmerProps = {
   className?: string;
+  style?: CSSProperties;
 };
 
-export function Shimmer({ className = "" }: ShimmerProps) {
-  return <div className={`soft-shimmer rounded ${className}`} aria-hidden />;
+export function Shimmer({ className = "", style }: ShimmerProps) {
+  return <div className={`soft-shimmer rounded ${className}`} style={style} aria-hidden />;
 }
 
 /** Circular shimmer for header / nav icons while fonts load. */

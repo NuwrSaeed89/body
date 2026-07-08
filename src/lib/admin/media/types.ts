@@ -20,6 +20,8 @@ export type MediaListing = {
   path: string;
   folders: MediaFolderItem[];
   files: MediaFileItem[];
+  directSizeBytes: number;
+  totalSizeBytes: number;
 };
 
 export type AdminMediaData = {

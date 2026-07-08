@@ -5,5 +5,5 @@ export const DEFAULT_COLOR_CODE = "charcoal-black";
 export const PRODUCT_STATUSES = ["draft", "active", "archived"] as const;
 export type ProductStatus = (typeof PRODUCT_STATUSES)[number];
 
-export const PRODUCT_CURRENCIES = ["SEK", "USD", "EUR"] as const;
+export const PRODUCT_CURRENCIES = ["USD", "EUR", "SEK"] as const;
 export type ProductCurrency = (typeof PRODUCT_CURRENCIES)[number];

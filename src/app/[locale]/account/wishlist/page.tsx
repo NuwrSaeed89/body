@@ -33,14 +33,18 @@ export default async function WishlistPage({ params }: WishlistPageProps) {
 
   return (
     <>
-      <SiteHeader />
-      <PageContainer as="main" className="pb-24 pt-28 md:pt-32">
-        <h1 className="mb-8 text-2xl font-medium text-primary md:text-4xl">
+      <div className="hidden md:block">
+        <SiteHeader />
+      </div>
+      <PageContainer as="main" className="-mx-5 pb-24 pt-0 md:mx-0 md:pt-32">
+        <h1 className="mb-8 hidden text-2xl font-medium text-primary md:block md:text-4xl">
           {t("title")}
         </h1>
         <WishlistPageContent catalog={catalog} />
       </PageContainer>
-      <SiteFooter />
+      <div className="hidden md:block">
+        <SiteFooter />
+      </div>
     </>
   );
 }

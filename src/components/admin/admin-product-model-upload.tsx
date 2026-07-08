@@ -10,10 +10,11 @@ import {
 import {
   deleteProductModel,
   isUploadAbortError,
+  registerProductModelUrl,
   uploadProductModel,
   type ProductModelUploadResult,
 } from "@/lib/admin/products/upload-product-model";
-import { adminLabelClassName } from "./admin-form-styles";
+import { adminFieldClassName, adminLabelClassName } from "./admin-form-styles";
 import { AdminProductModelPreview } from "./admin-product-model-preview";
 
 export type ProductModelChangePayload = {
@@ -50,6 +51,8 @@ export function AdminProductModelUpload({
   const uploadAbortRef = useRef<AbortController | null>(null);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [savingUrl, setSavingUrl] = useState(false);
+  const [urlInput, setUrlInput] = useState(modelUrl ?? "");
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -65,11 +68,17 @@ export function AdminProductModelUpload({
   }, []);
 
   useEffect(() => {
-    onUploadingChange?.(uploading);
-  }, [uploading, onUploadingChange]);
+    onUploadingChange?.(uploading || savingUrl);
+  }, [uploading, savingUrl, onUploadingChange]);
+
+  useEffect(() => {
+    setUrlInput(modelUrl ?? "");
+  }, [modelUrl]);
+
+  const busy = uploading || deleting || savingUrl;
 
   const uploadFile = async (file: File) => {
-    if (!productId || !canUpload || uploading || deleting) return;
+    if (!productId || !canUpload || busy) return;
 
     if (!isAllowedProductModelFile(file)) {
       setError(
@@ -110,7 +119,7 @@ export function AdminProductModelUpload({
   };
 
   const handlePickFile = () => {
-    if (!canUpload || uploading || deleting) return;
+    if (!canUpload || busy) return;
     inputRef.current?.click();
   };
 
@@ -124,7 +133,7 @@ export function AdminProductModelUpload({
   const handleDragEnter = (event: React.DragEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    if (!canUpload || uploading || deleting) return;
+    if (!canUpload || busy) return;
     dragDepthRef.current += 1;
     setDragging(true);
   };
@@ -141,7 +150,7 @@ export function AdminProductModelUpload({
   const handleDragOver = (event: React.DragEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    if (!canUpload || uploading || deleting) return;
+    if (!canUpload || busy) return;
     event.dataTransfer.dropEffect = "copy";
   };
 
@@ -151,7 +160,7 @@ export function AdminProductModelUpload({
     dragDepthRef.current = 0;
     setDragging(false);
 
-    if (!canUpload || uploading || deleting) return;
+    if (!canUpload || busy) return;
 
     const file = event.dataTransfer.files?.[0];
     if (!file) return;
@@ -168,6 +177,7 @@ export function AdminProductModelUpload({
     try {
       await deleteProductModel(productId);
       onModelChange(null);
+      setUrlInput("");
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : "Delete failed");
     } finally {
@@ -175,8 +185,33 @@ export function AdminProductModelUpload({
     }
   };
 
+  const handleApplyUrl = async () => {
+    if (!productId || !canUpload || busy) return;
+
+    const trimmedUrl = urlInput.trim();
+    if (!trimmedUrl) {
+      setError("Enter a model URL.");
+      return;
+    }
+
+    setSavingUrl(true);
+    setError(null);
+
+    try {
+      const result = await registerProductModelUrl(productId, trimmedUrl);
+      onModelChange({
+        publicUrl: result.publicUrl,
+        fileName: result.fileName,
+      });
+    } catch (urlError) {
+      setError(urlError instanceof Error ? urlError.message : "Could not save model URL");
+    } finally {
+      setSavingUrl(false);
+    }
+  };
+
   const dropZoneClassName = `flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 transition-colors ${
-    !canUpload || uploading
+    !canUpload || busy
       ? "cursor-not-allowed border-outline-variant bg-surface-container opacity-60"
       : dragging
         ? "border-primary bg-primary/10"
@@ -192,7 +227,7 @@ export function AdminProductModelUpload({
 
       {!productId && (
         <p className="mb-3 rounded-lg border border-outline-variant bg-surface-container-high px-4 py-3 text-sm text-on-surface-variant">
-          Save the product first, then upload a 3D model.
+          Save the product first, then upload a 3D model or paste a URL.
         </p>
       )}
 
@@ -230,7 +265,7 @@ export function AdminProductModelUpload({
                 <button
                   type="button"
                   onClick={() => void handleDelete()}
-                  disabled={deleting || uploading}
+                  disabled={busy}
                   className="material-symbols-outlined rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-error disabled:opacity-50"
                   aria-label="Remove 3D model"
                 >
@@ -303,14 +338,50 @@ export function AdminProductModelUpload({
         type="file"
         accept={PRODUCT_MODEL_ACCEPT}
         className="sr-only"
-        disabled={!canUpload || uploading || deleting}
+        disabled={!canUpload || busy}
         onChange={(event) => void handleFileChange(event)}
       />
+
+      <div className="my-5 flex items-center gap-3">
+        <div className="h-px flex-1 bg-outline-variant/30" />
+        <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-on-surface-variant">
+          or paste URL
+        </span>
+        <div className="h-px flex-1 bg-outline-variant/30" />
+      </div>
+
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+        <input
+          type="url"
+          value={urlInput}
+          onChange={(event) => setUrlInput(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              void handleApplyUrl();
+            }
+          }}
+          placeholder="https://example.com/model.glb"
+          disabled={!canUpload || busy}
+          className={`${adminFieldClassName} font-mono text-xs sm:flex-1`}
+        />
+        <button
+          type="button"
+          onClick={() => void handleApplyUrl()}
+          disabled={!canUpload || busy || !urlInput.trim()}
+          className="shrink-0 rounded-lg border border-outline-variant px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] text-primary transition-colors hover:bg-surface-container disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {savingUrl ? "Saving…" : modelUrl ? "Update URL" : "Use URL"}
+        </button>
+      </div>
+      <p className="mt-2 text-xs text-on-surface-variant">
+        Direct link to a hosted {formatProductModelFormatsLabel()} file.
+      </p>
 
       {uploading && (
         <div className="mt-4">
           <div className="mb-1 flex items-center justify-between text-xs text-on-surface-variant">
-            <span>Uploading to Supabase…</span>
+            <span>Uploading and optimizing…</span>
             <span>{progress}%</span>
           </div>
           <div

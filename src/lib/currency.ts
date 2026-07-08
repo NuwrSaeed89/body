@@ -1,9 +1,15 @@
-export const CURRENCIES = ["SEK", "USD", "EUR"] as const;
+export const CURRENCIES = ["USD", "EUR", "SEK"] as const;
 
 export type Currency = (typeof CURRENCIES)[number];
 
+/** Catalog amounts in mock/legacy paths are stored as SEK-equivalent base units. */
 export const BASE_CURRENCY: Currency = "SEK";
-export const DEFAULT_CURRENCY: Currency = "SEK";
+/** Default shopper + admin display currency. */
+export const DEFAULT_CURRENCY: Currency = "USD";
+/** Default currency for new product prices in admin. */
+export const DEFAULT_PRODUCT_CURRENCY: Currency = "USD";
+/** Admin dashboard + reports display currency. */
+export const ADMIN_DISPLAY_CURRENCY: Currency = DEFAULT_CURRENCY;
 export const CURRENCY_STORAGE_KEY = "mbody-currency";
 export const CURRENCY_COOKIE = "mbody-currency";
 
@@ -45,6 +51,23 @@ export function roundMoney(amount: number, currency: Currency): number {
   const decimals = currency === "SEK" ? 0 : 2;
   const factor = 10 ** decimals;
   return Math.round(amount * factor) / factor;
+}
+
+/** Convert an amount in the given currency to SEK (catalog base). */
+export function amountToSek(amount: number, currency: Currency): number {
+  if (currency === "SEK") return roundMoney(amount, "SEK");
+  return roundMoney(amount * SEK_PER_UNIT[currency], "SEK");
+}
+
+/** Convert between any supported currencies via SEK. */
+export function convertCurrency(
+  amount: number,
+  from: Currency,
+  to: Currency,
+): number {
+  if (from === to) return roundMoney(amount, to);
+  const amountSek = amountToSek(amount, from);
+  return convertFromSek(amountSek, to);
 }
 
 /** Convert a VAT-inclusive SEK amount to the selected display currency. */

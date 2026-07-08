@@ -1,3 +1,4 @@
+import type { ProductImageItem } from "@/lib/admin/products/upload-product-image";
 import type { AdminDashboardData } from "./types";
 
 export type AdminOrderRow = {
@@ -6,6 +7,7 @@ export type AdminOrderRow = {
   customer: string;
   email: string;
   date: string;
+  createdAt: string;
   status: string;
   statusRaw: string;
   total: string;
@@ -19,6 +21,39 @@ export type AdminOrdersData = {
   totalCount: number;
 };
 
+export type AdminOrderDetailItem = {
+  id: string;
+  productName: string;
+  sku: string;
+  sizeCode: string;
+  colorCode: string;
+  quantity: number;
+  unitPrice: string;
+  lineTotal: string;
+};
+
+export type AdminOrderDetail = {
+  id: string;
+  orderNumber: string;
+  customer: string;
+  email: string;
+  date: string;
+  status: string;
+  statusRaw: string;
+  currency: string;
+  isCod: boolean;
+  subtotal: string;
+  discountTotal: string;
+  shippingTotal: string;
+  taxTotal: string;
+  grandTotal: string;
+  paymentMethod: string | null;
+  paymentStatus: string | null;
+  shippingAddressLines: string[];
+  items: AdminOrderDetailItem[];
+  source: "supabase" | "mock";
+};
+
 export type AdminProductRow = {
   id: string;
   slug: string;
@@ -29,6 +64,8 @@ export type AdminProductRow = {
   price: string;
   basePrice: number;
   stock: number;
+  lowStockThreshold: number;
+  variantCount: number;
   unitsSold: number;
   views: number;
   flags: string[];
@@ -40,6 +77,7 @@ export type AdminProductRow = {
   categorySlug: string | null;
   categoryName: string | null;
   imageUrl: string | null;
+  images: ProductImageItem[];
   modelGlbUrl: string | null;
   modelFileName: string | null;
 };

@@ -180,8 +180,21 @@ function mapRowsToShopProducts(rows: DbCatalogProduct[], locale: string): ShopPr
   return rows.map((row) => mapDbProductToShopProduct(row, contentLocale));
 }
 
+function matchesSearchText(product: ShopProduct, query: string): boolean {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return true;
+  return (
+    product.name.toLowerCase().includes(normalized) ||
+    product.slug.toLowerCase().includes(normalized)
+  );
+}
+
 function filterMockProducts(query: ProductListQuery): ShopProduct[] {
   let items = [...SHOP_PRODUCTS];
+
+  if (query.q) {
+    items = items.filter((product) => matchesSearchText(product, query.q!));
+  }
 
   if (query.category && query.category !== "all") {
     items = items.filter((product) => product.category === query.category);
@@ -259,7 +272,10 @@ export async function listCatalogProducts(query: ProductListQuery): Promise<Cata
 
   rows = applyRowFilters(rows, query, locale);
   rows = sortRows(rows, query.sort);
-  const items = mapRowsToShopProducts(rows, locale);
+  let items = mapRowsToShopProducts(rows, locale);
+  if (query.q) {
+    items = items.filter((product) => matchesSearchText(product, query.q!));
+  }
   const limited = query.limit ? items.slice(0, query.limit) : items;
 
   return { items: limited, total: items.length };

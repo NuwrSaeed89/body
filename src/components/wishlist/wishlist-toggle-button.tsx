@@ -51,7 +51,7 @@ export function WishlistToggleButton({
 
   const labeledClassName =
     variant === "labeled"
-      ? "flex w-full items-center justify-center gap-2 border border-primary py-4 text-xs font-semibold uppercase tracking-[0.15em] text-primary transition-colors hover:bg-primary hover:text-on-primary"
+      ? "flex w-full items-center justify-center gap-2 rounded-lg border border-primary py-4 text-xs font-semibold uppercase tracking-[0.15em] text-primary transition-colors hover:bg-primary hover:text-on-primary"
       : "";
 
   return (
@@ -63,12 +63,9 @@ export function WishlistToggleButton({
       aria-pressed={active}
     >
       <span
-        className={`material-symbols-outlined ${iconClassName}`}
-        style={
-          active && filledWhenActive
-            ? { fontVariationSettings: "'FILL' 1" }
-            : undefined
-        }
+        className={`material-symbols-outlined ${
+          active && filledWhenActive ? "material-symbols-filled" : ""
+        } ${iconClassName}`}
       >
         favorite
       </span>

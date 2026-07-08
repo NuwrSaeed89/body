@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSessionActive } from "@/lib/supabase/ssr-options";
 import { shouldUseAuthMock } from "@/lib/auth/should-use-auth-mock";
@@ -22,76 +24,40 @@ export type AdminSessionUser = {
   role: "admin";
 };
 
-async function refreshSessionUser() {
+/**
+ * Reads the user from auth cookies without Supabase Auth HTTP calls.
+ * Uncached — use in Route Handlers where React cache() is unreliable.
+ */
+export async function readSessionUserFromCookies() {
   try {
-    const supabase = await createSupabaseServerClient({ refresh: true });
+    const supabase = await createSupabaseServerClient();
     const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-    if (error || !user?.email) return null;
-    return user;
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.user?.email) return null;
+
+    // Trust cookies: active access token OR refresh token keeps the user signed in.
+    // Token refresh is handled only in the browser — never call getUser() here.
+    if (isSessionActive(session) || session.refresh_token) {
+      return session.user;
+    }
+
+    return null;
   } catch {
     return null;
   }
 }
 
-/**
- * Reads session from cookies. Refreshes on Node when the access token expired
- * but a refresh token is still present — keeps users signed in until sign-out.
- */
-async function getSessionUser() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+/** Per-request dedupe for Server Components only. */
+const getSessionUser = cache(readSessionUserFromCookies);
 
-  if (!session?.user) return null;
-  if (isSessionActive(session)) return session.user;
-
-  if (!session.refresh_token) return null;
-  return refreshSessionUser();
-}
-
-export async function getServerSessionUser(): Promise<AuthSessionUser | null> {
-  if (shouldUseAuthMock()) return null;
-
-  const user = await getSessionUser();
+async function resolveAdminUser(
+  user: Awaited<ReturnType<typeof readSessionUserFromCookies>>,
+): Promise<AdminSessionUser | null> {
   if (!user?.email) return null;
 
-  return {
-    id: user.id,
-    email: user.email.toLowerCase(),
-  };
-}
-
-export async function getServerProfile(): Promise<AuthProfile | null> {
-  if (shouldUseAuthMock()) return null;
-
-  const user = await getSessionUser();
-  if (!user?.email) return null;
-
-  const supabase = await createSupabaseServerClient();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, email, full_name")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  return {
-    id: user.id,
-    email: user.email.toLowerCase(),
-    full_name: profile?.full_name ?? null,
-  };
-}
-
-export async function getServerAdminUser(): Promise<AdminSessionUser | null> {
-  if (shouldUseAuthMock()) return null;
-
-  const user = await getSessionUser();
-  if (!user?.email) return null;
-
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseAdminClient();
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, email, full_name, role")
@@ -107,3 +73,52 @@ export async function getServerAdminUser(): Promise<AdminSessionUser | null> {
     role: "admin",
   };
 }
+
+/**
+ * Admin auth for Route Handlers — always reads cookies fresh (no React cache).
+ */
+export async function resolveAdminUserFromCookies(): Promise<AdminSessionUser | null> {
+  if (shouldUseAuthMock()) return null;
+
+  const user = await readSessionUserFromCookies();
+  return resolveAdminUser(user);
+}
+
+export const getServerSessionUser = cache(async (): Promise<AuthSessionUser | null> => {
+  if (shouldUseAuthMock()) return null;
+
+  const user = await getSessionUser();
+  if (!user?.email) return null;
+
+  return {
+    id: user.id,
+    email: user.email.toLowerCase(),
+  };
+});
+
+export const getServerProfile = cache(async (): Promise<AuthProfile | null> => {
+  if (shouldUseAuthMock()) return null;
+
+  const user = await getSessionUser();
+  if (!user?.email) return null;
+
+  const supabase = createSupabaseAdminClient();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, email, full_name")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  return {
+    id: user.id,
+    email: user.email.toLowerCase(),
+    full_name: profile?.full_name ?? null,
+  };
+});
+
+export const getServerAdminUser = cache(async (): Promise<AdminSessionUser | null> => {
+  if (shouldUseAuthMock()) return null;
+
+  const user = await getSessionUser();
+  return resolveAdminUser(user);
+});

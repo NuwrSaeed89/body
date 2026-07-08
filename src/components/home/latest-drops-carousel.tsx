@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
+import { ProductCardWishlistAction } from "@/components/product/product-card-wishlist-action";
 import { FormattedPrice } from "@/components/ui/formatted-price";
 import { Link } from "@/i18n/navigation";
 import { LATEST_DROPS_CAROUSEL } from "@/lib/home-data";
@@ -31,9 +32,9 @@ export async function LatestDropsCarousel() {
           <Link
             key={product.id}
             href={product.href ?? "/shop"}
-            className="min-w-[260px] snap-center"
+            className="group min-w-[260px] snap-center"
           >
-            <div className="group relative mb-4 aspect-[4/5] overflow-hidden rounded-xl bg-surface-container-low shadow-sm">
+            <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-xl bg-surface-container-low shadow-sm">
               <Image
                 src={product.image}
                 alt={product.imageAlt}
@@ -50,6 +51,7 @@ export async function LatestDropsCarousel() {
                   {t(`shop.badges.${product.badgeKey}`)}
                 </span>
               )}
+              <ProductCardWishlistAction productId={product.id} />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-start justify-between gap-2">

@@ -31,7 +31,7 @@ type CartContextValue = {
   mounted: boolean;
   loading: boolean;
   isGuestCart: boolean;
-  refresh: () => Promise<void>;
+  refresh: (options?: { silent?: boolean }) => Promise<void>;
   addItem: (variantId: string, quantity?: number) => Promise<AddToCartResult>;
   updateItemQuantity: (itemId: string, quantity: number) => Promise<CartMutationResult>;
   removeItem: (itemId: string) => Promise<CartMutationResult>;
@@ -107,46 +107,47 @@ export function CartProvider({ children }: CartProviderProps) {
     setItemCount(body.itemCount ?? 0);
   }, [locale]);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (options?: { silent?: boolean }) => {
+    const silent = options?.silent ?? false;
     if (shouldUseCartMock()) {
       if (!isAuthenticated || !user?.id) {
         setItems([]);
         setItemCount(0);
         return;
       }
-      setLoading(true);
+      if (!silent) setLoading(true);
       try {
         await fetchAuthenticatedCart();
       } catch {
         setItems([]);
         setItemCount(0);
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
       }
       return;
     }
 
     if (!isAuthenticated) {
-      setLoading(true);
+      if (!silent) setLoading(true);
       try {
         await fetchGuestPreview();
       } catch {
         setItems([]);
         setItemCount(guestCartItemCount());
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
       }
       return;
     }
 
-    setLoading(true);
+    if (!silent) setLoading(true);
     try {
       await fetchAuthenticatedCart();
     } catch {
       setItems([]);
       setItemCount(0);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [isAuthenticated, user?.id, fetchAuthenticatedCart, fetchGuestPreview]);
 
@@ -191,7 +192,7 @@ export function CartProvider({ children }: CartProviderProps) {
 
   useEffect(() => {
     const onCartChange = () => {
-      void refresh();
+      void refresh({ silent: true });
     };
     window.addEventListener(CART_CHANGE_EVENT, onCartChange);
     window.addEventListener(GUEST_CART_CHANGE_EVENT, onCartChange);
@@ -279,7 +280,7 @@ export function CartProvider({ children }: CartProviderProps) {
         }
 
         setItemCount(body.itemCount);
-        await refresh();
+        await refresh({ silent: true });
         window.dispatchEvent(new CustomEvent(CART_CHANGE_EVENT));
         return { ok: true, itemCount: body.itemCount };
       } catch {
@@ -291,10 +292,39 @@ export function CartProvider({ children }: CartProviderProps) {
 
   const mutateCartItem = useCallback(
     async (itemId: string, init: RequestInit): Promise<CartMutationResult> => {
+      const snapshot = { items, itemCount };
+      const targetItem = items.find((item) => item.id === itemId);
+
+      const applyOptimisticUpdate = () => {
+        if (!targetItem) return;
+
+        if (init.method === "DELETE") {
+          setItems((current) => current.filter((item) => item.id !== itemId));
+          setItemCount((current) => Math.max(0, current - targetItem.quantity));
+          return;
+        }
+
+        const body = init.body ? (JSON.parse(String(init.body)) as { quantity?: number }) : {};
+        const quantity = body.quantity ?? 0;
+
+        if (quantity <= 0) {
+          setItems((current) => current.filter((item) => item.id !== itemId));
+          setItemCount((current) => Math.max(0, current - targetItem.quantity));
+          return;
+        }
+
+        setItems((current) =>
+          current.map((item) => (item.id === itemId ? { ...item, quantity } : item)),
+        );
+        setItemCount((current) => current - targetItem.quantity + quantity);
+      };
+
       if (!shouldUseCartMock() && !isAuthenticated) {
         try {
           const entry = readGuestCart().find((row) => row.variantId === itemId);
           if (!entry) return { ok: false, error: "item_not_found" };
+
+          applyOptimisticUpdate();
 
           if (init.method === "DELETE") {
             removeGuestCartEntry(itemId);
@@ -302,6 +332,8 @@ export function CartProvider({ children }: CartProviderProps) {
             const body = init.body ? (JSON.parse(String(init.body)) as { quantity?: number }) : {};
             const quantity = body.quantity ?? 0;
             if (!Number.isInteger(quantity) || quantity < 0) {
+              setItems(snapshot.items);
+              setItemCount(snapshot.itemCount);
               return { ok: false, error: "invalid_quantity" };
             }
             if (quantity === 0) {
@@ -311,12 +343,14 @@ export function CartProvider({ children }: CartProviderProps) {
             }
           }
 
-          await fetchGuestPreview();
-          const nextCount = guestCartItemCount();
+          const preview = await fetchGuestPreview();
+          const nextCount = preview.itemCount;
           setItemCount(nextCount);
           window.dispatchEvent(new CustomEvent(GUEST_CART_CHANGE_EVENT));
           return { ok: true, itemCount: nextCount };
         } catch {
+          setItems(snapshot.items);
+          setItemCount(snapshot.itemCount);
           return { ok: false, error: "server_error" };
         }
       }
@@ -324,6 +358,8 @@ export function CartProvider({ children }: CartProviderProps) {
       if (!isAuthenticated || !user?.id) {
         return { ok: false, error: "item_not_found" };
       }
+
+      applyOptimisticUpdate();
 
       try {
         const params = new URLSearchParams({ locale });
@@ -338,6 +374,8 @@ export function CartProvider({ children }: CartProviderProps) {
           | { ok: false; error: string };
 
         if (!response.ok || !body.ok) {
+          setItems(snapshot.items);
+          setItemCount(snapshot.itemCount);
           const error = !body.ok ? body.error : "server_error";
           if (error === "out_of_stock") {
             return { ok: false, error: "out_of_stock" };
@@ -352,14 +390,15 @@ export function CartProvider({ children }: CartProviderProps) {
         }
 
         setItemCount(body.itemCount);
-        await refresh();
         window.dispatchEvent(new CustomEvent(CART_CHANGE_EVENT));
         return { ok: true, itemCount: body.itemCount };
       } catch {
+        setItems(snapshot.items);
+        setItemCount(snapshot.itemCount);
         return { ok: false, error: "server_error" };
       }
     },
-    [isAuthenticated, user?.id, locale, refresh, fetchGuestPreview],
+    [isAuthenticated, user?.id, locale, items, itemCount, fetchGuestPreview],
   );
 
   const updateItemQuantity = useCallback(

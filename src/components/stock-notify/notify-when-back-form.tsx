@@ -138,7 +138,7 @@ export function NotifyWhenBackForm({
         <button
           type="submit"
           disabled={status === "loading"}
-          className={`shrink-0 bg-primary text-on-primary font-semibold uppercase tracking-[0.1em] transition-opacity hover:opacity-90 disabled:opacity-60 ${
+          className={`shrink-0 rounded-lg bg-primary text-on-primary font-semibold uppercase tracking-[0.1em] transition-opacity hover:opacity-90 disabled:opacity-60 ${
             isCompact
               ? "rounded-full px-4 py-2.5 text-[10px]"
               : "px-4 py-3 text-xs"

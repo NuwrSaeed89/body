@@ -138,9 +138,8 @@ function FileCard({ file }: { file: MediaFileItem }) {
         <p className="truncate text-sm font-medium text-primary" title={file.name}>
           {file.name}
         </p>
-        <p className="text-xs text-on-surface-variant">
-          {formatBytes(file.size)} · {formatDate(file.updatedAt)}
-        </p>
+        <p className="text-xs text-on-surface-variant">Size: {formatBytes(file.size)}</p>
+        <p className="text-xs text-on-surface-variant">Updated: {formatDate(file.updatedAt)}</p>
         <div className="flex gap-2">
           <a
             href={file.publicUrl}
@@ -220,7 +219,13 @@ export function AdminMediaBrowser({ initialData }: AdminMediaBrowserProps) {
 
       <article className="overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest shadow-[0_30px_50px_-12px_rgba(18,18,18,0.03)]">
         <div className={adminCardToolbarClass}>
-          <MediaBreadcrumbs path={path} bucket={listing.bucket} onNavigate={loadPath} />
+          <div className="flex flex-col gap-2">
+            <MediaBreadcrumbs path={path} bucket={listing.bucket} onNavigate={loadPath} />
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-on-surface-variant">
+              Folder Size: {formatBytes(listing.directSizeBytes)} · Recursive Total:{" "}
+              {formatBytes(listing.totalSizeBytes)} · Files: {listing.files.length}
+            </p>
+          </div>
           <div className="flex gap-2">
             {path && (
               <button

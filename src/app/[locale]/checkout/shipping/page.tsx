@@ -78,7 +78,7 @@ export default async function ShippingPage({ params }: ShippingPageProps) {
 
           <Link
             href="/checkout/payment"
-            className="inline-block w-full bg-primary py-4 text-center text-xs font-semibold uppercase tracking-[0.15em] text-white sm:w-auto sm:px-12"
+            className="inline-block w-full rounded-lg bg-primary py-4 text-center text-xs font-semibold uppercase tracking-[0.15em] text-white transition-opacity hover:opacity-90 sm:w-auto sm:px-12"
           >
             {t("continue")}
           </Link>

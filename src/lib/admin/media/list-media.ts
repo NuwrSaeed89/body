@@ -90,12 +90,15 @@ function mapStorageRows(bucket: string, path: string, rows: StorageObjectRow[]):
 
   folders.sort((a, b) => a.name.localeCompare(b.name));
   files.sort((a, b) => a.name.localeCompare(b.name));
+  const directSizeBytes = files.reduce((sum, file) => sum + Math.max(0, file.size || 0), 0);
 
   return {
     bucket,
     path: normalizeMediaPath(path),
     folders,
     files,
+    directSizeBytes,
+    totalSizeBytes: directSizeBytes,
   };
 }
 
@@ -108,12 +111,16 @@ const MOCK_TREE: Record<string, MediaListing> = {
       { name: "seed", path: "seed" },
     ],
     files: [],
+    directSizeBytes: 0,
+    totalSizeBytes: 1_525_000,
   },
   products: {
     bucket: ADMIN_MEDIA_BUCKET,
     path: "products",
     folders: [{ name: "sculpt-leggings", path: "products/sculpt-leggings" }],
     files: [],
+    directSizeBytes: 0,
+    totalSizeBytes: 1_280_000,
   },
   "products/sculpt-leggings": {
     bucket: ADMIN_MEDIA_BUCKET,
@@ -130,12 +137,16 @@ const MOCK_TREE: Record<string, MediaListing> = {
         kind: "model",
       },
     ],
+    directSizeBytes: 1_280_000,
+    totalSizeBytes: 1_280_000,
   },
   seed: {
     bucket: ADMIN_MEDIA_BUCKET,
     path: "seed",
     folders: [{ name: "sculpt-leggings", path: "seed/sculpt-leggings" }],
     files: [],
+    directSizeBytes: 0,
+    totalSizeBytes: 245_000,
   },
   "seed/sculpt-leggings": {
     bucket: ADMIN_MEDIA_BUCKET,
@@ -153,6 +164,8 @@ const MOCK_TREE: Record<string, MediaListing> = {
         kind: "image",
       },
     ],
+    directSizeBytes: 245_000,
+    totalSizeBytes: 245_000,
   },
 };
 
@@ -164,8 +177,53 @@ export function getMockMediaListing(path: string): MediaListing {
       path: normalized,
       folders: [],
       files: [],
+      directSizeBytes: 0,
+      totalSizeBytes: 0,
     }
   );
+}
+
+function extractFoldersAndFileBytes(path: string, rows: StorageObjectRow[]) {
+  const folders: string[] = [];
+  let sizeBytes = 0;
+
+  for (const row of rows) {
+    if (!row.name || row.name === ".emptyFolderPlaceholder") continue;
+    if (row.id === null) {
+      folders.push(joinMediaPath(path, row.name));
+      continue;
+    }
+    sizeBytes += Math.max(0, Number(row.metadata?.size ?? 0));
+  }
+
+  return { folders, sizeBytes };
+}
+
+async function computeRecursiveTotalSize(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  bucket: string,
+  rootPath: string,
+): Promise<number> {
+  const queue: string[] = [rootPath];
+  let total = 0;
+
+  while (queue.length > 0) {
+    const currentPath = queue.shift() ?? "";
+    const { data, error } = await supabase.storage.from(bucket).list(currentPath, {
+      limit: 200,
+      sortBy: { column: "name", order: "asc" },
+    });
+    if (error) throw error;
+
+    const { folders, sizeBytes } = extractFoldersAndFileBytes(
+      currentPath,
+      (data ?? []) as StorageObjectRow[],
+    );
+    total += sizeBytes;
+    queue.push(...folders);
+  }
+
+  return total;
 }
 
 export async function listMediaAtPath(
@@ -182,5 +240,7 @@ export async function listMediaAtPath(
 
   if (error) throw error;
 
-  return mapStorageRows(bucket, normalized, (data ?? []) as StorageObjectRow[]);
+  const listing = mapStorageRows(bucket, normalized, (data ?? []) as StorageObjectRow[]);
+  const totalSizeBytes = await computeRecursiveTotalSize(supabase, bucket, normalized);
+  return { ...listing, totalSizeBytes };
 }

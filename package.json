@@ -12,7 +12,10 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit -p tsconfig.ci.json",
     "check:payment": "npx --yes tsx scripts/check-payment-config.ts",
-    "check:supabase": "npx --yes tsx scripts/check-supabase-config.ts"
+    "check:supabase": "npx --yes tsx scripts/check-supabase-config.ts",
+    "glb:optimize": "node scripts/optimize-glb.mjs",
+    "glb:optimize:draco": "node scripts/optimize-glb.mjs --method draco",
+    "glb:optimize:meshopt": "node scripts/optimize-glb.mjs --method meshopt"
   },
   "dependencies": {
     "@google/model-viewer": "^4.3.1",

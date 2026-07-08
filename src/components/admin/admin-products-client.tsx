@@ -3,9 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { AdminCategoryOption } from "@/lib/admin/categories/types";
+import type { ProductImageItem } from "@/lib/admin/products/upload-product-image";
+import { countLowStockAlerts } from "@/lib/admin/inventory/alerts";
+import { isLowStockProduct, isOutOfStockProduct } from "@/lib/admin/inventory/status";
 import type { AdminProductRow } from "@/lib/admin/list-types";
 import type { ProductDetail } from "@/lib/admin/products/types";
+import { DEFAULT_PRODUCT_CURRENCY } from "@/lib/currency";
 import { adminCardToolbarClass } from "./admin-layout-styles";
+import { AdminInventoryStockEditor } from "./admin-inventory-stock-editor";
 import { AdminProductFormModal } from "./admin-product-form-modal";
 import {
   AdminProductStockBadge,
@@ -31,13 +36,13 @@ function rowToProductDetail(product: AdminProductRow, locale: string): ProductDe
     status: product.statusRaw as ProductDetail["status"],
     basePrice: product.basePrice,
     compareAtPrice: null,
-    currency: "SEK",
+    currency: DEFAULT_PRODUCT_CURRENCY,
     stock: product.stock,
     isLatestDrop: product.isLatestDrop,
     isPremium: product.isPremium,
     isBestSeller: product.isBestSeller,
     isTemporarilyUnavailable: product.isTemporarilyUnavailable,
-    lowStockThreshold: 5,
+    lowStockThreshold: product.lowStockThreshold,
     locale,
     categoryId: product.categoryId,
     categorySlug: product.categorySlug,
@@ -47,9 +52,14 @@ function rowToProductDetail(product: AdminProductRow, locale: string): ProductDe
 
 function matchesStockFilter(product: AdminProductRow, filter: StockFilter): boolean {
   if (filter === "all") return true;
-  if (filter === "out-of-stock") return product.stock === 0;
-  if (filter === "low-stock") return product.stock > 0 && product.stock <= 5;
-  return product.stock > 5;
+  if (filter === "out-of-stock") return isOutOfStockProduct(product.stock);
+  if (filter === "low-stock") {
+    return isLowStockProduct(product.stock, product.lowStockThreshold);
+  }
+  return (
+    !isOutOfStockProduct(product.stock) &&
+    !isLowStockProduct(product.stock, product.lowStockThreshold)
+  );
 }
 
 export function AdminProductsClient({
@@ -62,10 +72,11 @@ export function AdminProductsClient({
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [editingProduct, setEditingProduct] = useState<ProductDetail | null>(null);
-  const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
+  const [editingImages, setEditingImages] = useState<ProductImageItem[]>([]);
   const [editingModelUrl, setEditingModelUrl] = useState<string | null>(null);
   const [editingModelFileName, setEditingModelFileName] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [savingInventoryId, setSavingInventoryId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -117,7 +128,7 @@ export function AdminProductsClient({
   const openCreate = () => {
     setFormMode("create");
     setEditingProduct(null);
-    setEditingImageUrl(null);
+    setEditingImages([]);
     setEditingModelUrl(null);
     setEditingModelFileName(null);
     setFormOpen(true);
@@ -127,7 +138,7 @@ export function AdminProductsClient({
   const openEdit = (product: AdminProductRow) => {
     setFormMode("edit");
     setEditingProduct(rowToProductDetail(product, locale));
-    setEditingImageUrl(product.imageUrl);
+    setEditingImages(product.images);
     setEditingModelUrl(product.modelGlbUrl);
     setEditingModelFileName(product.modelFileName);
     setFormOpen(true);
@@ -136,6 +147,10 @@ export function AdminProductsClient({
 
   const openStoreProduct = (product: AdminProductRow) => {
     window.open(`/${locale}/shop/${product.slug}`, "_blank", "noopener,noreferrer");
+  };
+
+  const openVariants = (product: AdminProductRow) => {
+    router.push(`/admin/products/${product.id}/variants`);
   };
 
   const handleDelete = async (product: AdminProductRow) => {
@@ -159,6 +174,34 @@ export function AdminProductsClient({
       setActionError("Network error — could not delete product");
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const alertCounts = useMemo(() => countLowStockAlerts(products), [products]);
+
+  const handleInventorySave = async (
+    productId: string,
+    values: { stock: number; lowStockThreshold: number },
+  ) => {
+    setSavingInventoryId(productId);
+    setActionError(null);
+
+    try {
+      const response = await fetch(`/api/admin/products/${productId}/inventory?locale=${locale}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const body = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setActionError(body.error ?? "Inventory update failed");
+        return;
+      }
+      router.refresh();
+    } catch {
+      setActionError("Network error — could not update inventory");
+    } finally {
+      setSavingInventoryId(null);
     }
   };
 
@@ -202,6 +245,26 @@ export function AdminProductsClient({
         <p className="mb-4 rounded-lg border border-outline-variant bg-surface-container-high px-4 py-3 text-sm text-primary">
           {actionError}
         </p>
+      )}
+
+      {alertCounts.total > 0 && (
+        <div className="mb-4 rounded-xl border border-error/30 bg-error/5 px-4 py-3 sm:px-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="material-symbols-outlined text-error">warning</span>
+            <p className="text-sm font-semibold text-primary">Inventory alerts</p>
+          </div>
+          <p className="mt-2 text-sm text-on-surface-variant">
+            {alertCounts.out > 0 && (
+              <span>
+                {alertCounts.out} out of stock
+                {alertCounts.low > 0 ? " · " : ""}
+              </span>
+            )}
+            {alertCounts.low > 0 && <span>{alertCounts.low} low stock</span>}
+            {" — "}
+            Use the stock column to update quantities and alert thresholds.
+          </p>
+        </div>
       )}
 
       <article className="mb-6 overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest shadow-[0_30px_50px_-12px_rgba(18,18,18,0.03)] sm:mb-8">
@@ -323,6 +386,18 @@ export function AdminProductsClient({
                       <p className="text-sm font-bold text-primary">{product.price}</p>
                       <AdminProductStockBadge product={product} />
                     </div>
+                    <div
+                      className="mt-2"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <AdminInventoryStockEditor
+                        product={product}
+                        canMutate={canMutate}
+                        saving={savingInventoryId === product.id}
+                        onSave={handleInventorySave}
+                        onVariants={openVariants}
+                      />
+                    </div>
                   </div>
                   <div className="flex shrink-0 gap-1">
                     <button
@@ -338,6 +413,18 @@ export function AdminProductsClient({
                     </button>
                     {canMutate && (
                       <>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openVariants(product);
+                          }}
+                          className="material-symbols-outlined rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+                          aria-label={`Variants for ${product.name}`}
+                          title="Manage variants"
+                        >
+                          view_module
+                        </button>
                         <button
                           type="button"
                           onClick={(event) => {
@@ -376,9 +463,12 @@ export function AdminProductsClient({
             emptyMessage={emptyMessage}
             canMutate={canMutate}
             deletingId={deletingId}
+            savingInventoryId={savingInventoryId}
             onView={openStoreProduct}
+            onVariants={openVariants}
             onEdit={openEdit}
             onDelete={(product) => void handleDelete(product)}
+            onInventorySave={handleInventorySave}
           />
         </div>
       </article>
@@ -389,7 +479,7 @@ export function AdminProductsClient({
         locale={locale}
         categories={categories}
         initial={editingProduct}
-        imageUrl={editingImageUrl}
+        images={editingImages}
         modelGlbUrl={editingModelUrl}
         modelFileName={editingModelFileName}
         canMutate={canMutate}

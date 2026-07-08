@@ -67,7 +67,7 @@ export async function ProductCard({
         </div>
         <button
           type="button"
-          className={`border border-primary px-6 py-3 text-xs font-semibold uppercase tracking-[0.1em] text-primary transition-all hover:bg-primary hover:text-white ${
+          className={`rounded-lg border border-primary px-6 py-3 text-xs font-semibold uppercase tracking-[0.1em] text-primary transition-all hover:bg-primary hover:text-white ${
             isFeature ? "" : "mt-6 w-full"
           }`}
         >
