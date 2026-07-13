@@ -71,14 +71,10 @@ export function ProductEngagementBar({ slug, initialStats }: ProductEngagementBa
       icon: "favorite",
       label: t("likes", { count: formatEngagementCount(stats.likeCount) }),
     },
-    ...(stats.waitingCount > 0
-      ? [
-          {
-            icon: "notifications",
-            label: t("waiting", { count: formatEngagementCount(stats.waitingCount) }),
-          },
-        ]
-      : []),
+    {
+      icon: "notifications",
+      label: t("waiting", { count: formatEngagementCount(stats.waitingCount) }),
+    },
     {
       icon: "local_shipping",
       label: t("sold", { count: formatEngagementCount(stats.unitsSold) }),

@@ -1,6 +1,10 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { hasSupabaseConfig, publicEnv } from "@/lib/env";
 import { getStorefrontProductBySlug } from "@/lib/catalog/get-storefront-catalog";
+import {
+  fetchProductWaitingCount,
+  reconcileProductWaitingCounts,
+} from "@/lib/waiting-list/waiting-list-service";
 
 type ViewRequestBody = {
   sessionId?: string;
@@ -44,6 +48,14 @@ export async function POST(request: Request, context: RouteContext) {
   const sessionId = body.sessionId?.trim() || null;
   const supabase = createSupabaseAdminClient();
 
+  let waitingCount = product.stats.waitingCount;
+  try {
+    await reconcileProductWaitingCounts([product.id]);
+    waitingCount = await fetchProductWaitingCount(product.id);
+  } catch (waitingError) {
+    console.warn("[catalog] waiting_count reconcile skipped:", waitingError);
+  }
+
   const { data: viewCount, error } = await supabase.rpc("record_product_view", {
     p_product_id: product.id,
     p_session_id: sessionId,
@@ -56,7 +68,7 @@ export async function POST(request: Request, context: RouteContext) {
       recorded: false,
       viewCount: product.stats.viewCount,
       likeCount: product.stats.likeCount,
-      waitingCount: product.stats.waitingCount,
+      waitingCount,
       unitsSold: product.stats.unitsSold,
     });
   }
@@ -65,7 +77,7 @@ export async function POST(request: Request, context: RouteContext) {
     recorded: true,
     viewCount: Number(viewCount ?? product.stats.viewCount),
     likeCount: product.stats.likeCount,
-    waitingCount: product.stats.waitingCount,
+    waitingCount,
     unitsSold: product.stats.unitsSold,
   });
 }

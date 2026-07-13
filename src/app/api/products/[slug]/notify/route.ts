@@ -52,7 +52,9 @@ export async function POST(request: Request, context: RouteContext) {
         ? 400
         : result.error === "product_not_found"
           ? 404
-          : 501;
+          : result.error === "subscribe_failed"
+            ? 500
+            : 501;
     return Response.json(result, { status });
   }
 

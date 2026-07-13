@@ -9,6 +9,10 @@ import {
   fetchWishlistLikeCounts,
   reconcileProductLikeCounts,
 } from "@/lib/wishlist/wishlist-service";
+import {
+  fetchWaitingCounts,
+  reconcileProductWaitingCounts,
+} from "@/lib/waiting-list/waiting-list-service";
 
 type DbProduct = {
   id: string;
@@ -106,6 +110,17 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
     console.error("[admin] wishlist like_count sync failed:", syncError);
   }
 
+  // Authoritative waiting list from stock_notifications → products.waiting_count.
+  let waitingCountByProductId = new Map<string, number>();
+  let waitingSynced = false;
+  try {
+    waitingCountByProductId = await fetchWaitingCounts(productIds);
+    await reconcileProductWaitingCounts(productIds);
+    waitingSynced = true;
+  } catch (syncError) {
+    console.error("[admin] waiting_count sync failed:", syncError);
+  }
+
   const ratingByProductId = new Map<string, { average: number; count: number }>();
   if (productIds.length > 0) {
     const { data: ratingRows, error: ratingError } = await supabase
@@ -174,6 +189,9 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
     const likes = likesSynced
       ? (likeCountByProductId.get(product.id) ?? 0)
       : Number(product.like_count ?? 0);
+    const waitingCount = waitingSynced
+      ? (waitingCountByProductId.get(product.id) ?? 0)
+      : Number(product.waiting_count ?? 0);
 
     return {
       id: product.id,
@@ -194,7 +212,7 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
       unitsSold: Number(product.units_sold ?? 0),
       views: Number(product.view_count ?? 0),
       likes,
-      waitingCount: Number(product.waiting_count ?? 0),
+      waitingCount,
       ratingAverage: rating.average,
       ratingCount: rating.count,
       flags,

@@ -9,6 +9,7 @@ import type {
   SubscribeStockNotificationResult,
 } from "./types";
 import { buildVariantKey } from "./variant-key";
+import { insertStockNotification } from "./waiting-list-service";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -78,13 +79,26 @@ export async function subscribeStockNotification(
     };
   }
 
-  // Supabase: insert into stock_notifications (maps to database/004_engagement.sql)
-  // const supabase = createServiceRoleClient();
-  // await supabase.from('stock_notifications').insert({ email, product_id, variant_id, user_id })
-  return {
-    ok: false,
-    alreadySubscribed: false,
-    waitingCount: mockProduct?.stats.waitingCount ?? 0,
-    error: "supabase_not_wired",
-  };
+  try {
+    const result = await insertStockNotification({
+      email,
+      productId: input.productId,
+      variantId: input.variantId,
+      userId: input.userId,
+    });
+
+    return {
+      ok: true,
+      alreadySubscribed: result.alreadySubscribed,
+      waitingCount: result.waitingCount,
+    };
+  } catch (error) {
+    console.error("[waiting-list] subscribe failed:", error);
+    return {
+      ok: false,
+      alreadySubscribed: false,
+      waitingCount: 0,
+      error: "subscribe_failed",
+    };
+  }
 }
