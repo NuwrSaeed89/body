@@ -12,9 +12,18 @@ import {
   adminFieldClassName,
   adminLabelClassName,
 } from "./admin-form-styles";
+import {
+  AdminProductEngagementPanel,
+  type ProductEngagementStats,
+} from "./admin-product-engagement-panel";
+import {
+  AdminProductRatingPanel,
+  type ProductRatingStats,
+} from "./admin-product-rating-panel";
 import { AdminProductImageUpload } from "./admin-product-image-upload";
 import { AdminProductModelUpload } from "./admin-product-model-upload";
 import type { ProductModelChangePayload } from "./admin-product-model-upload";
+import { AdminConfirmDialog } from "./admin-confirm-dialog";
 
 export type ProductFormValues = {
   slug: string;
@@ -38,11 +47,14 @@ type AdminProductFormModalProps = {
   categories: AdminCategoryOption[];
   initial?: ProductDetail | null;
   images?: ProductImageItem[];
+  engagement?: ProductEngagementStats | null;
+  rating?: ProductRatingStats | null;
   modelGlbUrl?: string | null;
   modelFileName?: string | null;
   canMutate?: boolean;
   onClose: () => void;
   onSaved: () => void;
+  onImagesChange?: (images: ProductImageItem[]) => void;
 };
 
 const EMPTY_FORM: ProductFormValues = {
@@ -85,11 +97,14 @@ export function AdminProductFormModal({
   categories,
   initial,
   images = [],
+  engagement = null,
+  rating = null,
   modelGlbUrl,
   modelFileName,
   canMutate = true,
   onClose,
   onSaved,
+  onImagesChange,
 }: AdminProductFormModalProps) {
   const [form, setForm] = useState<ProductFormValues>(EMPTY_FORM);
   const [mode, setMode] = useState<"create" | "edit">(modeProp);
@@ -104,6 +119,7 @@ export function AdminProductFormModal({
   const [visible, setVisible] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
   const [modelUploading, setModelUploading] = useState(false);
+  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -126,12 +142,8 @@ export function AdminProductFormModal({
 
   const requestClose = useCallback(() => {
     if (modelUploading || imageUploading) {
-      const confirmed = window.confirm(
-        modelUploading
-          ? "3D model upload is in progress. Cancel the upload and close?"
-          : "Image upload is in progress. Cancel the upload and close?",
-      );
-      if (!confirmed) return;
+      setConfirmCloseOpen(true);
+      return;
     }
     onClose();
   }, [modelUploading, imageUploading, onClose]);
@@ -355,11 +367,22 @@ export function AdminProductFormModal({
               </div>
             </div>
 
+            {mode === "edit" && engagement && (
+              <AdminProductEngagementPanel stats={engagement} />
+            )}
+
+            {mode === "edit" && rating && (
+              <AdminProductRatingPanel stats={rating} />
+            )}
+
             <AdminProductImageUpload
               productId={productId}
               images={images}
               disabled={!canMutate}
-              onImagesChange={onSaved}
+              onImagesChange={(next) => {
+                onImagesChange?.(next);
+                onSaved();
+              }}
               onUploadingChange={setImageUploading}
             />
 
@@ -488,6 +511,24 @@ export function AdminProductFormModal({
           </div>
         </form>
       </aside>
+
+      <AdminConfirmDialog
+        open={confirmCloseOpen}
+        title="Close editor?"
+        description={
+          modelUploading
+            ? "3D model upload is in progress. Cancel upload and close?"
+            : "Image upload is in progress. Cancel upload and close?"
+        }
+        confirmLabel="Close"
+        cancelLabel="Stay"
+        tone="primary"
+        onCancel={() => setConfirmCloseOpen(false)}
+        onConfirm={() => {
+          setConfirmCloseOpen(false);
+          onClose();
+        }}
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import type { AdminOrderDetail } from "@/lib/admin/list-types";
 import {
@@ -17,6 +17,7 @@ import {
   adminTableHeadCellClass,
 } from "./admin-layout-styles";
 import { AdminPageHeader } from "./admin-page-header";
+import { AdminOrderShippingPanel } from "./admin-order-shipping-panel";
 import { AdminSourceBadge } from "./admin-source-badge";
 
 type AdminOrderDetailViewProps = {
@@ -25,10 +26,55 @@ type AdminOrderDetailViewProps = {
   canMutate: boolean;
 };
 
+function toUserFriendlyError(
+  fallback:
+    | "update_status_failed"
+    | "initiate_return_failed"
+    | "approve_return_failed",
+  message?: string,
+): string {
+  const text = (message ?? "").toLowerCase();
+
+  if (text.includes("permission denied") || text.includes("unauthorized")) {
+    return "You do not have permission to perform this action.";
+  }
+  if (text.includes("order item not found")) {
+    return "The selected order line was not found. Refresh and try again.";
+  }
+  if (text.includes("order not found")) {
+    return "This order no longer exists or is unavailable.";
+  }
+  if (text.includes("return quantity cannot exceed")) {
+    return message ?? "Return quantity cannot exceed the ordered amount.";
+  }
+  if (text.includes("return quantity exceeds remaining returnable amount")) {
+    return "Requested return quantity exceeds what is still returnable for this line.";
+  }
+  if (text.includes("already approved") || text.includes("already rejected")) {
+    return "This return request has already been processed.";
+  }
+  if (text.includes("variant not found")) {
+    return "The product variant for this return could not be found.";
+  }
+  if (text.includes("no returnable quantity left")) {
+    return "No returnable quantity left for the selected line item.";
+  }
+
+  if (fallback === "update_status_failed") {
+    return "Could not update order status. Please try again.";
+  }
+  if (fallback === "initiate_return_failed") {
+    return "Could not create return request. Please review quantity and try again.";
+  }
+  return "Could not approve return and restock. Please try again.";
+}
+
 export function AdminOrderDetailView({ order, locale, canMutate }: AdminOrderDetailViewProps) {
   const router = useRouter();
   const [statusRaw, setStatusRaw] = useState(order.statusRaw);
   const [statusLabel, setStatusLabel] = useState(order.status);
+  const [returns, setReturns] = useState(order.returns);
+  const [shipping, setShipping] = useState(order.shipping);
   const [selectedStatus, setSelectedStatus] = useState(
     ADMIN_FULFILLMENT_STATUSES.includes(
       order.statusRaw as (typeof ADMIN_FULFILLMENT_STATUSES)[number],
@@ -36,18 +82,51 @@ export function AdminOrderDetailView({ order, locale, canMutate }: AdminOrderDet
       ? order.statusRaw
       : ADMIN_FULFILLMENT_STATUSES[0],
   );
+  const [returnItemId, setReturnItemId] = useState(order.items[0]?.id ?? "");
+  const [returnQuantity, setReturnQuantity] = useState("1");
+  const [returnReason, setReturnReason] = useState("");
   const [saving, setSaving] = useState(false);
+  const [submittingReturn, setSubmittingReturn] = useState(false);
+  const [approvingReturnId, setApprovingReturnId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   const canUpdateStatus = canMutate && ADMIN_STATUS_UPDATABLE_FROM.has(statusRaw);
+
+  const reservedByItem = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const item of returns) {
+      if (item.status !== "pending" && item.status !== "approved") continue;
+      map.set(item.orderItemId, (map.get(item.orderItemId) ?? 0) + item.quantity);
+    }
+    return map;
+  }, [returns]);
+
+  const selectedReturnItem = useMemo(
+    () => order.items.find((item) => item.id === returnItemId),
+    [order.items, returnItemId],
+  );
+
+  const maxReturnQty = Math.max(
+    0,
+    (selectedReturnItem?.quantity ?? 0) - (reservedByItem.get(returnItemId) ?? 0),
+  );
+
+  const syncOrderFromPayload = (payloadOrder: AdminOrderDetail | undefined) => {
+    if (!payloadOrder) return;
+    setStatusRaw(payloadOrder.statusRaw);
+    setStatusLabel(payloadOrder.status);
+    setSelectedStatus(payloadOrder.statusRaw);
+    setReturns(payloadOrder.returns ?? []);
+    setShipping(payloadOrder.shipping);
+  };
 
   const handleSaveStatus = async () => {
     if (!canUpdateStatus || selectedStatus === statusRaw) return;
 
     setSaving(true);
     setError(null);
-    setSaved(false);
+    setSavedMessage(null);
 
     try {
       const response = await fetch(`/api/admin/orders/${order.id}?locale=${locale}`, {
@@ -57,26 +136,105 @@ export function AdminOrderDetailView({ order, locale, canMutate }: AdminOrderDet
       });
 
       const payload = (await response.json()) as { order?: AdminOrderDetail; error?: string };
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Failed to update order status");
-      }
+      if (!response.ok) throw new Error(payload.error ?? "");
 
       if (payload.order) {
-        setStatusRaw(payload.order.statusRaw);
-        setStatusLabel(payload.order.status);
-        setSelectedStatus(payload.order.statusRaw);
+        syncOrderFromPayload(payload.order);
       } else {
         setStatusRaw(selectedStatus);
         setStatusLabel(formatOrderStatusLabel(selectedStatus));
       }
 
-      setSaved(true);
+      setSavedMessage("Order status updated.");
       router.refresh();
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : "Failed to update order status");
+      setError(
+        toUserFriendlyError(
+          "update_status_failed",
+          saveError instanceof Error ? saveError.message : undefined,
+        ),
+      );
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleInitiateReturn = async () => {
+    if (!canMutate || !returnItemId) return;
+    if (maxReturnQty <= 0) {
+      setError("No returnable quantity left for this item.");
+      return;
+    }
+
+    setSubmittingReturn(true);
+    setError(null);
+    setSavedMessage(null);
+
+    try {
+      const response = await fetch(`/api/admin/orders/${order.id}/returns?locale=${locale}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderItemId: returnItemId,
+          quantity: Number(returnQuantity),
+          reason: returnReason.trim() || null,
+        }),
+      });
+
+      const payload = (await response.json()) as { order?: AdminOrderDetail; error?: string };
+      if (!response.ok) throw new Error(payload.error ?? "");
+
+      syncOrderFromPayload(payload.order);
+      setSavedMessage("Return request created.");
+      setReturnReason("");
+      setReturnQuantity("1");
+      router.refresh();
+    } catch (returnError) {
+      setError(
+        toUserFriendlyError(
+          "initiate_return_failed",
+          returnError instanceof Error ? returnError.message : undefined,
+        ),
+      );
+    } finally {
+      setSubmittingReturn(false);
+    }
+  };
+
+  const handleApproveReturn = async (returnId: string) => {
+    if (!canMutate) return;
+
+    setApprovingReturnId(returnId);
+    setError(null);
+    setSavedMessage(null);
+
+    try {
+      const response = await fetch(
+        `/api/admin/orders/${order.id}/returns/${returnId}/approve?locale=${locale}`,
+        { method: "POST" },
+      );
+
+      const payload = (await response.json()) as { order?: AdminOrderDetail; error?: string };
+      if (!response.ok) throw new Error(payload.error ?? "");
+
+      syncOrderFromPayload(payload.order);
+      setSavedMessage("Return approved and stock restocked.");
+      router.refresh();
+    } catch (approveError) {
+      setError(
+        toUserFriendlyError(
+          "approve_return_failed",
+          approveError instanceof Error ? approveError.message : undefined,
+        ),
+      );
+    } finally {
+      setApprovingReturnId(null);
+    }
+  };
+
+  const selectItemForReturn = (itemId: string) => {
+    setReturnItemId(itemId);
+    setReturnQuantity("1");
   };
 
   return (
@@ -93,7 +251,7 @@ export function AdminOrderDetailView({ order, locale, canMutate }: AdminOrderDet
 
       <AdminPageHeader
         title={`Order #${order.orderNumber}`}
-        description="Review line items, shipping details, and update fulfillment status."
+        description="Review line items, shipping details, and manage returns with restock approval."
         source={order.source}
       />
 
@@ -102,9 +260,9 @@ export function AdminOrderDetailView({ order, locale, canMutate }: AdminOrderDet
           {error}
         </p>
       )}
-      {saved && !error && (
+      {savedMessage && !error && (
         <p className="mb-4 rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-primary">
-          Order status updated.
+          {savedMessage}
         </p>
       )}
 
@@ -129,6 +287,24 @@ export function AdminOrderDetailView({ order, locale, canMutate }: AdminOrderDet
               ))}
             </address>
           </article>
+
+          <AdminOrderShippingPanel
+            order={{ ...order, shipping }}
+            locale={locale}
+            canMutate={canMutate}
+            onOrderUpdated={(next) => {
+              syncOrderFromPayload(next);
+              router.refresh();
+            }}
+            onError={(message) => {
+              setSavedMessage(null);
+              setError(message);
+            }}
+            onSuccess={(message) => {
+              setError(null);
+              setSavedMessage(message);
+            }}
+          />
 
           <article className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
             <h3 className="text-xs font-semibold uppercase tracking-[0.1em] text-on-surface-variant">
@@ -192,8 +368,7 @@ export function AdminOrderDetailView({ order, locale, canMutate }: AdminOrderDet
               <p className="mt-4 text-xs leading-relaxed text-on-surface-variant">
                 {!canMutate ? (
                   <>
-                    Status updates require live Supabase (<AdminSourceBadge source={order.source} />
-                    ).
+                    Status updates require live Supabase (<AdminSourceBadge source={order.source} />).
                   </>
                 ) : (
                   <>Status cannot be updated while the order is &ldquo;{statusLabel}&rdquo;.</>
@@ -220,7 +395,7 @@ export function AdminOrderDetailView({ order, locale, canMutate }: AdminOrderDet
                 <table className="min-w-[720px] w-full text-left">
                   <thead className="bg-surface-container-high">
                     <tr>
-                      {["Product", "SKU", "Size", "Color", "Qty", "Unit", "Total"].map(
+                      {["Product", "SKU", "Size", "Color", "Qty", "Unit", "Total", "Return"].map(
                         (heading) => (
                           <th key={heading} className={adminTableHeadCellClass}>
                             {heading}
@@ -247,12 +422,166 @@ export function AdminOrderDetailView({ order, locale, canMutate }: AdminOrderDet
                         <td className={`${adminTableBodyCellClass} font-semibold text-primary`}>
                           {item.lineTotal}
                         </td>
+                        <td className={adminTableBodyCellClass}>
+                          {(() => {
+                            const returnableQty = Math.max(
+                              0,
+                              item.quantity - (reservedByItem.get(item.id) ?? 0),
+                            );
+                            if (!canMutate) {
+                              return (
+                                <span className="text-xs text-on-surface-variant">
+                                  {returnableQty} returnable
+                                </span>
+                              );
+                            }
+                            return (
+                              <button
+                                type="button"
+                                onClick={() => selectItemForReturn(item.id)}
+                                disabled={returnableQty <= 0}
+                                className="rounded-lg border border-outline-variant px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-primary hover:bg-surface-container disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {returnableQty > 0
+                                  ? `Return (${returnableQty})`
+                                  : "No qty left"}
+                              </button>
+                            );
+                          })()}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             )}
+          </article>
+
+          <article className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.1em] text-on-surface-variant">
+                Returns management
+              </h3>
+              <span className="rounded-full bg-surface-container-high px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-primary">
+                {returns.length} requests
+              </span>
+            </div>
+
+            {canMutate ? (
+              <div className="grid gap-3 rounded-lg border border-outline-variant/50 bg-surface-container-lowest p-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <label className={adminLabelClassName} htmlFor="return-item-id">
+                    Order item
+                  </label>
+                  <select
+                    id="return-item-id"
+                    value={returnItemId}
+                    onChange={(event) => selectItemForReturn(event.target.value)}
+                    className={adminFieldClassName}
+                  >
+                    {order.items.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.productName} · {item.sku} · {item.sizeCode}/{item.colorCode} · Qty{" "}
+                        {item.quantity} (returnable{" "}
+                        {Math.max(0, item.quantity - (reservedByItem.get(item.id) ?? 0))})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className={adminLabelClassName} htmlFor="return-qty">
+                    Return quantity
+                  </label>
+                  <input
+                    id="return-qty"
+                    type="number"
+                    min={1}
+                    max={maxReturnQty || 1}
+                    value={returnQuantity}
+                    onChange={(event) => setReturnQuantity(event.target.value)}
+                    className={adminFieldClassName}
+                    disabled={maxReturnQty <= 0}
+                  />
+                  <p className="mt-2 text-xs text-on-surface-variant">
+                    Max returnable for selected line: {maxReturnQty}
+                  </p>
+                </div>
+                <div>
+                  <label className={adminLabelClassName} htmlFor="return-reason">
+                    Reason (optional)
+                  </label>
+                  <input
+                    id="return-reason"
+                    value={returnReason}
+                    onChange={(event) => setReturnReason(event.target.value)}
+                    className={adminFieldClassName}
+                    placeholder="Damaged, wrong size, etc."
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleInitiateReturn}
+                  disabled={submittingReturn || !returnItemId || maxReturnQty <= 0}
+                  className="sm:col-span-2 rounded-lg bg-primary px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-on-primary disabled:opacity-50"
+                >
+                  {submittingReturn ? "Creating…" : "Initiate return"}
+                </button>
+              </div>
+            ) : (
+              <p className="text-xs text-on-surface-variant">
+                Returns actions require live Supabase (<AdminSourceBadge source={order.source} />).
+              </p>
+            )}
+
+            <div className="mt-5 space-y-3">
+              {returns.length === 0 ? (
+                <p className="text-sm text-on-surface-variant">No return requests for this order.</p>
+              ) : (
+                returns.map((ret) => {
+                  const item = order.items.find((line) => line.id === ret.orderItemId);
+                  return (
+                    <div
+                      key={ret.id}
+                      className="rounded-lg border border-outline-variant/40 bg-surface-container-lowest p-4"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-primary">
+                          {item?.productName ?? "Order item"} · Qty {ret.quantity}
+                        </p>
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] ${
+                            ret.status === "approved"
+                              ? "bg-primary/15 text-primary"
+                              : ret.status === "rejected"
+                                ? "bg-error/15 text-error"
+                                : "bg-surface-container-high text-on-surface"
+                          }`}
+                        >
+                          {ret.statusLabel}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-on-surface-variant">
+                        Created {ret.createdAt}
+                        {ret.restockedAt ? ` · Restocked ${ret.restockedAt}` : ""}
+                      </p>
+                      {ret.reason ? (
+                        <p className="mt-2 text-sm text-on-surface-variant">Reason: {ret.reason}</p>
+                      ) : null}
+                      {canMutate && ret.status === "pending" && (
+                        <button
+                          type="button"
+                          onClick={() => void handleApproveReturn(ret.id)}
+                          disabled={approvingReturnId === ret.id}
+                          className="mt-3 rounded-lg border border-outline-variant px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-primary hover:bg-surface-container disabled:opacity-50"
+                        >
+                          {approvingReturnId === ret.id ? "Approving…" : "Approve & restock"}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </article>
 
           <article className="rounded-xl border border-outline-variant bg-surface-container-low p-5">

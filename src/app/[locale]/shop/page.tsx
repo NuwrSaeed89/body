@@ -6,6 +6,10 @@ import { ShopMobileHeader } from "@/components/shop/shop-mobile-header";
 import { ShopPageContent } from "@/components/shop/shop-page-content";
 import { PageContainer } from "@/components/ui/page-container";
 import { Link } from "@/i18n/navigation";
+import {
+  getCatalogFilterOptions,
+  listCatalogCategories,
+} from "@/lib/catalog/catalog-api-service";
 import { getStorefrontProducts } from "@/lib/catalog/get-storefront-catalog";
 
 type ShopPageProps = {
@@ -18,7 +22,11 @@ export default async function ShopPage({ params, searchParams }: ShopPageProps) 
   const { q = "" } = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("shop");
-  const products = await getStorefrontProducts(locale);
+  const [products, categories, filterOptions] = await Promise.all([
+    getStorefrontProducts(locale),
+    listCatalogCategories(locale),
+    getCatalogFilterOptions(locale),
+  ]);
 
   return (
     <>
@@ -35,7 +43,13 @@ export default async function ShopPage({ params, searchParams }: ShopPageProps) 
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <span className="text-primary">{t("breadcrumb.shop")}</span>
         </nav>
-        <ShopPageContent locale={locale} products={products} initialQuery={q} />
+        <ShopPageContent
+          locale={locale}
+          products={products}
+          categories={categories}
+          colors={filterOptions.colors}
+          initialQuery={q}
+        />
       </PageContainer>
 
       <div className="hidden md:block">

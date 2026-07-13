@@ -15,6 +15,7 @@ import {
   type ProductModelUploadResult,
 } from "@/lib/admin/products/upload-product-model";
 import { adminFieldClassName, adminLabelClassName } from "./admin-form-styles";
+import { AdminConfirmDialog } from "./admin-confirm-dialog";
 import { AdminProductModelPreview } from "./admin-product-model-preview";
 
 export type ProductModelChangePayload = {
@@ -56,6 +57,7 @@ export function AdminProductModelUpload({
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const dragDepthRef = useRef(0);
 
   const canUpload = Boolean(productId) && !disabled;
@@ -124,8 +126,10 @@ export function AdminProductModelUpload({
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    // Copy before clearing — FileList is live and empties when value is reset.
+    const files = Array.from(event.target.files ?? []);
     event.target.value = "";
+    const file = files[0];
     if (!file) return;
     await uploadFile(file);
   };
@@ -169,7 +173,6 @@ export function AdminProductModelUpload({
 
   const handleDelete = async () => {
     if (!productId || !modelUrl) return;
-    if (!window.confirm("Remove the 3D model from this product?")) return;
 
     setDeleting(true);
     setError(null);
@@ -264,7 +267,7 @@ export function AdminProductModelUpload({
               {canUpload && (
                 <button
                   type="button"
-                  onClick={() => void handleDelete()}
+                  onClick={() => setConfirmDeleteOpen(true)}
                   disabled={busy}
                   className="material-symbols-outlined rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-error disabled:opacity-50"
                   aria-label="Remove 3D model"
@@ -404,6 +407,21 @@ export function AdminProductModelUpload({
           {error}
         </p>
       )}
+
+      <AdminConfirmDialog
+        open={confirmDeleteOpen}
+        title="Delete 3D model?"
+        description="This will remove the current model from this product."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={deleting}
+        onCancel={() => setConfirmDeleteOpen(false)}
+        onConfirm={() => {
+          setConfirmDeleteOpen(false);
+          void handleDelete();
+        }}
+      />
     </div>
   );
 }

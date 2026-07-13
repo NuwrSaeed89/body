@@ -1,10 +1,14 @@
 import { isCurrency, type Currency } from "@/lib/currency";
-import { formatInteger, formatAdminAmount } from "./format";
+import { formatAdminAmount } from "./format";
 import type { AdminProductsData } from "./list-types";
 import { MOCK_ADMIN_PRODUCTS } from "./mock-list-data";
 import { resolvePrimaryCategoryFromLinks } from "./products/resolve-category";
 import { shouldUseAdminMock } from "./should-use-mock";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import {
+  fetchWishlistLikeCounts,
+  reconcileProductLikeCounts,
+} from "@/lib/wishlist/wishlist-service";
 
 type DbProduct = {
   id: string;
@@ -14,6 +18,8 @@ type DbProduct = {
   currency: string;
   units_sold: number;
   view_count: number;
+  like_count: number;
+  waiting_count: number;
   is_latest_drop: boolean;
   is_premium: boolean;
   is_best_seller: boolean;
@@ -61,6 +67,8 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
       currency,
       units_sold,
       view_count,
+      like_count,
+      waiting_count,
       is_latest_drop,
       is_premium,
       is_best_seller,
@@ -84,7 +92,48 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
 
   if (error) throw error;
 
-  const products = ((data ?? []) as unknown as DbProduct[]).map((product) => {
+  const productRows = (data ?? []) as unknown as DbProduct[];
+  const productIds = productRows.map((product) => product.id);
+
+  // Authoritative likes from wishlists; also reconcile denormalized like_count.
+  let likeCountByProductId = new Map<string, number>();
+  let likesSynced = false;
+  try {
+    likeCountByProductId = await fetchWishlistLikeCounts(productIds);
+    await reconcileProductLikeCounts(productIds);
+    likesSynced = true;
+  } catch (syncError) {
+    console.error("[admin] wishlist like_count sync failed:", syncError);
+  }
+
+  const ratingByProductId = new Map<string, { average: number; count: number }>();
+  if (productIds.length > 0) {
+    const { data: ratingRows, error: ratingError } = await supabase
+      .from("product_ratings")
+      .select("product_id, stars")
+      .in("product_id", productIds);
+
+    if (ratingError) throw ratingError;
+
+    const totals = new Map<string, { sum: number; count: number }>();
+    for (const row of ratingRows ?? []) {
+      const productId = String((row as { product_id: string }).product_id);
+      const stars = Number((row as { stars: number }).stars);
+      const current = totals.get(productId) ?? { sum: 0, count: 0 };
+      current.sum += stars;
+      current.count += 1;
+      totals.set(productId, current);
+    }
+
+    for (const [productId, total] of totals) {
+      ratingByProductId.set(productId, {
+        average: Math.round((total.sum / total.count) * 10) / 10,
+        count: total.count,
+      });
+    }
+  }
+
+  const products = productRows.map((product) => {
     const translation =
       product.product_translations.find((t) => t.locale === contentLocale) ??
       product.product_translations[0];
@@ -121,6 +170,10 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
     const modelFileName = modelMedia?.public_url
       ? decodeURIComponent(modelMedia.public_url.split("/").pop() ?? "model")
       : null;
+    const rating = ratingByProductId.get(product.id) ?? { average: 0, count: 0 };
+    const likes = likesSynced
+      ? (likeCountByProductId.get(product.id) ?? 0)
+      : Number(product.like_count ?? 0);
 
     return {
       id: product.id,
@@ -140,6 +193,10 @@ async function fetchProducts(locale: string): Promise<AdminProductsData> {
       variantCount,
       unitsSold: Number(product.units_sold ?? 0),
       views: Number(product.view_count ?? 0),
+      likes,
+      waitingCount: Number(product.waiting_count ?? 0),
+      ratingAverage: rating.average,
+      ratingCount: rating.count,
       flags,
       isLatestDrop: product.is_latest_drop,
       isPremium: product.is_premium,

@@ -418,12 +418,15 @@ export function AdminProductVariantMatrix({
           <div className="mt-2 flex flex-wrap gap-3">
           {colors.map((color) => {
             const checked = selectedColorIds.includes(color.id);
+            const inputId = `variant-color-${color.id}`;
             return (
               <label
                 key={color.id}
-                className="flex items-center gap-2 rounded-lg border border-outline-variant bg-surface px-3 py-2 text-sm"
+                htmlFor={inputId}
+                className="flex cursor-pointer items-center gap-2 rounded-lg border border-outline-variant bg-surface px-3 py-2 text-sm"
               >
                 <input
+                  id={inputId}
                   type="checkbox"
                   checked={checked}
                   disabled={disabled || (checked && selectedColorIds.length === 1)}

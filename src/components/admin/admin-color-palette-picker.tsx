@@ -6,6 +6,7 @@ import {
   normalizeHex,
   slugifyColorCode,
   suggestColorFromHex,
+  type PaletteSwatch,
 } from "@/lib/admin/colors/color-palette";
 import type { AdminColorOption } from "@/lib/admin/products/variant-types";
 import { adminFieldClassName, adminLabelClassName } from "./admin-form-styles";
@@ -15,6 +16,12 @@ type AdminColorPalettePickerProps = {
   existingColors: AdminColorOption[];
   onColorAdded: (color: AdminColorOption) => void;
 };
+
+function sameHex(a: string | null | undefined, b: string | null | undefined): boolean {
+  const left = normalizeHex(a ?? "");
+  const right = normalizeHex(b ?? "");
+  return Boolean(left && right && left === right);
+}
 
 export function AdminColorPalettePicker({
   disabled = false,
@@ -31,29 +38,26 @@ export function AdminColorPalettePicker({
   const codePreview = useMemo(() => slugifyColorCode(name) || "color", [name]);
   const normalizedHex = normalizeHex(hex) ?? "#3D3E3F";
 
-  const applySuggestion = (nextHex: string, forceName = false) => {
-    const suggestion = suggestColorFromHex(nextHex);
-    if (!suggestion) return;
-    setHex(suggestion.hex);
-    if (forceName || !nameEdited) {
-      setName(suggestion.name);
-      setNameEdited(false);
-    }
-  };
-
-  const pickSwatch = (swatchHex: string) => {
+  const pickSwatch = (swatch: PaletteSwatch) => {
     setError(null);
-    applySuggestion(swatchHex, true);
+    // Apply the clicked swatch exactly — never fuzzy-match to a neighbor.
+    setHex(normalizeHex(swatch.hex) ?? swatch.hex);
+    setName(swatch.name);
+    setNameEdited(false);
   };
 
   const handleHexInput = (value: string) => {
     setError(null);
+    setHex(value);
+
     const normalized = normalizeHex(value);
-    if (!normalized) {
-      setHex(value);
-      return;
-    }
-    applySuggestion(normalized);
+    if (!normalized || nameEdited) return;
+
+    // Keep the typed/custom hex; only suggest a display name (do not replace hex
+    // with a different palette color).
+    const suggestion = suggestColorFromHex(normalized);
+    if (!suggestion) return;
+    setName(suggestion.name);
   };
 
   const handleAdd = async () => {
@@ -71,9 +75,7 @@ export function AdminColorPalettePicker({
       return;
     }
 
-    const duplicate = existingColors.find(
-      (color) => color.hex?.toUpperCase() === finalHex.toUpperCase(),
-    );
+    const duplicate = existingColors.find((color) => sameHex(color.hex, finalHex));
     if (duplicate) {
       onColorAdded(duplicate);
       setOpen(false);
@@ -152,10 +154,8 @@ export function AdminColorPalettePicker({
             </p>
             <div className="flex flex-wrap gap-2">
               {FASHION_COLOR_PALETTE.map((swatch) => {
-                const selected = normalizedHex === swatch.hex.toUpperCase();
-                const alreadyAdded = existingColors.some(
-                  (color) => color.hex?.toUpperCase() === swatch.hex.toUpperCase(),
-                );
+                const selected = sameHex(normalizedHex, swatch.hex);
+                const alreadyAdded = existingColors.some((color) => sameHex(color.hex, swatch.hex));
 
                 return (
                   <button
@@ -163,7 +163,7 @@ export function AdminColorPalettePicker({
                     type="button"
                     disabled={disabled}
                     title={`${swatch.name}${alreadyAdded ? " (in catalog)" : ""}`}
-                    onClick={() => pickSwatch(swatch.hex)}
+                    onClick={() => pickSwatch(swatch)}
                     className={`relative size-9 rounded-full border-2 transition-transform hover:scale-105 disabled:opacity-50 ${
                       selected ? "border-primary ring-2 ring-primary/30" : "border-outline-variant"
                     }`}
@@ -232,9 +232,21 @@ export function AdminColorPalettePicker({
             </div>
           </div>
 
-          <p className="text-xs text-on-surface-variant">
-            SKU code: <span className="font-mono font-semibold text-primary">{codePreview}</span>
-          </p>
+          <div className="flex items-center gap-3 rounded-lg border border-outline-variant/50 bg-surface-container-low px-3 py-2">
+            <span
+              className="size-8 shrink-0 rounded-full border border-outline-variant"
+              style={{ backgroundColor: normalizedHex }}
+              aria-hidden
+            />
+            <p className="text-xs text-on-surface-variant">
+              Selected:{" "}
+              <span className="font-semibold text-primary">{name}</span>
+              {" · "}
+              <span className="font-mono text-primary">{normalizedHex}</span>
+              {" · SKU "}
+              <span className="font-mono font-semibold text-primary">{codePreview}</span>
+            </p>
+          </div>
 
           {error && (
             <p className="rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-sm text-primary">

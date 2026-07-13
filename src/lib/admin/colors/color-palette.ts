@@ -113,7 +113,9 @@ export type ColorSuggestion = {
   fromPalette: boolean;
 };
 
-/** Suggests a display name and SKU code slug from a hex value. */
+/** Suggests a display name and SKU code slug from a hex value.
+ * Always keeps the input hex — never swaps in a neighboring palette hex.
+ */
 export function suggestColorFromHex(hex: string): ColorSuggestion | null {
   const normalized = normalizeHex(hex);
   const rgb = hexToRgb(normalized ?? hex);
@@ -132,7 +134,8 @@ export function suggestColorFromHex(hex: string): ColorSuggestion | null {
     }
   }
 
-  if (nearest && nearestDistance < 42) {
+  // Exact palette hit only — do not borrow another swatch's name for a nearby hue.
+  if (nearest && nearestDistance < 1) {
     return {
       name: nearest.name,
       code: nearest.code,

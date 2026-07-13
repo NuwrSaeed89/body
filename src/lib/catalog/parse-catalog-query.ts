@@ -4,21 +4,10 @@ import type {
   CatalogSort,
   ProductListQuery,
 } from "./catalog-api-types";
-import type { ShopCategory } from "@/lib/shop-data";
 
 const SORT_VALUES: CatalogSort[] = ["newest", "price-asc", "price-desc", "best-selling"];
 const FLAG_VALUES: CatalogProductFlag[] = ["is_latest_drop", "is_best_seller", "is_premium"];
 const AVAILABILITY_VALUES: CatalogAvailability[] = ["in-stock", "out-of-stock"];
-
-const CATEGORY_VALUES: ShopCategory[] = [
-  "all",
-  "leggings",
-  "sports-bras",
-  "tops",
-  "shorts",
-  "matching-sets",
-  "accessories",
-];
 
 function readNumber(value: string | null): number | undefined {
   if (!value) return undefined;
@@ -48,7 +37,9 @@ export function mapShopSortToApi(sort: string): CatalogSort | undefined {
 }
 
 export function parseProductListQuery(searchParams: URLSearchParams): ProductListQuery {
-  const category = readEnum(searchParams.get("category"), CATEGORY_VALUES);
+  const categoryParam = searchParams.get("category")?.trim();
+  const category =
+    categoryParam && categoryParam !== "all" ? categoryParam : undefined;
   const sort =
     readEnum(searchParams.get("sort"), SORT_VALUES) ??
     mapShopSortToApi(searchParams.get("sort") ?? "");
@@ -56,7 +47,7 @@ export function parseProductListQuery(searchParams: URLSearchParams): ProductLis
   return {
     locale: searchParams.get("locale") ?? "en",
     q: searchParams.get("q")?.trim() || searchParams.get("query")?.trim() || undefined,
-    category: category ?? undefined,
+    category,
     collection: searchParams.get("collection")?.trim() || undefined,
     size: searchParams.get("size")?.trim().toUpperCase() || undefined,
     color: searchParams.get("color")?.trim() || undefined,

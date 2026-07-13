@@ -622,6 +622,7 @@
       "management": "Management",
       "managementLinks": {
         "wishlist": "Wishlist",
+        "orders": "Orders",
         "shippingAddresses": "Shipping Addresses",
         "payment": "Payment",
         "support": "Support"

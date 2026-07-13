@@ -11,6 +11,15 @@ import type { ProductDetail } from "@/lib/admin/products/types";
 import { DEFAULT_PRODUCT_CURRENCY } from "@/lib/currency";
 import { adminCardToolbarClass } from "./admin-layout-styles";
 import { AdminInventoryStockEditor } from "./admin-inventory-stock-editor";
+import { AdminConfirmDialog } from "./admin-confirm-dialog";
+import {
+  AdminProductEngagementPanel,
+  productEngagementFromRow,
+} from "./admin-product-engagement-panel";
+import {
+  AdminProductRatingPanel,
+  productRatingFromRow,
+} from "./admin-product-rating-panel";
 import { AdminProductFormModal } from "./admin-product-form-modal";
 import {
   AdminProductStockBadge,
@@ -26,6 +35,23 @@ type AdminProductsClientProps = {
 };
 
 type StockFilter = "all" | "in-stock" | "low-stock" | "out-of-stock";
+
+type EngagementSort =
+  | "newest"
+  | "views"
+  | "likes"
+  | "waiting"
+  | "sold"
+  | "rating";
+
+const ENGAGEMENT_SORT_OPTIONS: { value: EngagementSort; label: string }[] = [
+  { value: "newest", label: "Newest" },
+  { value: "views", label: "Most views" },
+  { value: "likes", label: "Most likes" },
+  { value: "waiting", label: "Most waiting" },
+  { value: "sold", label: "Most sold" },
+  { value: "rating", label: "Top rated" },
+];
 
 function rowToProductDetail(product: AdminProductRow, locale: string): ProductDetail {
   return {
@@ -62,6 +88,36 @@ function matchesStockFilter(product: AdminProductRow, filter: StockFilter): bool
   );
 }
 
+function sortByEngagement(
+  products: AdminProductRow[],
+  sort: EngagementSort,
+): AdminProductRow[] {
+  if (sort === "newest") return products;
+
+  const copy = [...products];
+  copy.sort((a, b) => {
+    switch (sort) {
+      case "views":
+        return b.views - a.views || a.name.localeCompare(b.name);
+      case "likes":
+        return b.likes - a.likes || a.name.localeCompare(b.name);
+      case "waiting":
+        return b.waitingCount - a.waitingCount || a.name.localeCompare(b.name);
+      case "sold":
+        return b.unitsSold - a.unitsSold || a.name.localeCompare(b.name);
+      case "rating":
+        return (
+          b.ratingAverage - a.ratingAverage ||
+          b.ratingCount - a.ratingCount ||
+          a.name.localeCompare(b.name)
+        );
+      default:
+        return 0;
+    }
+  });
+  return copy;
+}
+
 export function AdminProductsClient({
   products,
   categories,
@@ -73,31 +129,45 @@ export function AdminProductsClient({
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [editingProduct, setEditingProduct] = useState<ProductDetail | null>(null);
   const [editingImages, setEditingImages] = useState<ProductImageItem[]>([]);
+  const [editingEngagement, setEditingEngagement] = useState<{
+    views: number;
+    likes: number;
+    waitingCount: number;
+    unitsSold: number;
+  } | null>(null);
+  const [editingRating, setEditingRating] = useState<{
+    average: number;
+    count: number;
+  } | null>(null);
   const [editingModelUrl, setEditingModelUrl] = useState<string | null>(null);
   const [editingModelFileName, setEditingModelFileName] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteProduct, setConfirmDeleteProduct] = useState<AdminProductRow | null>(null);
   const [savingInventoryId, setSavingInventoryId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<StockFilter>("all");
+  const [engagementSort, setEngagementSort] = useState<EngagementSort>("newest");
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const [showStatusMenu, setShowStatusMenu] = useState(false);
+  const [showSortMenu, setShowSortMenu] = useState(false);
   const filtersRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!showCategoryMenu && !showStatusMenu) return;
+    if (!showCategoryMenu && !showStatusMenu && !showSortMenu) return;
 
     const closeMenus = (event: MouseEvent) => {
       if (!filtersRef.current?.contains(event.target as Node)) {
         setShowCategoryMenu(false);
         setShowStatusMenu(false);
+        setShowSortMenu(false);
       }
     };
 
     document.addEventListener("mousedown", closeMenus);
     return () => document.removeEventListener("mousedown", closeMenus);
-  }, [showCategoryMenu, showStatusMenu]);
+  }, [showCategoryMenu, showStatusMenu, showSortMenu]);
 
   const categoryOptions = useMemo(() => {
     const names = new Set<string>();
@@ -109,7 +179,7 @@ export function AdminProductsClient({
 
   const filteredProducts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    return products.filter((product) => {
+    const filtered = products.filter((product) => {
       const matchesQuery =
         !query ||
         product.name.toLowerCase().includes(query) ||
@@ -118,7 +188,19 @@ export function AdminProductsClient({
       const matchesStatus = matchesStockFilter(product, statusFilter);
       return matchesQuery && matchesCategory && matchesStatus;
     });
-  }, [products, searchQuery, categoryFilter, statusFilter]);
+    return sortByEngagement(filtered, engagementSort);
+  }, [products, searchQuery, categoryFilter, statusFilter, engagementSort]);
+
+  useEffect(() => {
+    if (!formOpen || !editingProduct?.id) return;
+    const row = products.find((product) => product.id === editingProduct.id);
+    if (!row) return;
+    setEditingImages(row.images);
+    setEditingEngagement(productEngagementFromRow(row));
+    setEditingRating(productRatingFromRow(row));
+    setEditingModelUrl(row.modelGlbUrl);
+    setEditingModelFileName(row.modelFileName);
+  }, [products, formOpen, editingProduct?.id]);
 
   const emptyMessage =
     products.length === 0
@@ -129,6 +211,8 @@ export function AdminProductsClient({
     setFormMode("create");
     setEditingProduct(null);
     setEditingImages([]);
+    setEditingEngagement(null);
+    setEditingRating(null);
     setEditingModelUrl(null);
     setEditingModelFileName(null);
     setFormOpen(true);
@@ -139,6 +223,8 @@ export function AdminProductsClient({
     setFormMode("edit");
     setEditingProduct(rowToProductDetail(product, locale));
     setEditingImages(product.images);
+    setEditingEngagement(productEngagementFromRow(product));
+    setEditingRating(productRatingFromRow(product));
     setEditingModelUrl(product.modelGlbUrl);
     setEditingModelFileName(product.modelFileName);
     setFormOpen(true);
@@ -154,11 +240,6 @@ export function AdminProductsClient({
   };
 
   const handleDelete = async (product: AdminProductRow) => {
-    const confirmed = window.confirm(
-      `Delete "${product.name}"? This removes variants, translations, and media links.`,
-    );
-    if (!confirmed) return;
-
     setDeletingId(product.id);
     setActionError(null);
 
@@ -213,6 +294,9 @@ export function AdminProductsClient({
         : statusFilter === "low-stock"
           ? "Low stock"
           : "Out of stock";
+
+  const engagementSortLabel =
+    ENGAGEMENT_SORT_OPTIONS.find((option) => option.value === engagementSort)?.label ?? "Newest";
 
   return (
     <>
@@ -288,6 +372,7 @@ export function AdminProductsClient({
                 onClick={() => {
                   setShowCategoryMenu((open) => !open);
                   setShowStatusMenu(false);
+                  setShowSortMenu(false);
                 }}
                 className="flex w-full items-center justify-center gap-2 rounded-lg border border-outline-variant px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition-colors hover:bg-surface-container sm:w-auto"
               >
@@ -328,6 +413,7 @@ export function AdminProductsClient({
                 onClick={() => {
                   setShowStatusMenu((open) => !open);
                   setShowCategoryMenu(false);
+                  setShowSortMenu(false);
                 }}
                 className="flex w-full items-center justify-center gap-2 rounded-lg border border-outline-variant px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition-colors hover:bg-surface-container sm:w-auto"
               >
@@ -359,6 +445,39 @@ export function AdminProductsClient({
                 </div>
               )}
             </div>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSortMenu((open) => !open);
+                  setShowCategoryMenu(false);
+                  setShowStatusMenu(false);
+                }}
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-outline-variant px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition-colors hover:bg-surface-container sm:w-auto"
+              >
+                <span className="material-symbols-outlined text-[18px]">sort</span>
+                <span className="truncate">{engagementSortLabel}</span>
+              </button>
+              {showSortMenu && (
+                <div className="absolute left-0 z-20 mt-2 min-w-[180px] rounded-lg border border-outline-variant bg-surface-container-lowest py-1 shadow-lg sm:left-auto sm:right-0">
+                  {ENGAGEMENT_SORT_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        setEngagementSort(option.value);
+                        setShowSortMenu(false);
+                      }}
+                      className={`block w-full px-4 py-2 text-left text-sm hover:bg-surface-container ${
+                        engagementSort === option.value ? "font-semibold text-primary" : ""
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -382,6 +501,16 @@ export function AdminProductsClient({
                     <p className="mt-1 text-xs text-on-surface-variant">
                       {product.categoryName ?? "—"}
                     </p>
+                    <AdminProductEngagementPanel
+                      className="mt-2"
+                      compact
+                      stats={productEngagementFromRow(product)}
+                    />
+                    <AdminProductRatingPanel
+                      className="mt-1.5"
+                      compact
+                      stats={productRatingFromRow(product)}
+                    />
                     <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
                       <p className="text-sm font-bold text-primary">{product.price}</p>
                       <AdminProductStockBadge product={product} />
@@ -440,7 +569,7 @@ export function AdminProductsClient({
                           type="button"
                           onClick={(event) => {
                             event.stopPropagation();
-                            void handleDelete(product);
+                            setConfirmDeleteProduct(product);
                           }}
                           disabled={deletingId === product.id}
                           className="material-symbols-outlined rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-error disabled:opacity-50"
@@ -467,7 +596,7 @@ export function AdminProductsClient({
             onView={openStoreProduct}
             onVariants={openVariants}
             onEdit={openEdit}
-            onDelete={(product) => void handleDelete(product)}
+            onDelete={(product) => setConfirmDeleteProduct(product)}
             onInventorySave={handleInventorySave}
           />
         </div>
@@ -480,11 +609,34 @@ export function AdminProductsClient({
         categories={categories}
         initial={editingProduct}
         images={editingImages}
+        engagement={editingEngagement}
+        rating={editingRating}
         modelGlbUrl={editingModelUrl}
         modelFileName={editingModelFileName}
         canMutate={canMutate}
         onClose={() => setFormOpen(false)}
         onSaved={() => router.refresh()}
+        onImagesChange={setEditingImages}
+      />
+
+      <AdminConfirmDialog
+        open={Boolean(confirmDeleteProduct)}
+        title="Delete product?"
+        description={
+          confirmDeleteProduct
+            ? `Delete "${confirmDeleteProduct.name}"? This removes variants, translations, and media links.`
+            : ""
+        }
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={Boolean(confirmDeleteProduct && deletingId === confirmDeleteProduct.id)}
+        onCancel={() => setConfirmDeleteProduct(null)}
+        onConfirm={() => {
+          const target = confirmDeleteProduct;
+          setConfirmDeleteProduct(null);
+          if (target) void handleDelete(target);
+        }}
       />
     </>
   );

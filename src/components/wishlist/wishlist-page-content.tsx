@@ -2,26 +2,34 @@
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { AccountNav } from "@/components/account/account-nav";
+import { AccountDesktopSidebar } from "@/components/account/account-desktop-sidebar";
 import { CartHeaderLink } from "@/components/layout/cart-header-link";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { FormattedPrice } from "@/components/ui/formatted-price";
 import { Link, useRouter } from "@/i18n/navigation";
+import { getProfileFirstName } from "@/lib/account/format-profile";
 import type { ShopProduct } from "@/lib/shop-data";
+import type { AccountProfileData } from "@/lib/account/types";
 import { useAuth } from "@/providers/auth-provider";
 import { useWishlist } from "@/providers/wishlist-provider";
 
 type WishlistPageContentProps = {
   catalog: ShopProduct[];
+  profile: AccountProfileData | null;
 };
 
-export function WishlistPageContent({ catalog }: WishlistPageContentProps) {
+export function WishlistPageContent({ catalog, profile }: WishlistPageContentProps) {
   const t = useTranslations("wishlist");
   const router = useRouter();
   const { isAuthenticated, mounted: authMounted, signOut, user } = useAuth();
   const { productIds, remove, mounted: wishlistMounted } = useWishlist();
 
   const ready = authMounted && wishlistMounted;
+  const displayName =
+    profile?.fullName?.trim() ??
+    getProfileFirstName(user?.firstName ?? null) ??
+    "Member";
+  const email = profile?.email ?? user?.email ?? null;
 
   if (!ready) {
     return (
@@ -34,9 +42,9 @@ export function WishlistPageContent({ catalog }: WishlistPageContentProps) {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex flex-col gap-10 lg:flex-row lg:gap-16">
-        <AccountNav />
-        <section className="flex min-h-[40vh] flex-1 flex-col items-center justify-center rounded-xl border border-outline-variant/30 px-6 py-16 text-center">
+      <div className="flex flex-col gap-10 md:flex-row md:gap-16">
+        <AccountDesktopSidebar active="wishlist" displayName={displayName} email={email} />
+        <section className="flex min-h-[40vh] flex-1 flex-col items-center justify-center rounded-xl border border-outline-variant/30 px-6 py-16 text-center md:ml-64">
           <span
             className="material-symbols-outlined mb-4 text-4xl text-on-surface-variant"
             aria-hidden
@@ -155,10 +163,10 @@ export function WishlistPageContent({ catalog }: WishlistPageContentProps) {
         </main>
       </div>
 
-      <div className="hidden flex-col gap-10 lg:flex lg:flex-row lg:gap-16">
-        <AccountNav />
+      <div className="hidden md:flex md:flex-row md:gap-16">
+        <AccountDesktopSidebar active="wishlist" displayName={displayName} email={email} />
 
-        <div className="min-w-0 flex-1 space-y-8">
+        <div className="min-w-0 flex-1 space-y-8 md:ml-64">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-[0.1em] text-primary">

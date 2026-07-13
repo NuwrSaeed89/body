@@ -2,29 +2,25 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import type { ShopCategory } from "@/lib/shop-data";
+import type {
+  CatalogCategoryItem,
+  CatalogColorOption,
+} from "@/lib/catalog/catalog-api-types";
 
 type CategoryTabsProps = {
-  active: ShopCategory;
-  onChange: (category: ShopCategory) => void;
+  categories: CatalogCategoryItem[];
+  active: string;
+  onChange: (category: string) => void;
   sticky?: boolean;
 };
 
 export function CategoryTabs({
+  categories,
   active,
   onChange,
   sticky = false,
 }: CategoryTabsProps) {
   const t = useTranslations("shop.categories");
-
-  const categories: ShopCategory[] = [
-    "all",
-    "leggings",
-    "sports-bras",
-    "tops",
-    "shorts",
-    "matching-sets",
-  ];
 
   return (
     <nav
@@ -35,20 +31,31 @@ export function CategoryTabs({
       }
     >
       <div className="hide-scrollbar flex gap-6 overflow-x-auto px-5 md:flex-wrap md:overflow-visible md:px-0">
+        <button
+          type="button"
+          onClick={() => onChange("all")}
+          className={`shrink-0 whitespace-nowrap pb-1 text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
+            active === "all"
+              ? "border-b-2 border-primary text-primary"
+              : "text-on-surface-variant hover:text-primary"
+          }`}
+        >
+          {t("all")}
+        </button>
         {categories.map((category) => {
-          const isActive = active === category;
+          const isActive = active === category.slug;
           return (
             <button
-              key={category}
+              key={category.id}
               type="button"
-              onClick={() => onChange(category)}
+              onClick={() => onChange(category.slug)}
               className={`shrink-0 whitespace-nowrap pb-1 text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
                 isActive
                   ? "border-b-2 border-primary text-primary"
                   : "text-on-surface-variant hover:text-primary"
               }`}
             >
-              {t(category)}
+              {category.name}
             </button>
           );
         })}
@@ -240,10 +247,18 @@ function FilterGroup({
 }
 
 type ShopSidebarFiltersProps = {
+  colors: CatalogColorOption[];
+  selectedColor: string | null;
+  onColorChange: (colorCode: string | null) => void;
   className?: string;
 };
 
-export function ShopSidebarFilters({ className = "" }: ShopSidebarFiltersProps) {
+export function ShopSidebarFilters({
+  colors,
+  selectedColor,
+  onColorChange,
+  className = "",
+}: ShopSidebarFiltersProps) {
   const t = useTranslations("shop.filters");
 
   return (
@@ -262,6 +277,30 @@ export function ShopSidebarFilters({ className = "" }: ShopSidebarFiltersProps) 
           <FilterCheckbox key={size} label={size} />
         ))}
       </FilterGroup>
+      {colors.length > 0 && (
+        <FilterGroup title={t("color")}>
+          <div className="flex flex-wrap gap-3">
+            {colors.map((color) => {
+              const isActive = selectedColor === color.code;
+              return (
+                <button
+                  key={color.id}
+                  type="button"
+                  onClick={() => onColorChange(isActive ? null : color.code)}
+                  className={`h-8 w-8 rounded-full transition-shadow ${
+                    isActive
+                      ? "ring-2 ring-primary ring-offset-2"
+                      : "ring-1 ring-outline-variant hover:ring-primary"
+                  }`}
+                  style={{ backgroundColor: color.hex }}
+                  aria-label={color.name}
+                  title={color.name}
+                />
+              );
+            })}
+          </div>
+        </FilterGroup>
+      )}
     </aside>
   );
 }

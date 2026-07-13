@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import type { AdminOrderRow, AdminOrdersData } from "@/lib/admin/list-types";
 import {
@@ -27,19 +27,40 @@ type AdminOrdersClientProps = {
   filters: AdminOrderFilters;
 };
 
+function toDisplayDate(value: string | null): string {
+  if (!value) return "";
+  const [year, month, day] = value.split("-");
+  if (!year || !month || !day) return "";
+  return `${day}/${month}/${year}`;
+}
+
+function toFilterDate(value: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const match = trimmed.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return null;
+  const [, day, month, year] = match;
+  const iso = `${year}-${month}-${day}`;
+  const parsed = new Date(`${iso}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return iso;
+}
+
 export function AdminOrdersClient({ data, filters }: AdminOrdersClientProps) {
   const router = useRouter();
   const pathname = usePathname();
   const filtersRef = useRef<HTMLDivElement>(null);
+  const fromDatePickerRef = useRef<HTMLInputElement>(null);
+  const toDatePickerRef = useRef<HTMLInputElement>(null);
 
   const [showStatusMenu, setShowStatusMenu] = useState(false);
   const [showPaymentMenu, setShowPaymentMenu] = useState(false);
-  const [dateFrom, setDateFrom] = useState(filters.dateFrom ?? "");
-  const [dateTo, setDateTo] = useState(filters.dateTo ?? "");
+  const [dateFrom, setDateFrom] = useState(toDisplayDate(filters.dateFrom));
+  const [dateTo, setDateTo] = useState(toDisplayDate(filters.dateTo));
 
   useEffect(() => {
-    setDateFrom(filters.dateFrom ?? "");
-    setDateTo(filters.dateTo ?? "");
+    setDateFrom(toDisplayDate(filters.dateFrom));
+    setDateTo(toDisplayDate(filters.dateTo));
   }, [filters.dateFrom, filters.dateTo]);
 
   useEffect(() => {
@@ -65,9 +86,11 @@ export function AdminOrdersClient({ data, filters }: AdminOrdersClientProps) {
   };
 
   const applyDateFilters = () => {
+    const nextDateFrom = toFilterDate(dateFrom);
+    const nextDateTo = toFilterDate(dateTo);
     updateFilters({
-      dateFrom: dateFrom || null,
-      dateTo: dateTo || null,
+      dateFrom: nextDateFrom,
+      dateTo: nextDateTo,
     });
   };
 
@@ -85,6 +108,16 @@ export function AdminOrdersClient({ data, filters }: AdminOrdersClientProps) {
   const statusLabel = orderStatusFilterLabel(filters.status);
   const paymentLabel = orderPaymentFilterLabel(filters.payment);
 
+  const openDatePicker = (ref: RefObject<HTMLInputElement | null>) => {
+    const picker = ref.current as (HTMLInputElement & { showPicker?: () => void }) | null;
+    if (!picker) return;
+    if (picker.showPicker) {
+      picker.showPicker();
+      return;
+    }
+    picker.click();
+  };
+
   return (
     <>
       <AdminPageHeader
@@ -97,7 +130,7 @@ export function AdminOrdersClient({ data, filters }: AdminOrdersClientProps) {
 
       <article className="overflow-hidden rounded-xl border border-outline-variant bg-surface-container-low">
         <div className={adminCardToolbarClass}>
-          <div ref={filtersRef} className="flex w-full flex-col gap-3 xl:flex-row xl:flex-wrap xl:items-end">
+          <div ref={filtersRef} className="flex w-full flex-col gap-3 lg:flex-row lg:items-end lg:gap-2">
             <div className="relative">
               <button
                 type="button"
@@ -176,40 +209,86 @@ export function AdminOrdersClient({ data, filters }: AdminOrdersClientProps) {
               )}
             </div>
 
-            <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 xl:min-w-[320px]">
-              <div>
+            <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:gap-2">
+              <div className="min-w-[210px]">
                 <label
                   htmlFor="orders-date-from"
                   className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant"
                 >
                   From
                 </label>
-                <input
-                  id="orders-date-from"
-                  type="date"
-                  value={dateFrom}
-                  onChange={(event) => setDateFrom(event.target.value)}
-                  className={`${adminFieldClassName} py-2`}
-                />
+                <div className="flex items-center gap-2">
+                  <input
+                    id="orders-date-from"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="DD/MM/YYYY"
+                    maxLength={10}
+                    dir="ltr"
+                    value={dateFrom}
+                    onChange={(event) => setDateFrom(event.target.value)}
+                    className={`${adminFieldClassName} py-2 text-left [direction:ltr]`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => openDatePicker(fromDatePickerRef)}
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant transition-colors hover:bg-surface-container"
+                    aria-label="Pick from date"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+                  </button>
+                  <input
+                    ref={fromDatePickerRef}
+                    type="date"
+                    tabIndex={-1}
+                    value={toFilterDate(dateFrom) ?? ""}
+                    onChange={(event) => setDateFrom(toDisplayDate(event.target.value))}
+                    className="pointer-events-none absolute h-0 w-0 opacity-0"
+                    aria-hidden
+                  />
+                </div>
               </div>
-              <div>
+              <div className="min-w-[210px]">
                 <label
                   htmlFor="orders-date-to"
                   className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant"
                 >
                   To
                 </label>
-                <input
-                  id="orders-date-to"
-                  type="date"
-                  value={dateTo}
-                  onChange={(event) => setDateTo(event.target.value)}
-                  className={`${adminFieldClassName} py-2`}
-                />
+                <div className="flex items-center gap-2">
+                  <input
+                    id="orders-date-to"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="DD/MM/YYYY"
+                    maxLength={10}
+                    dir="ltr"
+                    value={dateTo}
+                    onChange={(event) => setDateTo(event.target.value)}
+                    className={`${adminFieldClassName} py-2 text-left [direction:ltr]`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => openDatePicker(toDatePickerRef)}
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant transition-colors hover:bg-surface-container"
+                    aria-label="Pick to date"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+                  </button>
+                  <input
+                    ref={toDatePickerRef}
+                    type="date"
+                    tabIndex={-1}
+                    value={toFilterDate(dateTo) ?? ""}
+                    onChange={(event) => setDateTo(toDisplayDate(event.target.value))}
+                    className="pointer-events-none absolute h-0 w-0 opacity-0"
+                    aria-hidden
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex shrink-0 flex-wrap gap-2">
               <button
                 type="button"
                 onClick={applyDateFilters}
@@ -217,15 +296,13 @@ export function AdminOrdersClient({ data, filters }: AdminOrdersClientProps) {
               >
                 Apply dates
               </button>
-              {activeFilters && (
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className="rounded-lg border border-outline-variant px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-on-surface-variant transition-colors hover:bg-surface-container"
-                >
-                  Clear filters
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="rounded-lg border border-outline-variant px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-on-surface-variant transition-colors hover:bg-surface-container"
+              >
+                Reset filters
+              </button>
             </div>
           </div>
         </div>

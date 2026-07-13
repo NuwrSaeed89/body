@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { AdminCategoryRow, CategoryDetail } from "@/lib/admin/categories/types";
 import { adminCardToolbarClass } from "./admin-layout-styles";
+import { AdminConfirmDialog } from "./admin-confirm-dialog";
 import { AdminCategoryFormModal } from "./admin-category-form-modal";
 import {
   AdminCategoriesTable,
@@ -35,6 +36,7 @@ export function AdminCategoriesClient({ categories, canMutate }: AdminCategories
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [editingCategory, setEditingCategory] = useState<CategoryDetail | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteCategory, setConfirmDeleteCategory] = useState<AdminCategoryRow | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "hidden">("all");
@@ -74,12 +76,6 @@ export function AdminCategoriesClient({ categories, canMutate }: AdminCategories
   };
 
   const handleDelete = async (category: AdminCategoryRow) => {
-    const warning =
-      category.productCount > 0
-        ? `Delete "${category.name}"? ${category.productCount} product(s) will be unlinked from this category.`
-        : `Delete "${category.name}"?`;
-    if (!window.confirm(warning)) return;
-
     setDeletingId(category.id);
     setActionError(null);
 
@@ -199,7 +195,7 @@ export function AdminCategoriesClient({ categories, canMutate }: AdminCategories
                         type="button"
                         onClick={(event) => {
                           event.stopPropagation();
-                          void handleDelete(category);
+                          setConfirmDeleteCategory(category);
                         }}
                         disabled={deletingId === category.id}
                         className="material-symbols-outlined rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-error disabled:opacity-50"
@@ -222,7 +218,7 @@ export function AdminCategoriesClient({ categories, canMutate }: AdminCategories
             canMutate={canMutate}
             deletingId={deletingId}
             onEdit={openEdit}
-            onDelete={(category) => void handleDelete(category)}
+            onDelete={(category) => setConfirmDeleteCategory(category)}
           />
         </div>
       </article>
@@ -233,6 +229,28 @@ export function AdminCategoriesClient({ categories, canMutate }: AdminCategories
         initial={editingCategory}
         onClose={() => setFormOpen(false)}
         onSaved={() => router.refresh()}
+      />
+
+      <AdminConfirmDialog
+        open={Boolean(confirmDeleteCategory)}
+        title="Delete category?"
+        description={
+          confirmDeleteCategory
+            ? confirmDeleteCategory.productCount > 0
+              ? `Delete "${confirmDeleteCategory.name}"? ${confirmDeleteCategory.productCount} product(s) will be unlinked from this category.`
+              : `Delete "${confirmDeleteCategory.name}"?`
+            : ""
+        }
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={Boolean(confirmDeleteCategory && deletingId === confirmDeleteCategory.id)}
+        onCancel={() => setConfirmDeleteCategory(null)}
+        onConfirm={() => {
+          const target = confirmDeleteCategory;
+          setConfirmDeleteCategory(null);
+          if (target) void handleDelete(target);
+        }}
       />
     </>
   );

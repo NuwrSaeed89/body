@@ -3,6 +3,8 @@ export type AdminNavKey =
   | "orders"
   | "products"
   | "categories"
+  | "discounts"
+  | "shipping"
   | "media"
   | "customers"
   | "settings";
@@ -16,6 +18,8 @@ export type AdminNavItem = {
     | "/admin/orders"
     | "/admin/products"
     | "/admin/categories"
+    | "/admin/discounts"
+    | "/admin/shipping"
     | "/admin/media"
     | "/admin/customers"
     | "/admin/settings";
@@ -31,6 +35,20 @@ export const ADMIN_NAV: AdminNavItem[] = [
     label: "Categories",
     icon: "category",
     href: "/admin/categories",
+    enabled: true,
+  },
+  {
+    key: "discounts",
+    label: "Discounts",
+    icon: "sell",
+    href: "/admin/discounts",
+    enabled: true,
+  },
+  {
+    key: "shipping",
+    label: "Shipping",
+    icon: "local_shipping",
+    href: "/admin/shipping",
     enabled: true,
   },
   { key: "media", label: "Media", icon: "perm_media", href: "/admin/media", enabled: true },

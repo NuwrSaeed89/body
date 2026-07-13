@@ -1,5 +1,6 @@
 import type { AdminOrderDetail } from "./list-types";
 import { MOCK_ADMIN_ORDERS } from "./mock-list-data";
+import { EMPTY_ORDER_SHIPPING } from "./orders/shipping/types";
 
 const MOCK_ORDER_DETAILS: Record<string, AdminOrderDetail> = {
   o1: {
@@ -25,6 +26,20 @@ const MOCK_ORDER_DETAILS: Record<string, AdminOrderDetail> = {
       "118 64 Stockholm",
       "Sweden",
     ],
+    shipping: {
+      carrier: "postnord",
+      carrierLabel: "PostNord",
+      service: "standard",
+      serviceLabel: "Standard",
+      trackingNumber: "PNMB9821DEMO01",
+      trackingUrl:
+        "https://www.postnord.se/en/our-tools/track-and-trace?shipmentId=PNMB9821DEMO01",
+      labelUrl: "/admin/orders/o1/label",
+      labelStatus: "generated",
+      labelStatusLabel: "Label generated",
+      shippedAt: "Jun 14, 2024",
+      notes: "Carrier ref: postnord-sim-PNMB9821DEMO01",
+    },
     items: [
       {
         id: "oi1",
@@ -47,6 +62,7 @@ const MOCK_ORDER_DETAILS: Record<string, AdminOrderDetail> = {
         lineTotal: "1,210 SEK",
       },
     ],
+    returns: [],
     source: "mock",
   },
   o2: {
@@ -72,6 +88,7 @@ const MOCK_ORDER_DETAILS: Record<string, AdminOrderDetail> = {
       "111 51 Stockholm",
       "Sweden",
     ],
+    shipping: EMPTY_ORDER_SHIPPING,
     items: [
       {
         id: "oi3",
@@ -84,6 +101,7 @@ const MOCK_ORDER_DETAILS: Record<string, AdminOrderDetail> = {
         lineTotal: "990 SEK",
       },
     ],
+    returns: [],
     source: "mock",
   },
   o3: {
@@ -109,6 +127,19 @@ const MOCK_ORDER_DETAILS: Record<string, AdminOrderDetail> = {
       "411 19 Göteborg",
       "Sweden",
     ],
+    shipping: {
+      carrier: "dhl",
+      carrierLabel: "DHL",
+      service: "express",
+      serviceLabel: "Express",
+      trackingNumber: "JDMB9815MANUAL",
+      trackingUrl: "https://www.dhl.com/se-en/home/tracking.html?tracking-id=JDMB9815MANUAL",
+      labelUrl: null,
+      labelStatus: "manual",
+      labelStatusLabel: "Manual tracking",
+      shippedAt: "Jun 13, 2024",
+      notes: null,
+    },
     items: [
       {
         id: "oi4",
@@ -141,6 +172,20 @@ const MOCK_ORDER_DETAILS: Record<string, AdminOrderDetail> = {
         lineTotal: "1,120 SEK",
       },
     ],
+    returns: [
+      {
+        id: "ret-o3-1",
+        orderItemId: "oi5",
+        variantId: "mock-variant-oi5",
+        quantity: 1,
+        reason: "Size exchange requested",
+        status: "approved",
+        statusLabel: "Approved",
+        createdAt: "Jun 15, 2024",
+        approvedAt: "Jun 16, 2024",
+        restockedAt: "Jun 16, 2024",
+      },
+    ],
     source: "mock",
   },
   o4: {
@@ -166,6 +211,7 @@ const MOCK_ORDER_DETAILS: Record<string, AdminOrderDetail> = {
       "903 26 Umeå",
       "Sweden",
     ],
+    shipping: EMPTY_ORDER_SHIPPING,
     items: [
       {
         id: "oi7",
@@ -178,6 +224,7 @@ const MOCK_ORDER_DETAILS: Record<string, AdminOrderDetail> = {
         lineTotal: "790 SEK",
       },
     ],
+    returns: [],
     source: "mock",
   },
 };
@@ -204,7 +251,9 @@ function buildFallbackMockDetail(orderId: string): AdminOrderDetail | null {
     paymentMethod: row.isCod ? "Cash on delivery" : "Card",
     paymentStatus: row.isCod ? "Pending" : "Succeeded",
     shippingAddressLines: [row.customer, "—"],
+    shipping: EMPTY_ORDER_SHIPPING,
     items: [],
+    returns: [],
     source: "mock",
   };
 }

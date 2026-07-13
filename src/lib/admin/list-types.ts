@@ -1,4 +1,5 @@
 import type { ProductImageItem } from "@/lib/admin/products/upload-product-image";
+import type { OrderShippingShipment } from "@/lib/admin/orders/shipping/types";
 import type { AdminDashboardData } from "./types";
 
 export type AdminOrderRow = {
@@ -23,6 +24,7 @@ export type AdminOrdersData = {
 
 export type AdminOrderDetailItem = {
   id: string;
+  variantId?: string;
   productName: string;
   sku: string;
   sizeCode: string;
@@ -30,6 +32,19 @@ export type AdminOrderDetailItem = {
   quantity: number;
   unitPrice: string;
   lineTotal: string;
+};
+
+export type AdminOrderReturn = {
+  id: string;
+  orderItemId: string;
+  variantId: string;
+  quantity: number;
+  reason: string | null;
+  status: "pending" | "approved" | "rejected";
+  statusLabel: string;
+  createdAt: string;
+  approvedAt: string | null;
+  restockedAt: string | null;
 };
 
 export type AdminOrderDetail = {
@@ -50,7 +65,9 @@ export type AdminOrderDetail = {
   paymentMethod: string | null;
   paymentStatus: string | null;
   shippingAddressLines: string[];
+  shipping: OrderShippingShipment;
   items: AdminOrderDetailItem[];
+  returns: AdminOrderReturn[];
   source: "supabase" | "mock";
 };
 
@@ -68,6 +85,12 @@ export type AdminProductRow = {
   variantCount: number;
   unitsSold: number;
   views: number;
+  likes: number;
+  waitingCount: number;
+  /** Average star rating 1–5 (0 if none). Read-only from product_ratings. */
+  ratingAverage: number;
+  /** Number of star ratings submitted. */
+  ratingCount: number;
   flags: string[];
   isLatestDrop: boolean;
   isPremium: boolean;

@@ -9,7 +9,7 @@ export type CatalogProductFlag = "is_latest_drop" | "is_best_seller" | "is_premi
 export type ProductListQuery = {
   locale: string;
   q?: string;
-  category?: ShopCategory | "all";
+  category?: string;
   collection?: string;
   size?: string;
   color?: string;

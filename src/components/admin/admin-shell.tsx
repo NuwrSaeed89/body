@@ -17,7 +17,10 @@ function activeKey(pathname: string): AdminNavKey {
   if (pathname.startsWith("/admin/orders")) return "orders";
   if (pathname.startsWith("/admin/products")) return "products";
   if (pathname.startsWith("/admin/categories")) return "categories";
+  if (pathname.startsWith("/admin/discounts")) return "discounts";
+  if (pathname.startsWith("/admin/shipping")) return "shipping";
   if (pathname.startsWith("/admin/media")) return "media";
+
   if (pathname.startsWith("/admin/customers")) return "customers";
   if (pathname.startsWith("/admin/settings")) return "settings";
   return "dashboard";
@@ -34,7 +37,7 @@ export function AdminShell({
 
   return (
     <div className="min-h-screen bg-surface text-on-surface">
-      <aside className="fixed left-0 top-0 z-50 hidden h-full w-64 flex-col border-r border-outline-variant bg-surface-container-lowest p-4 md:flex">
+      <aside className="fixed left-0 top-0 z-50 hidden h-full w-64 flex-col border-r border-outline-variant bg-surface-container-lowest p-4 print:hidden md:flex">
         <div className="mb-10 px-4">
           <h1 className="text-lg font-black text-primary">Mbody Admin</h1>
           <p className="mt-1 text-sm text-on-surface-variant">Management Portal</p>
@@ -95,8 +98,8 @@ export function AdminShell({
         </div>
       </aside>
 
-      <div className="md:ml-64">
-        <header className="sticky top-0 z-40 border-b border-outline-variant bg-surface/95 backdrop-blur-sm md:hidden">
+      <div className="md:ml-64 print:ml-0">
+        <header className="sticky top-0 z-40 border-b border-outline-variant bg-surface/95 backdrop-blur-sm print:hidden md:hidden">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="min-w-0">
               <p className="truncate text-sm font-black text-primary">Mbody Admin</p>

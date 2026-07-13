@@ -25,6 +25,7 @@ type AccountDashboardContentProps = {
   profile: AccountProfile;
   catalog: ShopProduct[];
   layout?: "mobile" | "desktop" | "responsive";
+  initialTab?: AccountTab;
 };
 
 function getInitials(name: string | null, email: string | null) {
@@ -42,9 +43,10 @@ export function AccountDashboardContent({
   profile,
   catalog,
   layout = "responsive",
+  initialTab = "orders",
 }: AccountDashboardContentProps) {
   const t = useTranslations("account");
-  const [activeTab, setActiveTab] = useState<AccountTab>("orders");
+  const [activeTab, setActiveTab] = useState<AccountTab>(initialTab);
   const [firstName, setFirstName] = useState(
     profile.fullName?.split(/\s+/)[0] ?? "",
   );
@@ -80,44 +82,47 @@ export function AccountDashboardContent({
   const welcomeTitle = profile.fullName
     ? t("welcomeNamed", { name: profile.fullName })
     : t("welcome");
+  const isWishlistView = activeTab === "wishlist";
 
   return (
     <div className="space-y-8 md:space-y-10">
-      <section
-        className={`rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-[0_10px_30px_rgba(18,18,18,0.02)] md:p-6 ${
-          isDesktopLayout ? "" : ""
-        }`}
-      >
-        <div className="flex items-start gap-4">
-          <div
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-on-primary"
-            aria-hidden
-          >
-            {getInitials(profile.fullName, profile.email)}
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-base font-semibold tracking-wide text-primary md:text-sm md:uppercase md:tracking-[0.1em]">
-              {welcomeTitle}
-            </h2>
-            <p className="mt-1 text-sm text-secondary">
-              {profile.email ? `${profile.email} · ` : ""}
-              {t("welcomeDescription")}
-            </p>
-            <Link
-              href="/shop"
-              className="mt-4 inline-block text-xs font-semibold uppercase tracking-[0.1em] text-primary underline underline-offset-4"
+      {!isWishlistView && (
+        <section
+          className={`rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-[0_10px_30px_rgba(18,18,18,0.02)] md:p-6 ${
+            isDesktopLayout ? "" : ""
+          }`}
+        >
+          <div className="flex items-start gap-4">
+            <div
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-on-primary"
+              aria-hidden
             >
-              {t("continueShopping")}
-            </Link>
+              {getInitials(profile.fullName, profile.email)}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-semibold tracking-wide text-primary md:text-sm md:uppercase md:tracking-[0.1em]">
+                {welcomeTitle}
+              </h2>
+              <p className="mt-1 text-sm text-secondary">
+                {profile.email ? `${profile.email} · ` : ""}
+                {t("welcomeDescription")}
+              </p>
+              <Link
+                href="/shop"
+                className="mt-4 inline-block text-xs font-semibold uppercase tracking-[0.1em] text-primary underline underline-offset-4"
+              >
+                {t("continueShopping")}
+              </Link>
+            </div>
+            <div className="hidden shrink-0 md:block">
+              <AccountSignOutButton />
+            </div>
           </div>
-          <div className="hidden shrink-0 md:block">
+          <div className="mt-5 flex justify-end md:hidden">
             <AccountSignOutButton />
           </div>
-        </div>
-        <div className="mt-5 flex justify-end md:hidden">
-          <AccountSignOutButton />
-        </div>
-      </section>
+        </section>
+      )}
 
       <AccountTabs activeTab={activeTab} onTabChange={setActiveTab} />
 

@@ -9,19 +9,26 @@ import {
   FilterSheet,
   ShopSidebarFilters,
 } from "@/components/shop/shop-filters";
-import type { ShopCategory, ShopProduct } from "@/lib/shop-data";
+import type {
+  CatalogCategoryItem,
+  CatalogColorOption,
+} from "@/lib/catalog/catalog-api-types";
+import type { ShopProduct } from "@/lib/shop-data";
 
 type ShopPageContentProps = {
   locale: string;
   products: ShopProduct[];
+  categories: CatalogCategoryItem[];
+  colors: CatalogColorOption[];
   initialQuery?: string;
 };
 
 function buildProductsUrl(
   locale: string,
-  category: ShopCategory,
+  category: string,
   sort: string,
   query: string,
+  color: string | null,
 ): string {
   const params = new URLSearchParams({ locale, sort });
   if (category !== "all") {
@@ -30,16 +37,22 @@ function buildProductsUrl(
   if (query.trim()) {
     params.set("q", query.trim());
   }
+  if (color) {
+    params.set("color", color);
+  }
   return `/api/products?${params.toString()}`;
 }
 
 export function ShopPageContent({
   locale,
   products,
+  categories,
+  colors,
   initialQuery = "",
 }: ShopPageContentProps) {
   const t = useTranslations("shop");
-  const [category, setCategory] = useState<ShopCategory>("all");
+  const [category, setCategory] = useState("all");
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [sort, setSort] = useState("newest");
   const [query, setQuery] = useState(initialQuery.trim());
@@ -51,7 +64,7 @@ export function ShopPageContent({
   }, [products]);
 
   useEffect(() => {
-    if (category === "all" && sort === "newest" && !query.trim()) {
+    if (category === "all" && sort === "newest" && !query.trim() && !selectedColor) {
       setDisplayedProducts(products);
       return;
     }
@@ -61,9 +74,10 @@ export function ShopPageContent({
     async function loadProducts() {
       setLoading(true);
       try {
-        const response = await fetch(buildProductsUrl(locale, category, sort, query), {
-          signal: controller.signal,
-        });
+        const response = await fetch(
+          buildProductsUrl(locale, category, sort, query, selectedColor),
+          { signal: controller.signal },
+        );
         if (!response.ok) {
           throw new Error("Failed to load products");
         }
@@ -91,7 +105,7 @@ export function ShopPageContent({
 
     void loadProducts();
     return () => controller.abort();
-  }, [category, sort, query, locale, products]);
+  }, [category, sort, query, selectedColor, locale, products]);
 
   return (
     <>
@@ -115,7 +129,12 @@ export function ShopPageContent({
           <h1 className="text-3xl font-medium tracking-tight text-primary">{t("title")}</h1>
         </section>
 
-        <CategoryTabs active={category} onChange={setCategory} sticky />
+        <CategoryTabs
+          categories={categories}
+          active={category}
+          onChange={setCategory}
+          sticky
+        />
 
         <section className="flex items-center justify-between px-5 py-6">
           <div className="mr-2 flex-1">
@@ -154,7 +173,11 @@ export function ShopPageContent({
         <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="flex flex-col gap-4">
             <h1 className="text-5xl font-medium tracking-tight text-primary">{t("title")}</h1>
-            <CategoryTabs active={category} onChange={setCategory} />
+            <CategoryTabs
+              categories={categories}
+              active={category}
+              onChange={setCategory}
+            />
             <input
               type="search"
               value={query}
@@ -182,7 +205,11 @@ export function ShopPageContent({
         </div>
 
         <div className="flex flex-col gap-6 md:flex-row">
-          <ShopSidebarFilters />
+          <ShopSidebarFilters
+            colors={colors}
+            selectedColor={selectedColor}
+            onColorChange={setSelectedColor}
+          />
           <div className="min-w-0 flex-1">
             <p className="mb-6 text-xs font-semibold uppercase tracking-[0.1em] text-on-surface-variant">
               {loading ? "…" : t("itemCount", { count: displayedProducts.length })}

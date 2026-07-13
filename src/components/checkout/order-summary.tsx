@@ -4,19 +4,16 @@ import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { FormattedPrice } from "@/components/ui/formatted-price";
 import { calculateCartSummary } from "@/lib/currency";
+import { useCart } from "@/providers/cart-provider";
 import { useCurrency } from "@/providers/currency-provider";
-
-const CHECKOUT_ITEMS = [
-  { name: "Sculpt High-Rise Leggings", size: "S", qty: 1, priceSek: 990 },
-  { name: "Elite Support Bra", size: "M", qty: 1, priceSek: 750 },
-] as const;
 
 export function OrderSummary() {
   const t = useTranslations("checkout.summary");
   const { currency } = useCurrency();
   const locale = useLocale();
+  const { items } = useCart();
 
-  const subtotalSek = CHECKOUT_ITEMS.reduce((sum, item) => sum + item.priceSek, 0);
+  const subtotalSek = items.reduce((sum, item) => sum + item.priceSek * item.quantity, 0);
   const summary = useMemo(
     () => calculateCartSummary(subtotalSek, currency, locale),
     [subtotalSek, currency, locale],
@@ -29,15 +26,18 @@ export function OrderSummary() {
       </h2>
 
       <ul className="mb-6 space-y-4 border-b border-outline-variant/20 pb-6">
-        {CHECKOUT_ITEMS.map((item) => (
-          <li key={item.name} className="flex justify-between gap-4 text-sm">
+        {items.map((item) => (
+          <li key={item.id} className="flex justify-between gap-4 text-sm">
             <div>
-              <p className="font-medium text-on-surface">{item.name}</p>
+              <p className="font-medium text-on-surface">{item.productName}</p>
               <p className="text-secondary">
-                {t("size")}: {item.size} · {t("qty")}: {item.qty}
+                {t("size")}: {item.size} · {t("qty")}: {item.quantity}
               </p>
             </div>
-            <FormattedPrice amountSek={item.priceSek} className="shrink-0 text-on-surface" />
+            <FormattedPrice
+              amountSek={item.priceSek * item.quantity}
+              className="shrink-0 text-on-surface"
+            />
           </li>
         ))}
       </ul>

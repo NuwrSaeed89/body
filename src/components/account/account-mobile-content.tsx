@@ -7,19 +7,16 @@ import {
   DEFAULT_PROFILE_AVATAR,
   FEATURED_ACCOUNT_ORDER,
 } from "@/lib/account-data";
+import type { AccountProfileData } from "@/lib/account/types";
 import { useAuth } from "@/providers/auth-provider";
 
-type AccountProfile = {
-  fullName: string | null;
-  email: string | null;
-};
-
 type AccountMobileContentProps = {
-  profile: AccountProfile;
+  profile: AccountProfileData | null;
 };
 
 const MANAGEMENT_LINKS = [
   { key: "wishlist", href: "/account/wishlist", icon: "favorite" },
+  { key: "orders", href: "/account/orders", icon: "shopping_cart" },
   { key: "shippingAddresses", href: "#addresses", icon: "location_on" },
   { key: "payment", href: "#payment", icon: "credit_card" },
   { key: "support", href: "#support", icon: "support_agent" },
@@ -29,7 +26,8 @@ export function AccountMobileContent({ profile }: AccountMobileContentProps) {
   const t = useTranslations("account");
   const router = useRouter();
   const { signOut } = useAuth();
-  const displayName = profile.fullName?.trim() || t("profile.placeholderName");
+  const displayName = profile?.fullName?.trim() || t("profile.placeholderName");
+  const displayEmail = profile?.email ?? null;
   const featuredOrder = FEATURED_ACCOUNT_ORDER;
 
   return (
@@ -49,12 +47,16 @@ export function AccountMobileContent({ profile }: AccountMobileContentProps) {
           <h2 className="text-2xl font-medium tracking-wide text-on-surface">
             {displayName}
           </h2>
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-primary" aria-hidden />
-            <span className="text-xs font-semibold uppercase tracking-widest text-secondary">
-              {t("mobile.eliteMember")}
-            </span>
-          </div>
+          {displayEmail ? (
+            <p className="truncate text-sm text-secondary">{displayEmail}</p>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-primary" aria-hidden />
+              <span className="text-xs font-semibold uppercase tracking-widest text-secondary">
+                {t("mobile.eliteMember")}
+              </span>
+            </div>
+          )}
         </div>
       </section>
 

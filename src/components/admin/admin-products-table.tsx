@@ -1,5 +1,13 @@
 import type { AdminProductRow } from "@/lib/admin/list-types";
 import { getInventoryStatus } from "@/lib/admin/inventory/status";
+import {
+  AdminProductEngagementPanel,
+  productEngagementFromRow,
+} from "./admin-product-engagement-panel";
+import {
+  AdminProductRatingPanel,
+  productRatingFromRow,
+} from "./admin-product-rating-panel";
 import { AdminInventoryStockEditor } from "./admin-inventory-stock-editor";
 
 type ProductThumbnailProps = {
@@ -130,6 +138,16 @@ export function AdminProductsTable({
                     <div className="min-w-0">
                       <span className="block truncate font-medium text-primary">{product.name}</span>
                       <AdminProductStockBadge product={product} />
+                      <AdminProductRatingPanel
+                        className="mt-1"
+                        compact
+                        stats={productRatingFromRow(product)}
+                      />
+                      <AdminProductEngagementPanel
+                        className="mt-1.5"
+                        compact
+                        stats={productEngagementFromRow(product)}
+                      />
                     </div>
                   </div>
                 </td>

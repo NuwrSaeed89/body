@@ -1,5 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { slugifyColorCode, suggestColorFromHex } from "./color-palette";
+import { normalizeHex, slugifyColorCode, suggestColorFromHex } from "./color-palette";
 import type { AdminColorDetail, ColorWriteInput } from "./types";
 
 type DbColorRow = {
@@ -55,13 +55,16 @@ export async function createColor(input: ColorWriteInput): Promise<AdminColorDet
   const name = input.name.trim();
   const baseCode = input.code?.trim() || suggestion?.code || slugifyColorCode(name);
 
-  const { data: existingHex, error: existingHexError } = await supabase
+  const { data: existingRows, error: existingHexError } = await supabase
     .from("colors")
-    .select("id, code, hex, sort_order, color_translations(locale, name)")
-    .eq("hex", hex)
-    .maybeSingle();
+    .select("id, code, hex, sort_order, color_translations(locale, name)");
 
   if (existingHexError) throw existingHexError;
+
+  const existingHex = (existingRows ?? []).find((row) => {
+    const rowHex = normalizeHex(row.hex ?? "");
+    return rowHex === hex;
+  });
   if (existingHex) return mapColorDetail(existingHex as DbColorRow);
 
   const code = await resolveUniqueCode(supabase, baseCode);

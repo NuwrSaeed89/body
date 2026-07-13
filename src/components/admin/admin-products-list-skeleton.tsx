@@ -34,7 +34,16 @@ function ProductTableRowSkeleton() {
       <td className="px-6 py-3 align-middle">
         <div className="flex min-w-0 items-center gap-3">
           <Shimmer className="h-12 w-10 shrink-0 rounded" />
-          <Shimmer className="h-4 w-32 max-w-full" />
+          <div className="min-w-0 space-y-1.5">
+            <Shimmer className="h-4 w-32 max-w-full" />
+            <Shimmer className="h-3 w-20" />
+            <div className="flex gap-2">
+              <Shimmer className="h-3 w-7" />
+              <Shimmer className="h-3 w-7" />
+              <Shimmer className="h-3 w-7" />
+              <Shimmer className="h-3 w-7" />
+            </div>
+          </div>
         </div>
       </td>
       <td className="px-6 py-3 align-middle">
@@ -83,11 +92,11 @@ export function AdminProductsListSkeleton({ rows = 6 }: { rows?: number }) {
           <div className="overflow-x-auto">
             <table className="w-full table-fixed border-collapse text-left">
               <colgroup>
-                <col style={{ width: "34%" }} />
-                <col style={{ width: "18%" }} />
+                <col style={{ width: "30%" }} />
+                <col style={{ width: "16%" }} />
                 <col style={{ width: "14%" }} />
                 <col style={{ width: "12%" }} />
-                <col style={{ width: "12%" }} />
+                <col style={{ width: "18%" }} />
                 <col style={{ width: "10%" }} />
               </colgroup>
               <thead className="bg-surface-container-low">
