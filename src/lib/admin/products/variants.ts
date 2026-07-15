@@ -1,5 +1,9 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { buildVariantSku } from "./variant-sku";
+import {
+  findRestockedVariantIds,
+  scheduleWaitingListRestockNotify,
+} from "@/lib/waiting-list/notify-on-restock";
 import type {
   AdminColorOption,
   AdminSizeOption,
@@ -141,7 +145,7 @@ export async function syncProductVariantMatrix(
 
   const { data: existing, error: listError } = await supabase
     .from("product_variants")
-    .select("id, size_id, color_id, sku")
+    .select("id, size_id, color_id, sku, stock_quantity")
     .eq("product_id", productId);
 
   if (listError) throw listError;
@@ -149,6 +153,10 @@ export async function syncProductVariantMatrix(
   const existingByKey = new Map(
     (existing ?? []).map((row) => [`${row.size_id}:${row.color_id}`, row]),
   );
+  const previousStocks = (existing ?? []).map((row) => ({
+    id: row.id as string,
+    stock_quantity: Number(row.stock_quantity ?? 0),
+  }));
   const incomingKeys = new Set(normalized.map((cell) => `${cell.sizeId}:${cell.colorId}`));
 
   const toUpsert = normalized
@@ -184,6 +192,20 @@ export async function syncProductVariantMatrix(
       .delete()
       .in("id", idsToDelete);
     if (deleteError) throw deleteError;
+  }
+
+  const { data: afterVariants, error: afterError } = await supabase
+    .from("product_variants")
+    .select("id, stock_quantity")
+    .eq("product_id", productId);
+  if (afterError) throw afterError;
+
+  const nextById = new Map(
+    (afterVariants ?? []).map((row) => [row.id as string, Number(row.stock_quantity ?? 0)]),
+  );
+  const restockedVariantIds = findRestockedVariantIds(previousStocks, nextById);
+  if (restockedVariantIds.length > 0) {
+    scheduleWaitingListRestockNotify({ productId, restockedVariantIds });
   }
 
   return getProductVariantMatrix(productId, "en");

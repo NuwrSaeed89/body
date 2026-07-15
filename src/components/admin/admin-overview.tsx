@@ -82,38 +82,63 @@ export function AdminOverview({ data }: AdminOverviewProps) {
           </div>
           <ul className="divide-y divide-error/10">
             {lowStockAlerts.map((alert) => (
-              <li key={alert.id} className="flex items-center gap-3 px-4 py-3 sm:px-5">
-                <div className="h-10 w-8 shrink-0 overflow-hidden rounded bg-surface-container">
-                  {alert.imageUrl ? (
-                    <img
-                      src={alert.imageUrl}
-                      alt=""
-                      className="size-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="flex size-full items-center justify-center">
-                      <span className="material-symbols-outlined text-sm text-on-surface-variant">
-                        image
-                      </span>
-                    </div>
+              <li
+                key={alert.id}
+                className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-3 sm:px-5"
+              >
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <div className="h-10 w-8 shrink-0 overflow-hidden rounded bg-surface-container">
+                    {alert.imageUrl ? (
+                      <img
+                        src={alert.imageUrl}
+                        alt=""
+                        className="size-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="flex size-full items-center justify-center">
+                        <span className="material-symbols-outlined text-sm text-on-surface-variant">
+                          image
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-primary">{alert.name}</p>
+                    <p className="text-xs text-on-surface-variant">
+                      {alert.status === "out"
+                        ? "0 in stock"
+                        : `${alert.stock} in stock · alert at ≤ ${alert.lowStockThreshold}`}
+                    </p>
+                    {alert.status === "out" && (
+                      <p className="mt-1 flex items-center gap-1 text-xs text-on-surface-variant">
+                        <span className="material-symbols-outlined text-[14px]" aria-hidden>
+                          notifications
+                        </span>
+                        {alert.waitingCount} waiting
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2 self-end sm:self-auto">
+                  {alert.status === "out" && (
+                    <Link
+                      href={`/admin/waiting-list?product=${encodeURIComponent(alert.slug)}`}
+                      className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-primary transition-colors hover:bg-surface-container"
+                    >
+                      View waitlist
+                    </Link>
                   )}
+                  <span
+                    className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                      alert.status === "out"
+                        ? "bg-surface-variant text-on-surface"
+                        : "bg-error/15 text-error"
+                    }`}
+                  >
+                    {alert.status === "out" ? "Out of stock" : "Low stock"}
+                  </span>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-primary">{alert.name}</p>
-                  <p className="text-xs text-on-surface-variant">
-                    {alert.stock} in stock · alert at ≤ {alert.lowStockThreshold}
-                  </p>
-                </div>
-                <span
-                  className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                    alert.status === "out"
-                      ? "bg-surface-variant text-on-surface"
-                      : "bg-error/15 text-error"
-                  }`}
-                >
-                  {alert.status === "out" ? "Out of stock" : "Low stock"}
-                </span>
               </li>
             ))}
           </ul>

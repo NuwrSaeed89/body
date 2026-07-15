@@ -11,7 +11,7 @@ export type AdminShippingRateRow = {
   zoneLabel: string;
   countries: string[];
   countriesLabel: string;
-  priceSek: number;
+  priceUsd: number;
   priceLabel: string;
   etaMinDays: number;
   etaMaxDays: number;
@@ -28,7 +28,7 @@ export type ShippingRateDetail = {
   zoneCode: string;
   zoneLabel: string;
   countries: string[];
-  priceSek: number;
+  priceUsd: number;
   etaMinDays: number;
   etaMaxDays: number;
   isActive: boolean;
@@ -41,7 +41,7 @@ export type ShippingRateWriteInput = {
   zoneCode: string;
   zoneLabel: string;
   countries: string[];
-  priceSek: number;
+  priceUsd: number;
   etaMinDays: number;
   etaMaxDays: number;
   isActive: boolean;
@@ -52,4 +52,6 @@ export type AdminShippingRatesData = {
   source: "supabase" | "mock";
   rates: AdminShippingRateRow[];
   totalCount: number;
+  /** Present when live Supabase is configured but shipping_rates could not be loaded. */
+  loadError?: string | null;
 };

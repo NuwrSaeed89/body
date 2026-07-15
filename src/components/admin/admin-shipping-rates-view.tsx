@@ -7,11 +7,16 @@ type AdminShippingRatesViewProps = {
 };
 
 export function AdminShippingRatesView({ data }: AdminShippingRatesViewProps) {
-  const canMutate = data.source === "supabase";
+  const canMutate = data.source === "supabase" && !data.loadError;
 
   return (
     <section className={adminPageSectionClass}>
-      <AdminShippingRatesClient rates={data.rates} canMutate={canMutate} />
+      <AdminShippingRatesClient
+        rates={data.rates}
+        source={data.source}
+        canMutate={canMutate}
+        loadError={data.loadError ?? null}
+      />
     </section>
   );
 }

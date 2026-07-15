@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mbody — Technical Implementation Guide</title>
+  <style>
+    :root {
+      --bg: #0f0f12; --surface: #1a1a20; --surface2: #24242c; --border: #33333d;
+      --text: #f4f4f6; --muted: #9a9aa8; --accent: #c9a962; --accent-dim: rgba(201,169,98,0.15);
+      --must: #4ade80; --tbd: #fbbf24; --later: #60a5fa; --done: #22c55e; --tech: #38bdf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    body[dir="rtl"] { font-family: "Segoe UI", Tahoma, system-ui, sans-serif; }
+
+    header { padding: 2rem 1.5rem 1.25rem; text-align: center; border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%); }
+    header h1 { font-size: clamp(1.35rem, 3.5vw, 2rem); font-weight: 600; }
+    header .brand { color: var(--accent); }
+    header p { color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem; }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; align-items: center;
+      padding: 0.85rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--surface);
+      position: sticky; top: 0; z-index: 100; }
+    .toolbar button, .toolbar a { background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+      padding: 0.4rem 0.85rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; text-decoration: none; }
+    .toolbar button:hover, .toolbar a:hover { border-color: var(--accent); }
+    .toolbar button.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+    .layout { display: grid; grid-template-columns: 200px 1fr; max-width: 1100px; margin: 0 auto; }
+    @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } }
+
+    .sidebar { position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto;
+      padding: 1rem 0.75rem; border-right: 1px solid var(--border); }
+    body[dir="rtl"] .sidebar { border-right: none; border-left: 1px solid var(--border); }
+    .sidebar a { display: block; color: var(--muted); text-decoration: none; font-size: 0.75rem;
+      padding: 0.3rem 0.5rem; border-radius: 4px; margin-bottom: 0.15rem; }
+    .sidebar a:hover { color: var(--accent); background: var(--accent-dim); }
+
+    main { padding: 1.5rem 1.5rem 3rem; min-width: 0; }
+
+    .phase-block { margin-bottom: 2.5rem; scroll-margin-top: 4.5rem; }
+    .phase-block h2 { font-size: 1.15rem; color: var(--accent); margin-bottom: 0.35rem;
+      padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+    .phase-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.75rem; }
+    .tag { padding: 0.15rem 0.5rem; border-radius: 4px; }
+    .tag.week { background: var(--accent-dim); color: var(--accent); }
+    .tag.mvp { background: rgba(74,222,128,0.15); color: var(--must); }
+    .tag.tbd { background: rgba(251,191,36,0.15); color: var(--tbd); }
+    .tag.done { background: rgba(34,197,94,0.15); color: var(--done); }
+    .tag.later { background: rgba(96,165,250,0.15); color: var(--later); }
+    .tag.gate { background: rgba(201,169,98,0.2); color: var(--accent); }
+
+    .migration-block {
+      margin-bottom: 2.5rem; scroll-margin-top: 4.5rem;
+      border: 1px solid rgba(201,169,98,0.35); border-radius: 12px;
+      padding: 0.25rem; background: linear-gradient(180deg, rgba(201,169,98,0.08) 0%, transparent 100%);
+    }
+    .migration-block .phase-block { margin-bottom: 0; border: none; }
+    .migration-block .phase-block h2 { color: var(--accent); }
+    .task-migrate {
+      font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 0.2rem 0.45rem; border-radius: 4px; white-space: nowrap; align-self: start;
+      background: rgba(201,169,98,0.15); color: var(--accent); border: 1px solid rgba(201,169,98,0.3);
+    }
+    .mock-files { list-style: none; font-size: 0.8rem; color: var(--muted); }
+    .mock-files li { padding: 0.35rem 0; border-bottom: 1px solid rgba(51,51,61,0.4); font-family: ui-monospace, monospace; font-size: 0.75rem; }
+    .mock-files li:last-child { border-bottom: none; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.15rem; margin-bottom: 0.75rem; }
+    .card h3 { font-size: 0.85rem; color: var(--tech); margin-bottom: 0.5rem; text-transform: uppercase;
+      letter-spacing: 0.05em; }
+    .card p { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .steps { list-style: none; counter-reset: step; }
+    .steps li {
+      counter-increment: step;
+      font-size: 0.84rem;
+      color: var(--text);
+      padding: 0.55rem 0;
+      border-bottom: 1px solid rgba(51,51,61,0.5);
+      display: grid;
+      grid-template-columns: auto auto auto 1fr auto auto;
+      gap: 0.5rem 0.65rem;
+      align-items: start;
+    }
+    @media (max-width: 640px) {
+      .steps li {
+        grid-template-columns: auto auto 1fr;
+        grid-template-areas: "check id text" "num . badges";
+      }
+      .steps li .task-check { grid-area: check; }
+      .steps li .task-id { grid-area: id; }
+      .steps li .step-num { grid-area: num; margin-left: 0.25rem; }
+      .steps li .task-text { grid-area: text; }
+      .steps li .task-days { display: none; }
+      .steps li .task-badges { grid-area: badges; justify-self: end; display: flex; gap: 0.35rem; flex-wrap: wrap; }
+      body[dir="rtl"] .steps li .step-num { margin-left: 0; margin-right: 0.25rem; }
+    }
+    .steps li:last-child { border-bottom: none; }
+    .steps li.is-done .task-text { color: var(--muted); text-decoration: line-through; }
+    .step-num {
+      width: 1.35rem; height: 1.35rem; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 4px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center;
+      color: var(--accent); font-weight: 600; flex-shrink: 0; margin-top: 0.1rem;
+    }
+    .task-id {
+      font-family: ui-monospace, "Cascadia Code", monospace;
+      font-size: 0.62rem; font-weight: 600;
+      padding: 0.2rem 0.4rem; border-radius: 4px; flex-shrink: 0; margin-top: 0.08rem;
+      background: rgba(201,169,98,0.12); color: var(--accent);
+      border: 1px solid rgba(201,169,98,0.28); white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+    .steps li.is-done .task-id { opacity: 0.75; }
+    .steps li.is-done .step-num { background: rgba(34,197,94,0.15); border-color: var(--done); color: var(--done); }
+    .steps.steps-simple li {
+      grid-template-columns: auto 1fr;
+      color: var(--muted);
+    }
+    .steps.steps-simple li .task-text { text-decoration: none; }
+    .task-check {
+      width: 1.1rem; height: 1.1rem; margin-top: 0.2rem; accent-color: var(--done); cursor: pointer; flex-shrink: 0;
+    }
+    .task-text { line-height: 1.45; min-width: 0; }
+    .task-days {
+      font-size: 0.7rem; color: var(--accent); background: var(--accent-dim);
+      padding: 0.15rem 0.45rem; border-radius: 4px; white-space: nowrap; align-self: start;
+    }
+    .task-status {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 0.2rem 0.45rem; border-radius: 4px; white-space: nowrap; align-self: start;
+    }
+    .task-status.pending { background: rgba(154,154,168,0.15); color: var(--muted); }
+    .task-status.done { background: rgba(34,197,94,0.15); color: var(--done); }
+    .task-badges {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      justify-self: end;
+      align-self: start;
+    }
+    .task-nodb {
+      font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 0.2rem 0.45rem; border-radius: 4px; white-space: nowrap; align-self: start;
+      background: rgba(56,189,248,0.15); color: var(--tech); border: 1px solid rgba(56,189,248,0.25);
+      cursor: help;
+    }
+    .nodb-legend {
+      max-width: 1100px; margin: 0 auto; padding: 0.65rem 1.5rem;
+      font-size: 0.78rem; color: var(--muted); border-bottom: 1px solid var(--border);
+      background: rgba(56,189,248,0.06);
+    }
+    .nodb-legend strong { color: var(--tech); font-weight: 600; }
+    .phase-progress {
+      font-size: 0.75rem; color: var(--muted); margin-bottom: 0.65rem;
+    }
+    .phase-progress strong { color: var(--accent); }
+    .global-progress {
+      font-size: 0.75rem; color: var(--muted); padding: 0.35rem 0.75rem;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+    }
+    .global-progress strong { color: var(--accent); }
+    .progress-bar-wrap {
+      width: 120px; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden;
+      display: inline-block; vertical-align: middle; margin: 0 0.35rem;
+    }
+    .progress-bar-fill { height: 100%; background: var(--done); border-radius: 3px; transition: width 0.25s; }
+
+    .float-progress {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 4.25rem;
+      height: 4.25rem;
+      z-index: 200;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      transition: box-shadow 0.25s;
+    }
+    .float-progress svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .float-progress-bg {
+      fill: none;
+      stroke: var(--surface2);
+      stroke-width: 4;
+    }
+    .float-progress-fill {
+      fill: none;
+      stroke: var(--done);
+      stroke-width: 4;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.35s ease;
+    }
+    .float-progress-pct {
+      position: relative;
+      z-index: 1;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--done);
+      line-height: 1;
+    }
+    .float-progress-label {
+      position: absolute;
+      bottom: -1.35rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.6rem;
+      color: var(--muted);
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .deliverables { font-size: 0.8rem; color: var(--muted); }
+    .deliverables strong { color: var(--accent); font-weight: 600; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+    .tab-divider {
+      width: 1px; height: 1.25rem; background: var(--border); margin: 0 0.15rem;
+    }
+    .panel-hidden { display: none !important; }
+    .steps.steps-compact li { grid-template-columns: auto auto auto 1fr auto; }
+    @media (max-width: 640px) {
+      .steps.steps-compact li {
+        grid-template-columns: auto auto 1fr;
+        grid-template-areas: "check id text" ". . badges";
+      }
+      .steps.steps-compact li .task-badges { grid-area: badges; justify-self: end; }
+    }
+    .migrate-progress { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.65rem; }
+    .migrate-progress strong { color: var(--accent); }
+
+    footer { text-align: center; padding: 1.5rem; color: var(--muted); font-size: 0.75rem;
+      border-top: 1px solid var(--border); }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><span class="brand">Mbody</span> — <span data-en>Technical Implementation Guide</span><span data-ar class="hidden">دليل التنفيذ التقني</span></h1>
+    <p>
+    <span data-en>Step-by-step build plan aligned with sh_roadmap.html · v0.8</span>
+    <span data-ar class="hidden">خطة بناء خطوة بخطوة متوافقة مع sh_roadmap.html · v0.8</span>
+    </p>
+  </header>
+
+  <div class="toolbar">
+    <button type="button" id="btn-en" class="active">English</button>
+    <button type="button" id="btn-ar">العربية</button>
+    <a href="sh_roadmap.html" data-en>→ Roadmap</a>
+    <a href="sh_roadmap.html" class="hidden" data-ar>→ خارطة الطريق</a>
+    <a href="sh_requirements.html" data-en>→ Requirements</a>
+    <a href="sh_requirements.html" class="hidden" data-ar>→ المتطلبات</a>
+    <a href="todo-ebody-erd.html" data-en>→ Database ERD</a>
+    <a href="todo-ebody-erd.html" class="hidden" data-ar>→ مخطط قاعدة البيانات</a>
+    <a href="mbody-client-configuration.html" data-en>→ Client config</a>
+    <a href="mbody-client-configuration.html" class="hidden" data-ar>→ إعداد العميل</a>
+    <span class="tab-divider"></span>
+    <button type="button" id="tab-phases" class="active" data-en>Implementation</button>
+    <button type="button" id="tab-phases-ar" class="active hidden" data-ar>التنفيذ</button>
+    <button type="button" id="tab-migrate" data-en>Mock → Supabase</button>
+    <button type="button" id="tab-migrate-ar" class="hidden" data-ar>Mock → Supabase</button>
+    <span class="global-progress" id="global-progress"></span>
+  </div>
+
+  <p class="nodb-legend" id="nodb-legend">
+    <span data-en><strong>Task ID</strong> (e.g. <code style="color:var(--accent)">p3-6</code>) · <strong>No DB</strong> = mock OK until Supabase</span>
+    <span data-ar class="hidden"><strong>معرّف المهمة</strong> (مثل <code style="color:var(--accent)">p3-6</code>) · <strong>بدون DB</strong> = mock حتى Supabase</span>
+  </p>
+
+  <p class="nodb-legend panel-hidden" id="migrate-legend" style="background:rgba(201,169,98,0.06);">
+    <span data-en><strong>Mock → Supabase</strong> — checklist after Supabase project registration. No day estimates; complete in order when ready.</span>
+    <span data-ar class="hidden"><strong>Mock → Supabase</strong> — قائمة بعد تسجيل مشروع Supabase. بدون تقدير أيام؛ نفّذ بالترتيب عند الجاهزية.</span>
+  </p>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <nav id="sidebar-phases">
+        <a href="#p0">Phase 0</a><a href="#p1">Phase 1</a>
+        <a href="#p2">Phase 2</a>
+        <a href="#p3">Phase 3</a><a href="#p4">Phase 4</a><a href="#p5">Phase 5</a>
+        <a href="#p6">Phase 6</a><a href="#p7">Phase 7</a><a href="#p8">Phase 8</a>
+        <a href="#p9">Phase 9</a>
+      </nav>
+      <nav id="sidebar-migrate" class="hidden">
+        <a href="#migrate-overview" data-en>Overview</a>
+        <a href="#migrate-overview" class="hidden" data-ar>نظرة عامة</a>
+        <a href="#migrate-actions" data-en>Migration actions</a>
+        <a href="#migrate-actions" class="hidden" data-ar>إجراءات الترحيل</a>
+        <a href="#migrate-files" data-en>Mock files</a>
+        <a href="#migrate-files" class="hidden" data-ar>ملفات mock</a>
+      </nav>
+    </aside>
+
+    <main id="content"></main>
+    <main id="migrate-content" class="panel-hidden"></main>
+  </div>
+
+  <footer>
+    <span data-en>Mbody · Technical Guide v0.7 · Jun 2026 — product stats · GLB 3D · GDPR · WCAG</span>
+    <span data-ar class="hidden">Mbody · دليل تقني v0.7 · يونيو 2026 — إحصائيات منتج · GLB 3D · GDPR · WCAG</span>
+  </footer>
+
+  <div class="float-progress" id="float-progress" role="status" aria-live="polite" aria-atomic="true">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle class="float-progress-bg" cx="32" cy="32" r="28" />
+      <circle class="float-progress-fill" id="float-progress-ring" cx="32" cy="32" r="28" />
+    </svg>
+    <span class="float-progress-pct" id="float-progress-pct">0%</span>
+    <span class="float-progress-label" id="float-progress-label" data-en>Done</span>
+    <span class="float-progress-label hidden" id="float-progress-label-ar" data-ar>مكتمل</span>
+  </div>
+
+  <script>
+/**
+ * Bilingual glossary tooltips (EN + AR) for abbreviations in roadmap & requirements HTML.
+ */
+(function (global) {
+  const GLOSSARY = {
+    "Post-MVP": {
+      en: "After minimum viable product launch — features planned for a later phase",
+      ar: "بعد إطلاق الحد الأدنى للمنتج (MVP) — ميزات مخططة لمرحلة لاحقة",
+    },
+    TBD: {
+      en: "To Be Determined — not yet decided; pending client confirmation",
+      ar: "يُحدَّد لاحقاً — لم يُحسم بعد؛ بانتظار تأكيد العميل",
+    },
+    MVP: {
+      en: "Minimum Viable Product — core features required for launch day",
+      ar: "الحد الأدنى للمنتج القابل للإطلاق — الميزات الأساسية المطلوبة يوم الإطلاق",
+    },
+    EU: {
+      en: "European Union — EU legal and market rules apply",
+      ar: "الاتحاد الأوروبي — تنطبق القواعد القانونية والسوقية الأوروبية",
+    },
+    VAT: {
+      en: "Value Added Tax — sales tax included in displayed prices (25% in Sweden)",
+      ar: "ضريبة القيمة المضافة — ضريبة المبيعات مضمنة في الأسعار المعروضة (25% في السويد)",
+    },
+    GDPR: {
+      en: "General Data Protection Regulation — EU privacy and data protection law",
+      ar: "اللائحة العامة لحماية البيانات — قانون الخصوصية وحماية البيانات في الاتحاد الأوروبي",
+    },
+    UAT: {
+      en: "User Acceptance Testing — client verifies the system before go-live",
+      ar: "اختبار قبول المستخدم — يتحقق العميل من النظام قبل الإطلاق",
+    },
+    QA: {
+      en: "Quality Assurance — testing to ensure the product works correctly",
+      ar: "ضمان الجودة — اختبار للتأكد من عمل المنتج بشكل صحيح",
+    },
+    ESP: {
+      en: "Email Service Provider — e.g. Klaviyo, Mailchimp for newsletters",
+      ar: "مزود خدمة البريد الإلكتروني — مثل Klaviyo أو Mailchimp للنشرات",
+    },
+    PDP: {
+      en: "Product Detail Page — single product page with gallery, sizes, and buy options",
+      ar: "صفحة تفاصيل المنتج — صفحة منتج واحد مع معرض وصور ومقاسات وشراء",
+    },
+    CRUD: {
+      en: "Create, Read, Update, Delete — basic data management operations",
+      ar: "إنشاء، قراءة، تحديث، حذف — عمليات إدارة البيانات الأساسية",
+    },
+    AOV: {
+      en: "Average Order Value — average amount spent per order",
+      ar: "متوسط قيمة الطلب — متوسط المبلغ المنفق في كل طلب",
+    },
+    PCI: {
+      en: "Payment Card Industry standard — secure handling of card payments",
+      ar: "معيار صناعة بطاقات الدفع — التعامل الآمن مع مدفوعات البطاقات",
+    },
+    WCAG: {
+      en: "Web Content Accessibility Guidelines — standards for accessible websites",
+      ar: "إرشادات إمكانية الوصول للمحتوى — معايير المواقع المتاحة للجميع",
+    },
+    SEO: {
+      en: "Search Engine Optimization — making pages discoverable on Google etc.",
+      ar: "تحسين محركات البحث — جعل الصفحات قابلة للاكتشاف في Google وغيرها",
+    },
+    FAQ: {
+      en: "Frequently Asked Questions — common customer questions and answers",
+      ar: "الأسئلة الشائعة — أسئلة وإجابات العملاء المتكررة",
+    },
+    D2C: {
+      en: "Direct to Consumer — brand sells directly to customers online",
+      ar: "مباشرة للمستهلك — العلامة تبيع مباشرة للعملاء عبر الإنترنت",
+    },
+    B2C: {
+      en: "Business to Consumer — company sells to individual customers",
+      ar: "من الشركة للمستهلك — الشركة تبيع للعملاء الأفراد",
+    },
+    COD: {
+      en: "Cash on Delivery — customer pays when the order is delivered",
+      ar: "الدفع عند الاستلام — العميل يدفع عند توصيل الطلب",
+    },
+    GLB: {
+      en: "GL Transmission Format — 3D model file for interactive product viewer",
+      ar: "تنسيق GLB — ملف نموذج ثلاثي الأبعاد لعارض المنتج التفاعلي",
+    },
+    Klarna: {
+      en: "Buy now, pay later payment provider — popular in Europe",
+      ar: "مزود دفع «اشتري الآن وادفع لاحقاً» — شائع في أوروبا",
+    },
+    Affiliate: {
+      en: "Partner marketing — influencers earn commission on referred sales",
+      ar: "التسويق بالعمولة — المؤثرون يكسبون عمولة على المبيعات المُحالة",
+    },
+    i18n: {
+      en: "Internationalization — multi-language support for the website",
+      ar: "التدويل — دعم متعدد اللغات للموقع",
+    },
+    API: {
+      en: "Application Programming Interface — system-to-system connection",
+      ar: "واجهة برمجة التطبيقات — ربط بين الأنظمة",
+    },
+    CI: {
+      en: "Continuous Integration — automated build and test on code changes",
+      ar: "التكامل المستمر — بناء واختبار تلقائي عند تغيير الكود",
+    },
+    SKU: {
+      en: "Stock Keeping Unit — unique product variant (size/color combination)",
+      ar: "وحدة حفظ المخزون — متغير منتج فريد (مقاس/لون)",
+    },
+    B2B: {
+      en: "Business to Business — selling to other companies (wholesale); out of scope",
+      ar: "من شركة لشركة — البيع للشركات (جملة)； خارج النطاق",
+    },
+  };
+
+  const SORTED_KEYS = Object.keys(GLOSSARY).sort((a, b) => b.length - a.length);
+  const TERM_RE = new RegExp(
+    "\\b(" + SORTED_KEYS.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")\\b",
+    "gi"
+  );
+
+  function canonicalTerm(matched) {
+    return SORTED_KEYS.find((k) => k.toLowerCase() === matched.toLowerCase()) || matched;
+  }
+
+  let tooltipEl = null;
+
+  function injectStyles() {
+    if (document.getElementById("glossary-tooltip-styles")) return;
+    const style = document.createElement("style");
+    style.id = "glossary-tooltip-styles";
+    style.textContent = `
+      abbr.glossary-term {
+        cursor: help;
+        text-decoration: underline dotted rgba(201, 169, 98, 0.65);
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+      }
+      abbr.glossary-term:focus-visible {
+        outline: 1px solid rgba(201, 169, 98, 0.8);
+        outline-offset: 2px;
+        border-radius: 2px;
+      }
+      #glossary-tooltip {
+        position: fixed;
+        z-index: 10000;
+        max-width: min(320px, 90vw);
+        padding: 0.65rem 0.85rem;
+        background: #1a1a20;
+        border: 1px solid rgba(201, 169, 98, 0.45);
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        font-size: 0.78rem;
+        line-height: 1.45;
+      }
+      #glossary-tooltip.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      #glossary-tooltip .gt-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.2rem;
+      }
+      #glossary-tooltip .gt-en .gt-label { color: #c9a962; }
+      #glossary-tooltip .gt-ar .gt-label { color: #60a5fa; margin-top: 0.5rem; }
+      #glossary-tooltip .gt-en p,
+      #glossary-tooltip .gt-ar p {
+        margin: 0;
+        color: #f4f4f6;
+      }
+      #glossary-tooltip .gt-ar p {
+        direction: rtl;
+        text-align: right;
+        font-family: "Segoe UI", Tahoma, system-ui, sans-serif;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function ensureTooltip() {
+    if (tooltipEl) return tooltipEl;
+    tooltipEl = document.createElement("div");
+    tooltipEl.id = "glossary-tooltip";
+    tooltipEl.setAttribute("role", "tooltip");
+    tooltipEl.innerHTML =
+      '<div class="gt-en"><div class="gt-label">English</div><p></p></div>' +
+      '<div class="gt-ar"><div class="gt-label">العربية</div><p></p></div>';
+    document.body.appendChild(tooltipEl);
+    return tooltipEl;
+  }
+
+  function showTooltip(abbr, x, y) {
+    const tip = ensureTooltip();
+    const term = canonicalTerm(abbr.textContent.trim());
+    const entry = GLOSSARY[term];
+    if (!entry) return;
+    tip.querySelector(".gt-en p").textContent = entry.en;
+    tip.querySelector(".gt-ar p").textContent = entry.ar;
+    tip.classList.add("visible");
+
+    const pad = 12;
+    const rect = tip.getBoundingClientRect();
+    let left = x + pad;
+    let top = y + pad;
+    if (left + rect.width > window.innerWidth - pad) {
+      left = x - rect.width - pad;
+    }
+    if (top + rect.height > window.innerHeight - pad) {
+      top = y - rect.height - pad;
+    }
+    tip.style.left = Math.max(pad, left) + "px";
+    tip.style.top = Math.max(pad, top) + "px";
+  }
+
+  function hideTooltip() {
+    if (tooltipEl) tooltipEl.classList.remove("visible");
+  }
+
+  function shouldSkipNode(node) {
+    const p = node.parentElement;
+    if (!p) return true;
+    if (p.closest("script, style, abbr.glossary-term, #glossary-tooltip, .sidebar nav")) {
+      return true;
+    }
+    return false;
+  }
+
+  function wrapTextNode(node) {
+    const text = node.textContent;
+    if (!TERM_RE.test(text)) return;
+    TERM_RE.lastIndex = 0;
+
+    const frag = document.createDocumentFragment();
+    let last = 0;
+    let match;
+
+    while ((match = TERM_RE.exec(text)) !== null) {
+      if (match.index > last) {
+        frag.appendChild(document.createTextNode(text.slice(last, match.index)));
+      }
+      const term = canonicalTerm(match[0]);
+      const abbr = document.createElement("abbr");
+      abbr.className = "glossary-term";
+      abbr.textContent = match[0];
+      abbr.title = ""; // custom tooltip only
+      frag.appendChild(abbr);
+      last = TERM_RE.lastIndex;
+    }
+
+    if (last < text.length) {
+      frag.appendChild(document.createTextNode(text.slice(last)));
+    }
+
+    node.parentNode.replaceChild(frag, node);
+  }
+
+  function wrapGlossary(root) {
+    if (!root) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    let n;
+    while ((n = walker.nextNode())) {
+      if (!shouldSkipNode(n)) nodes.push(n);
+    }
+    nodes.forEach(wrapTextNode);
+  }
+
+  function bindEvents() {
+    if (document.body.dataset.glossaryBound) return;
+    document.body.dataset.glossaryBound = "1";
+
+    document.body.addEventListener("mouseover", (e) => {
+      const abbr = e.target.closest("abbr.glossary-term");
+      if (abbr) showTooltip(abbr, e.clientX, e.clientY);
+    });
+
+    document.body.addEventListener("mousemove", (e) => {
+      const abbr = e.target.closest("abbr.glossary-term");
+      if (abbr && tooltipEl?.classList.contains("visible")) {
+        showTooltip(abbr, e.clientX, e.clientY);
+      }
+    });
+
+    document.body.addEventListener("mouseout", (e) => {
+      const abbr = e.target.closest("abbr.glossary-term");
+      const related = e.relatedTarget?.closest?.("abbr.glossary-term");
+      if (abbr && abbr !== related) hideTooltip();
+    });
+
+    document.body.addEventListener("focusin", (e) => {
+      const abbr = e.target.closest?.("abbr.glossary-term");
+      if (abbr) {
+        const r = abbr.getBoundingClientRect();
+        showTooltip(abbr, r.left + r.width / 2, r.bottom);
+      }
+    });
+
+    document.body.addEventListener("focusout", (e) => {
+      if (e.target.closest?.("abbr.glossary-term")) hideTooltip();
+    });
+
+    window.addEventListener("scroll", hideTooltip, true);
+    window.addEventListener("resize", hideTooltip);
+  }
+
+  function init(root) {
+    injectStyles();
+    ensureTooltip();
+    bindEvents();
+    wrapGlossary(root || document.body);
+  }
+
+  function refresh(root) {
+    wrapGlossary(root || document.body);
+  }
+
+  global.GlossaryTooltips = { init, refresh, GLOSSARY };
+})(window);
+</script>
+  <script>
+    const PHASES = [
+      {
+        id: "p0", week: { en: "Complete", ar: "مكتمل" }, tag: "done",
+        title: { en: "Phase 0 — Discovery & Requirements", ar: "المرحلة 0 — الاكتشاف والمتطلبات" },
+        objective: {
+          en: "Lock scope, client answers, and technical baseline before development starts.",
+          ar: "تثبيت النطاق وإجابات العميل والأساس التقني قبل بدء التطوير."
+        },
+        steps: {
+          en: [
+            "Finalize vision.md and sh_requirements.html (MVP scope, removed affiliate/accounting).",
+            "Document client config: Mbody brand, 5 products, Europe launch, 4 languages, 3 currencies.",
+            "Confirm payment provider timeline (Swedish bank — TBD).",
+            "Collect GLB 3D assets spec from client/agency (one file per product variant if needed).",
+            "Agree reference UI (DFYNE, Gymshark, AYBL, Reload) and design tokens.",
+            "Set up project repo, branching strategy, and environment naming (dev / staging / prod).",
+          ],
+          ar: [
+            "إنهاء vision.md و sh_requirements.html (نطاق MVP، إزالة affiliate/المحاسبة).",
+            "توثيق إعدادات العميل: Mbody، 5 منتجات، إطلاق أوروبا، 4 لغات، 3 عملات.",
+            "تأكيد جدول مزود الدفع (بنك سويدي — TBD).",
+            "جمع مواصفات أصول GLB 3D من العميل/الوكالة.",
+            "الاتفاق على واجهة مرجعية وتوكنات التصميم.",
+            "إعداد المستودع واستراتيجية الفروع وأسماء البيئات (dev / staging / prod).",
+          ]
+        },
+        deliverables: { en: "Signed requirements, roadmap, technical guide, repo access", ar: "متطلبات موقّعة، خارطة طريق، دليل تقني، وصول للمستودع" }
+      },
+      {
+        id: "p1", week: "Week 1", tag: "mvp",
+        title: { en: "Phase 1 — Foundation & Design System", ar: "المرحلة 1 — الأساس ونظام التصميم" },
+        objective: {
+          en: "Scaffold the application, design system, i18n, and legal page shells.",
+          ar: "إنشاء هيكل التطبيق ونظام التصميم والتدويل وهياكل الصفحات القانونية."
+        },
+        steps: {
+          en: [
+            "Initialize frontend (Next.js or agreed stack) + API/backend monorepo structure.",
+            "Configure CI pipeline: lint, type-check, build on pull request.",
+            "Implement design tokens: Mbody colors, typography, spacing, button/input/card components.",
+            "Build responsive layout shell: header, footer, mobile nav, language switcher.",
+            "Set up i18n (EN, SV, ES, DE) with next-intl, messages/*.json, middleware, and /[locale] routing.",
+            "Implement currency display helper (SEK, USD, EUR) with VAT-inclusive formatting.",
+            "Create static page templates: Terms, Privacy, Returns (placeholder → client EU text).",
+            "Add GDPR cookie consent banner component (logic only; copy from client).",
+            "WCAG 2.1 AA baseline: color contrast tokens, focus rings, semantic landmarks, skip link.",
+            "Configure staging deployment and environment variables template (.env.example).",
+          ],
+          ar: [
+            "تهيئة الواجهة (Next.js أو المكدس المتفق عليه) + هيكل monorepo للـ API.",
+            "إعداد CI: lint، type-check، build عند pull request.",
+            "تنفيذ توكنات التصميم: ألوان Mbody، خطوط، مسافات، مكوّنات زر/حقل/بطاقة.",
+            "بناء هيكل التخطيط: رأس، تذييل، تنقل جوال، مبدّل اللغة.",
+            "إعداد i18n (EN, SV, ES, DE) مع next-intl و messages/*.json و middleware ومسارات /[locale].",
+            "تنفيذ مساعد عرض العملة (SEK, USD, EUR) مع تنسيق شامل VAT.",
+            "إنشاء قوالب صفحات ثابتة: الشروط، الخصوصية، الإرجاع (نص EU من العميل).",
+            "إضافة بانر موافقة GDPR للكوكيز (المنطق فقط).",
+            "أساس WCAG 2.1 AA: توكنات تباين، حلقات تركيز، معالم دلالية، رابط تخطي.",
+            "إعداد نشر staging وقالب متغيرات البيئة (.env.example).",
+          ]
+        },
+        deliverables: { en: "Running staging app, design system Storybook or demo page", ar: "تطبيق staging يعمل، نظام تصميم أو صفحة عرض" }
+      },
+      {
+        id: "p2", week: "Week 2", tag: "mvp",
+        title: { en: "Phase 2 — Storefront Core", ar: "المرحلة 2 — نواة المتجر" },
+        objective: {
+          en: "Build catalog, product pages with 3D GLB viewer, and content pages.",
+          ar: "بناء الكتالوج وصفحات المنتج مع عارض GLB 3D وصفحات المحتوى."
+        },
+        steps: {
+          en: [
+            "Design database schema: products, variants (size/color), collections, categories, media — see database/supabase-schema.md + mbody_init.sql (001–009).",
+            "Run database/mbody_init.sql on Supabase (catalog + RLS + storage + seed). See database/README.md or ./database/run-init.sh.",
+            "Build API endpoints: list products, product detail, collections, categories, filters.",
+            "Implement shop page with filters (size, color, price, collection, availability).",
+            "Build product detail page (PDP): image gallery, variant selector, stock status, add-to-cart.",
+            "Integrate Three.js / model-viewer for GLB 3D viewer: load, rotate, zoom, pan, mobile touch.",
+            "Fallback UI when GLB missing (show image gallery only + admin warning).",
+            "Implement wishlist (authenticated users): add/remove, wishlist page.",
+            "Product stats schema: view_count, like_count (wishlist), units_sold per product.",
+            "Track PDP views on page load (dedupe per session); increment view_count API.",
+            "Display engagement bar on PDP: views, likes, waiting count (0 until Phase 6), units sold.",
+            "Build homepage sections: Hero, Latest Drop (Aero grid), Sculpt Bento, Premium editorial, Boutique Favorites, Complete the Look, Newsletter.",
+            "Create Collections / New Drops listing page.",
+            "Add About Us, Contact form, FAQ page shells (CMS or static until content ready).",
+          ],
+          ar: [
+            "تصميم مخطط DB: منتجات، متغيرات (مقاس/لون)، مجموعات، فئات، وسائط — database/supabase-schema.md + mbody_init.sql (001–009).",
+            "تشغيل database/mbody_init.sql على Supabase (كتالوج + RLS + storage + seed). راجع database/README.md أو ./database/run-init.sh.",
+            "بناء API: قائمة منتجات، تفاصيل، مجموعات، فئات، فلاتر.",
+            "تنفيذ صفحة المتجر مع فلاتر (مقاس، لون، سعر، مجموعة، توفر).",
+            "بناء PDP: معرض صور، اختيار متغير، حالة مخزون، إضافة للسلة.",
+            "تكامل Three.js / model-viewer لـ GLB: تحميل، تدوير، تكبير، تحريك، لمس جوال.",
+            "واجهة بديلة عند غياب GLB (معرض صور فقط + تحذير أدمن).",
+            "تنفيذ قائمة الأمنيات (مستخدم مسجّل): إضافة/حذف، صفحة أمنيات.",
+            "مخطط إحصائيات المنتج: view_count، like_count (أمنيات)، units_sold لكل منتج.",
+            "تتبع مشاهدات PDP عند التحميل (منع تكرار لكل جلسة)； API لزيادة view_count.",
+            "عرض شريط تفاعل في PDP: مشاهدات، إعجابات، منتظرين (0 حتى المرحلة 6)، مبيعات.",
+            "بناء أقسام الرئيسية: Hero، Latest Drop (شبكة Aero)، Sculpt Bento، Premium editorial، Boutique Favorites، Complete the Look، Newsletter.",
+            "إنشاء صفحة المجموعات / الإصدارات الجديدة.",
+            "إضافة من نحن، نموذج اتصال، FAQ (ثابت حتى جاهزية المحتوى).",
+          ]
+        },
+        deliverables: { en: "Browseable catalog, PDP with 3D viewer and engagement counters", ar: "كتالوج قابل للتصفح، PDP مع عارض 3D وعدادات تفاعل" }
+      },
+      {
+        id: "p3", week: "Week 3", tag: "mvp",
+        title: { en: "Phase 3 — Accounts, Cart & Checkout Flow", ar: "المرحلة 3 — الحسابات والسلة والدفع" },
+        objective: {
+          en: "Customer auth, cart, checkout UI, and order creation (payment pending Phase 4).",
+          ar: "مصادقة العميل، السلة، واجهة الدفع، وإنشاء الطلب (الدفع في المرحلة 4)."
+        },
+        steps: {
+          en: [
+            "Implement registration + login (email/password); block guest checkout.",
+            "Add password reset and email verification flow.",
+            "Build cart: add/update/remove lines, persist per user session.",
+            "Checkout step 1: shipping address (Europe validation).",
+            "Checkout step 2: shipping method (PostNord/DHL rules placeholder).",
+            "Checkout step 3: order summary with VAT 25% (SE) display, discount code field.",
+            "Apply free shipping rule when cart ≥ 499 SEK / 45 USD.",
+            "Create order record in DB with status 'pending_payment' until gateway connected.",
+            "Build customer account: order history, order detail, profile edit.",
+            "Order confirmation email template (trigger when payment succeeds in Phase 4).",
+          ],
+          ar: [
+            "تنفيذ التسجيل + الدخول (بريد/كلمة مرور)； منع شراء الضيف.",
+            "إضافة إعادة تعيين كلمة المرور والتحقق من البريد.",
+            "بناء السلة: إضافة/تحديث/حذف، حفظ لكل مستخدم.",
+            "خطوة 1: عنوان الشحن (تحقق أوروبا).",
+            "خطوة 2: طريقة الشحن (قواعد PostNord/DHL مؤقتة).",
+            "خطوة 3: ملخص الطلب مع VAT 25%، حقل كوبون خصم.",
+            "تطبيق شحن مجاني عند السلة ≥ 499 SEK / 45 USD.",
+            "إنشاء سجل طلب في DB بحالة pending_payment حتى ربط البوابة.",
+            "حساب العميل: سجل طلبات، تفاصيل، تعديل الملف.",
+            "قالب بريد تأكيد الطلب (يُفعّل عند نجاح الدفع في المرحلة 4).",
+          ]
+        },
+        deliverables: { en: "Full checkout flow (mock payment), account area, cart", ar: "تدفق دفع كامل (دفع وهمي)، منطقة حساب، سلة" }
+      },
+      {
+        id: "p4", week: "Week 4", tag: "tbd",
+        title: { en: "Phase 4 — Payments (Cards, Klarna & COD)", ar: "المرحلة 4 — المدفوعات (بطاقات، Klarna و COD)" },
+        objective: {
+          en: "Connect payment gateway, Klarna, wallets, and Cash on Delivery.",
+          ar: "ربط بوابة الدفع و Klarna والمحافظ والدفع عند الاستلام."
+        },
+        steps: {
+          en: [
+            "Obtain payment provider credentials from client (Swedish bank / Stripe — TBD).",
+            "Integrate payment gateway SDK: create payment intent on order submit.",
+            "Enable Apple Pay + Google Pay via gateway wallet APIs.",
+            "Enable Visa + Mastercard card payments (PCI — no card storage on server).",
+            "Integrate Klarna: Pay now + Pay within 30 days for EU markets.",
+            "Implement COD payment method: flag order as 'cod_pending', no online capture.",
+            "Handle webhooks: payment succeeded, failed, refunded → update order status.",
+            "On paid order: increment units_sold per product line item (net of cancelled lines).",
+            "Map payment method on order (card, klarna, apple_pay, google_pay, cod).",
+            "Admin: filter and badge COD orders separately.",
+            "End-to-end test suite on staging with test cards and Klarna sandbox.",
+          ],
+          ar: [
+            "الحصول على بيانات مزود الدفع من العميل (بنك سويدي / Stripe — TBD).",
+            "تكامل SDK البوابة: إنشاء payment intent عند إرسال الطلب.",
+            "تفعيل Apple Pay + Google Pay عبر APIs المحفظة.",
+            "تفعيل Visa + Mastercard (PCI — لا تخزين بطاقة على الخادم).",
+            "تكامل Klarna: ادفع الآن + خلال 30 يوم لأسواق EU.",
+            "تنفيذ COD: تمييز الطلب cod_pending بدون تحصيل إلكتروني.",
+            "معالجة webhooks: نجاح/فشل/استرداد → تحديث حالة الطلب.",
+            "عند دفع الطلب: زيادة units_sold لكل بند منتج (صافي بعد الإلغاء).",
+            "ربط طريقة الدفع بالطلب (بطاقة، klarna، apple_pay، google_pay، cod).",
+            "الأدمن: فلترة وتمييز طلبات COD.",
+            "اختبار شامل على staging ببطاقات تجريبية و sandbox Klarna.",
+          ]
+        },
+        deliverables: { en: "Live payments on staging, webhook handler, COD flow", ar: "مدفوعات حية على staging، معالج webhooks، تدفق COD" }
+      },
+      {
+        id: "p5", week: "Week 5", tag: "mvp",
+        title: { en: "Phase 5 — Admin Dashboard (Core)", ar: "المرحلة 5 — لوحة الإدارة (الأساس)" },
+        objective: {
+          en: "Back-office for 2 admin users: products, orders, inventory, analytics.",
+          ar: "لوحة تحكم لـ 2 مشرفين: منتجات، طلبات، مخزون، تحليلات."
+        },
+        steps: {
+          en: [
+            "Admin auth: separate login, 2 full-access accounts, session security.",
+            "Product CRUD: title, description, price, categories, collections (i18n fields).",
+            "Variant management: size × color matrix, SKU, stock quantity per variant.",
+            "Media upload: product images + GLB file attach per product (S3 or storage).",
+            "Manual flags: Latest Drop, Premium Collection toggles per product.",
+            "Inventory: update stock, low-stock threshold alerts in admin dashboard.",
+            "Order list: filter by status, payment method (incl. COD), date range.",
+            "Order detail: update status (processing, shipped, delivered, returned).",
+            "Returns management: initiate return, restock on approval.",
+            "Discount codes CRUD: percentage/fixed, expiry, usage limits.",
+            "Product engagement panel: views, likes, waiting count, units sold per product.",
+            "Star ratings admin: average 1–5 and count per product (read-only; no text/photos).",
+            "Sync like_count from wishlist table; expose sort by engagement in product list.",
+            "Sales dashboard: revenue, order count, best sellers, AOV chart.",
+          ],
+          ar: [
+            "مصادقة أدمن: دخول منفصل، حسابان بصلاحيات كاملة، أمان الجلسة.",
+            "CRUD منتجات: عنوان، وصف، سعر، فئات، مجموعات (حقول i18n).",
+            "إدارة متغيرات: مصفوفة مقاس × لون، SKU، كمية مخزون لكل متغير.",
+            "رفع وسائط: صور منتج + ملف GLB لكل منتج (S3 أو تخزين).",
+            "أعلام يدوية: أحدث إصدار، مجموعة فاخرة لكل منتج.",
+            "المخزون: تحديث، تنبيهات عتبة مخزون منخفض في الأدمن.",
+            "قائمة طلبات: فلترة حسب الحالة، طريقة الدفع (بما فيها COD)، التاريخ.",
+            "تفاصيل طلب: تحديث الحالة (معالجة، شُحن، وُصل، مُرتجع).",
+            "إدارة مرتجعات: بدء إرجاع، إعادة للمخزون عند الموافقة.",
+            "CRUD كوبونات: نسبة/مبلغ ثابت، انتهاء، حد استخدام.",
+            "لوحة تفاعل المنتج: مشاهدات، إعجابات، قائمة انتظار، قطع مباعة لكل منتج.",
+            "أدمن تقييم النجوم: متوسط 1–5 وعدد المقيّمين لكل منتج (قراءة فقط؛ بدون نص/صور).",
+            "مزامنة like_count من جدول الأمنيات؛ فرز حسب التفاعل في قائمة المنتجات.",
+            "لوحة مبيعات: إيرادات، عدد طلبات، الأكثر مبيعاً، مخطط AOV.",
+          ]
+        },
+        deliverables: { en: "Admin panel on staging with full product/order management", ar: "لوحة أدمن على staging بإدارة منتجات/طلبات كاملة" }
+      },
+      {
+        id: "p6", week: "Week 6", tag: "mvp",
+        title: { en: "Phase 6 — Shipping & Waiting List", ar: "المرحلة 6 — الشحن وقائمة الانتظار" },
+        objective: {
+          en: "Carriers, waiting list notifications, newsletter integration.",
+          ar: "شركات الشحن، إشعارات قائمة الانتظار، تكامل النشرة."
+        },
+        steps: {
+          en: [
+            "Configure PostNord + DHL shipping zones for Europe (rates table in admin).",
+            "Apply free-shipping threshold at checkout (499 SEK / 45 USD).",
+            "Generate shipping labels or manual tracking entry in admin (per carrier API).",
+            "Waiting list DB: email + product/variant ID when out-of-stock.",
+            "Public UI: 'Notify me when back' on PDP and shop (product stays visible).",
+            "Aggregate waiting_count per product; show on PDP engagement bar.",
+            "On wishlist add/remove: update like_count in real time on PDP.",
+            "Background job: on stock increase → email waiting list subscribers.",
+            "Newsletter signup API + store emails (ESP sync when platform TBD).",
+            "Optional: Klaviyo/Mailchimp API integration once client selects ESP.",
+            "GDPR: double opt-in for newsletter where required.",
+            "Email templates: back-in-stock, newsletter welcome (branded Mbody).",
+          ],
+          ar: [
+            "إعداد مناطق PostNord + DHL لأوروبا (جدول أسعار في الأدمن).",
+            "تطبيق عتبة الشحن المجاني عند الدفع (499 SEK / 45 USD).",
+            "إنشاء ملصقات شحن أو إدخال تتبع يدوي (حسب API الناقل).",
+            "DB قائمة انتظار: بريد + معرف منتج/متغير عند نفاد المخزون.",
+            "واجهة عامة: «أخبرني عند التوفر» في PDP والمتجر (المنتج يبقى ظاهراً).",
+            "تجميع waiting_count لكل منتج؛ عرضه في شريط التفاعل في PDP.",
+            "عند إضافة/حذف أمنية: تحديث like_count فوراً في PDP.",
+            "مهمة خلفية: عند زيادة المخزون → بريد لمشتركي قائمة الانتظار.",
+            "API اشتراك نشرة + حفظ إيميلات (مزامنة ESP عند اختيار المنصة).",
+            "اختياري: تكامل Klaviyo/Mailchimp عند اختيار العميل.",
+            "GDPR: تأكيد مزدوج للنشرة حيث يلزم.",
+            "قوالب بريد: عودة المخزون، ترحيب نشرة (هوية Mbody).",
+          ]
+        },
+        deliverables: { en: "Shipping rules live, waiting list emails working", ar: "قواعد شحن فعّالة، إيميلات قائمة انتظار تعمل" }
+      },
+      {
+        id: "p7", week: "Week 7", tag: "mvp",
+        title: { en: "Phase 7 — Vision Features & Launch Campaign", ar: "المرحلة 7 — ميزات الرؤية وحملة الإطلاق" },
+        objective: {
+          en: "Premium features, 3D polish, countdown launch campaign.",
+          ar: "ميزات فاخرة، تحسين 3D، حملة إطلاق بعدّ تنازلي."
+        },
+        steps: {
+          en: [
+            "Polish GLB viewer: performance (LOD), loading spinner, error states, accessibility.",
+            "Complete The Look: auto-query products in same collection on PDP.",
+            "Smart Size Guide: form (height, weight, body type) → size from client chart.",
+            "Countdown timer component: configurable per product/collection in admin.",
+            "Low-stock badge: 'Only X left' when stock below threshold.",
+            "Launch campaign page: countdown drop hero, CTA to shop collection.",
+            "Star ratings: 1–5 UI on PDP; verify purchase before submit; one rating per buyer per product.",
+            "Ratings DB: stars only (no text, images, comments); show average + count on PDP.",
+            "Performance pass: image optimization, lazy-load GLB, Core Web Vitals.",
+            "SEO: meta tags, Open Graph, structured data for products.",
+          ],
+          ar: [
+            "تحسين عارض GLB: أداء (LOD)، مؤشر تحميل، حالات خطأ، إمكانية وصول.",
+            "أكمل الإطلالة: استعلام تلقائي لمنتجات نفس المجموعة في PDP.",
+            "دليل المقاس الذكي: نموذج (طول، وزن، نوع جسم) → مقاس من جدول العميل.",
+            "مكوّن عدّ تنازلي: قابل للضبط لكل منتج/مجموعة في الأدمن.",
+            "شارة مخزون منخفض: «بقي X قطع» عند انخفاض المخزون.",
+            "صفحة حملة إطلاق: hero بعدّ تنازلي، CTA للمتجر.",
+            "تقييم نجوم: واجهة 1–5 في PDP؛ تحقق شراء قبل الإرسال؛ تقييم واحد لكل مشتري/منتج.",
+            "DB تقييمات: نجوم فقط (بدون نص أو صور أو تعليقات)； عرض المتوسط والعدد في PDP.",
+            "تحسين أداء: صور، تحميل كسول GLB، Core Web Vitals.",
+            "SEO: meta tags، Open Graph، بيانات منظمة للمنتجات.",
+          ]
+        },
+        deliverables: { en: "All vision MVP features on staging, launch campaign page", ar: "كل ميزات MVP الرؤية على staging، صفحة حملة إطلاق" }
+      },
+      {
+        id: "p8", week: "Week 8", tag: "mvp",
+        title: { en: "Phase 8 — QA, UAT & Go-Live", ar: "المرحلة 8 — QA و UAT والإطلاق" },
+        objective: {
+          en: "Test everything, client sign-off, production launch with countdown drop.",
+          ar: "اختبار كل شيء، موافقة العميل، إطلاق إنتاج مع عدّ تنازلي."
+        },
+        steps: {
+          en: [
+            "Load 5 launch products with real images, GLB files, variants, and stock.",
+            "QA checklist: all pages × 4 languages, mobile + desktop browsers.",
+            "Test checkout paths: card, Klarna, Apple/Google Pay, COD.",
+            "Test engagement metrics: view increments, wishlist like count, waiting count, sold after order.",
+            "Test waiting list: subscribe → restock → receive email.",
+            "Test 3D viewer on iOS Safari, Android Chrome, desktop (rotate/zoom).",
+            "WCAG 2.1 AA audit: keyboard nav, focus order, contrast, alt text, screen reader (VoiceOver/NVDA).",
+            "Star rating UAT: only verified buyers rate; 1–5 only; block text/photo; average displays correctly.",
+            "Security review: auth, admin routes, payment webhooks, input validation.",
+            "Client UAT session: walkthrough + bug fix sprint.",
+            "Production deploy: DNS, SSL, env vars, database migration.",
+            "Enable countdown drop on homepage at agreed launch time.",
+            "Post-launch monitoring: error tracking (Sentry), uptime checks.",
+          ],
+          ar: [
+            "تحميل 5 منتجات إطلاق بصور حقيقية، ملفات GLB، متغيرات، ومخزون.",
+            "قائمة QA: كل الصفحات × 4 لغات، جوال + سطح مكتب.",
+            "اختبار مسارات الدفع: بطاقة، Klarna، Apple/Google Pay، COD.",
+            "اختبار مقاييس التفاعل: زيادة مشاهدات، إعجابات أمنيات، منتظرين، مبيعات بعد الطلب.",
+            "اختبار قائمة انتظار: اشتراك → إعادة مخزون → استلام بريد.",
+            "اختبار عارض 3D على iOS Safari، Android Chrome، سطح مكتب.",
+            "تدقيق WCAG 2.1 AA: تنقل لوحة مفاتيح، ترتيب تركيز، تباين، alt، قارئ شاشة.",
+            "UAT تقييم النجوم: مشترون موثّقون فقط؛ 1–5 فقط؛ منع نص/صورة؛ المتوسط صحيح.",
+            "مراجعة أمان: مصادقة، مسارات أدمن، webhooks دفع، تحقق مدخلات.",
+            "جلسة UAT مع العميل: جولة + إصلاح أخطاء.",
+            "نشر إنتاج: DNS، SSL، متغيرات بيئة، ترحيل DB.",
+            "تفعيل عدّ تنازلي على الرئيسية في وقت الإطلاق.",
+            "مراقبة ما بعد الإطلاق: تتبع أخطاء (Sentry)، فحص توفر.",
+          ]
+        },
+        deliverables: { en: "Production site live, client sign-off document", ar: "موقع إنتاج حي، وثيقة موافقة العميل" }
+      },
+      {
+        id: "p9", week: { en: "Post-launch", ar: "بعد الإطلاق" }, tag: "later",
+        title: { en: "Phase 9 — International Expansion & Enhancements", ar: "المرحلة 9 — التوسع الدولي والتحسينات" },
+        objective: {
+          en: "Expand markets and add post-MVP enhancements.",
+          ar: "توسيع الأسواق وإضافة تحسينات ما بعد MVP."
+        },
+        steps: {
+          en: [
+            "Add USA, Canada, Middle East shipping zones and tax rules.",
+            "Extend payment methods per region if needed.",
+            "Advanced analytics: behavior tracking, funnel reports.",
+            "Performance and SEO iteration based on live data.",
+          ],
+          ar: [
+            "إضافة مناطق شحن USA، كندا، الشرق الأوسط وقواعد ضريبية.",
+            "توسيع طرق الدفع حسب المنطقة إن لزم.",
+            "تحليلات متقدمة: تتبع سلوك، تقارير قمع.",
+            "تحسين أداء و SEO بناءً على بيانات حية.",
+          ]
+        },
+        deliverables: { en: "Phase 2 markets live (when scheduled)", ar: "أسواق المرحلة 2 حية (عند الجدولة)" }
+      },
+    ];
+
+    /** Gate checklist: run after Supabase project registration — swap mock data for live DB. */
+    const MOCK_TO_SUPABASE = {
+      id: "migrate",
+      title: {
+        en: "Mock → Supabase Migration",
+        ar: "الترحيل من Mock إلى Supabase",
+      },
+      objective: {
+        en: "Once the Supabase project exists, connect mbody/ to Postgres + Auth + Storage and replace static mock files with database reads/writes. Complete this gate before Phase 2 API work counts as done.",
+        ar: "بعد إنشاء مشروع Supabase، اربط mbody/ بـ Postgres + Auth + Storage واستبدل ملفات mock الثابتة بقراءة/كتابة قاعدة البيانات. أكمل هذا البوابة قبل اعتبار API المرحلة 2 مكتملاً.",
+      },
+      mockFiles: {
+        en: [
+          "mbody/src/lib/home-data.ts — LATEST_DROP_PRODUCTS, SCULPT_COLLECTION, BOUTIQUE_FAVORITES, COMPLETE_THE_LOOK",
+          "mbody/src/components/home/*.tsx — homepage sections (mock-backed until DB wired)",
+          "mbody/src/lib/shop-data.ts — SHOP_PRODUCTS, PRODUCT_DETAILS",
+          "mbody/src/lib/cart-data.ts — cart lines, cross-sell, empty-state products",
+          "mbody/src/lib/auth-data.ts — mock account / orders",
+          "mbody/src/components/checkout/order-summary.tsx — hardcoded checkout lines",
+          "mbody/src/lib/currency.ts — SEK_PER_UNIT static FX (keep helper; prices from DB)",
+        ],
+        ar: [
+          "mbody/src/lib/home-data.ts — LATEST_DROP_PRODUCTS، SCULPT_COLLECTION، BOUTIQUE_FAVORITES، COMPLETE_THE_LOOK",
+          "mbody/src/components/home/*.tsx — أقسام الرئيسية (mock حتى ربط DB)",
+          "mbody/src/lib/shop-data.ts — SHOP_PRODUCTS، PRODUCT_DETAILS",
+          "mbody/src/lib/cart-data.ts — بنود السلة، cross-sell",
+          "mbody/src/lib/auth-data.ts — حساب/طلبات وهمية",
+          "mbody/src/components/checkout/order-summary.tsx — بنود checkout ثابتة",
+          "mbody/src/lib/currency.ts — أسعار صرف ثابتة (أبقِ المساعد؛ الأسعار من DB)",
+        ],
+      },
+      steps: {
+        en: [
+          "Register Supabase org; create dev + staging projects (EU region). Save project URL, anon key, service_role key.",
+          "Add env vars to mbody/.env.local + .env.example: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY.",
+          "Install @supabase/supabase-js (+ @supabase/ssr if using middleware cookies). Add lib/supabase/client.ts and server.ts helpers.",
+          "Run database/mbody_init.sql in Supabase SQL Editor (or ./database/run-init.sh with DATABASE_URL). Verify tables in Table Editor.",
+          "Enable Supabase Auth (email/password). Set Site URL + redirect URLs for localhost:3000 and staging domain.",
+          "Create storage bucket product-media; apply 007 storage policies. Test image upload from dashboard.",
+          "Seed catalog: 008_seed_catalog.sql is included in mbody_init.sql (16 products, variants, media). Re-run seed only if needed.",
+          "Shop + PDP: replace lib/shop-data.ts reads with Supabase queries (slug, category, filters). Keep types; remove static SHOP_PRODUCTS as source of truth.",
+          "Homepage: Latest Drop, Sculpt, Premium, Boutique sections query DB flags instead of home-data.ts arrays.",
+          "Cart: persist cart_items for authenticated users; merge guest localStorage cart on login. Keep CurrencyProvider + formatPriceFromSek (base_price in SEK from DB).",
+          "Auth + profiles: wire login/register to Supabase; sync profiles.locale and profiles.currency with LocaleSwitcher / CurrencySwitcher.",
+          "Server Actions or Route Handlers: list products, product by slug, PDP view_count increment, wishlist add/remove.",
+          "Add NEXT_PUBLIC_USE_MOCK_DATA flag (default false on staging). Mock files remain for Storybook/dev fallback only.",
+          "Smoke test staging: browse shop, PDP, add to cart (logged in), homepage sections show seeded products, RLS blocks cross-user data.",
+        ],
+        ar: [
+          "تسجيل Supabase وإنشاء مشاريع dev + staging (منطقة EU). حفظ URL والمفاتيح anon + service_role.",
+          "إضافة متغيرات البيئة في mbody/.env.local + .env.example: NEXT_PUBLIC_SUPABASE_URL، ANON_KEY، SERVICE_ROLE_KEY.",
+          "تثبيت @supabase/supabase-js (+ @supabase/ssr للـ cookies). إضافة lib/supabase/client.ts و server.ts.",
+          "تشغيل database/mbody_init.sql في SQL Editor (أو ./database/run-init.sh مع DATABASE_URL). التحقق من الجداول.",
+          "تفعيل Auth (بريد/كلمة مرور). ضبط Site URL و redirect URLs لـ localhost والـ staging.",
+          "إنشاء bucket product-media وتطبيق سياسات 007. اختبار رفع صورة.",
+          "Seed الكتالوج: 008_seed_catalog.sql مضمّن في mbody_init.sql (16 منتج، variants، media).",
+          "Shop + PDP: استبدال shop-data.ts باستعلامات Supabase (slug، فئة، فلاتر).",
+          "الرئيسية: Latest Drop وSculpt وPremium وBoutique من flags في DB بدل home-data.ts.",
+          "السلة: حفظ cart_items للمستخدم المسجّل؛ دمج سلة الضيف عند الدخول. الإبقاء على مساعد العملة و base_price بـ SEK.",
+          "Auth + profiles: ربط تسجيل/دخول Supabase؛ مزامنة locale و currency مع profiles.",
+          "Server Actions أو Route Handlers: قائمة منتجات، slug، view_count، wishlist.",
+          "إضافة NEXT_PUBLIC_USE_MOCK_DATA (false على staging). mock للتطوير/Storybook فقط.",
+          "اختبار smoke على staging: متجر، PDP، سلة (مسجّل)، RLS يمنع بيانات مستخدمين آخرين.",
+        ],
+      },
+      deliverables: {
+        en: "Staging app reads catalog + cart + auth from Supabase; mock files deprecated behind flag",
+        ar: "تطبيق staging يقرأ الكتالوج والسلة والمصادقة من Supabase؛ mock خلف feature flag",
+      },
+    };
+
+    const STORAGE_KEY = "mbody-sh-technical-progress";
+    const PROGRESS_VERSION = 42;
+
+
+
+
+    const VERSION_KEY = "mbody-sh-technical-progress-version";
+
+
+    /** Steps completable without Supabase / DB — UI, mock data, static pages, templates. */
+    const NO_DB_STEPS = new Set([
+      "p1-0", "p1-1", "p1-2", "p1-3", "p1-4", "p1-5", "p1-6", "p1-7", "p1-8", "p1-9",
+      "p2-0", "p2-2", "p2-3", "p2-4", "p2-5", "p2-6", "p2-7",
+      "p2-9", "p2-10", "p2-11", "p2-12", "p2-13",
+      "p3-0", "p3-2", "p3-3", "p3-4", "p3-5", "p3-6",
+      "p3-8", "p3-9",
+      "p4-0", "p4-6",
+      "p5-13",
+      "p6-1", "p6-3", "p6-4", "p6-10", "p6-11",
+      "p7-0", "p7-1", "p7-2", "p7-3", "p7-4", "p7-5", "p7-6", "p7-7", "p7-8", "p7-9",
+      "p8-1", "p8-5", "p8-6", "p8-11", "p8-12",
+    ]);
+
+    function isNoDbStep(phaseId, index) {
+      return NO_DB_STEPS.has(taskKey(phaseId, index));
+    }
+
+    /** Pre-checked tasks reflecting work completed in the mbody repo. */
+    const DEFAULT_DONE = {
+      "p1-0": true,
+      "p1-1": true,
+      "p1-2": true,
+      "p1-3": true,
+      "p1-4": true,
+      "p1-5": true,
+      "p1-6": true,
+      "p1-7": true,
+      "p1-8": true,
+      "p1-9": true,
+      "p2-0": true,
+      "p2-1": true,
+      "p2-2": true,
+      "p2-11": true,
+      "p2-3": true,
+      "p2-4": true,
+      "p2-5": true,
+      "p2-6": true,
+      "p2-8": true,
+      "p2-9": true,
+      "p2-10": true,
+      "p2-7": true,
+      "p2-12": true,
+      "p3-0": true,
+      "p3-1": true,
+      "p3-2": true,
+      "p3-3": true,
+      "p3-4": true,
+      "p3-5": true,
+      "p3-6": true,
+      "p3-8": true,
+      "p3-9": true,
+      "p4-0": true,
+      "p4-6": true,
+      "p5-0": true,
+      "p5-1": true,
+      "p5-2": true,
+      "p5-3": true,
+      "p5-4": true,
+      "p5-5": true,
+      "p5-6": true,
+      "p5-7": true,
+      "p5-8": true,
+      "p5-9": true,
+      "p5-10": true,
+      "p5-11": true,
+      "p5-12": true,
+      "p5-13": true,
+      "p6-0": true,
+      "p6-1": true,
+      "p6-2": true,
+      "p6-3": true,
+      "p6-4": true,
+      "p6-5": true,
+      "p6-6": true,
+      "p6-7": true,
+      "p7-0": true,
+      "p7-1": true,
+      "p7-3": true,
+      "p7-4": true,
+      "p7-5": true,
+      "p7-6": true,
+      "p7-7": true,
+      "migrate-0": true,
+      "migrate-1": true,
+      "migrate-2": true,
+      "migrate-3": true,
+      "migrate-4": true,
+      "migrate-5": true,
+      "migrate-6": true,
+      "migrate-7": true,
+      "migrate-8": true,
+      "migrate-9": true,
+      "migrate-10": true,
+      "migrate-11": true,
+      "migrate-12": true,
+    };
+    const DAY_MAP = {
+      p1: [0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5, 0.5, 0.5, 1],
+      p2: [0.5, 0.5, 0.5, 1, 1.5, 0.5, 1, 0.5, 0.5, 0.5, 1, 0.5, 0.5],
+      p3: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 1, 0.5],
+      p4: [0.5, 0.5, 0.5, 0.5, 1, 0.5, 1, 0.5, 0.5, 0.5, 1],
+      p5: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 1, 1, 0.5, 0.5, 0.5, 0.5, 1],
+      p6: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1, 0.5, 0.5],
+      p7: [0.5, 0.5, 0.5, 0.5, 0.5, 1, 1, 0.5, 1, 1],
+      p8: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5, 1, 1.5, 1, 0.5],
+      p9: [1.5, 1, 1.5, 1],
+    };
+
+    let currentLang = "en";
+    let currentTab = "phases";
+
+    function taskKey(phaseId, index) {
+      return `${phaseId}-${index}`;
+    }
+
+    function loadProgress() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveProgress(progress) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    }
+
+    function initDefaultProgress() {
+      const progress = loadProgress();
+      let changed = false;
+      const storedVersion = parseInt(localStorage.getItem(VERSION_KEY) || "0", 10);
+      if (storedVersion < PROGRESS_VERSION) {
+        Object.entries(DEFAULT_DONE).forEach(([key, val]) => {
+          if (!progress[key]) {
+            progress[key] = val;
+            changed = true;
+          }
+        });
+        localStorage.setItem(VERSION_KEY, String(PROGRESS_VERSION));
+      }
+      PHASES.filter((p) => p.id !== "p0").forEach((p) => {
+        const count = p.steps.en.length;
+        for (let i = 0; i < count; i++) {
+          const key = taskKey(p.id, i);
+          if (progress[key] === undefined) {
+            progress[key] = DEFAULT_DONE[key] === true;
+            changed = true;
+          }
+        }
+      });
+      MOCK_TO_SUPABASE.steps.en.forEach((_, i) => {
+        const key = taskKey(MOCK_TO_SUPABASE.id, i);
+        if (progress[key] === undefined) {
+          progress[key] = DEFAULT_DONE[key] === true;
+          changed = true;
+        }
+      });
+      if (changed) saveProgress(progress);
+      return progress;
+    }
+
+    function isTaskDone(progress, phaseId, index) {
+      return !!progress[taskKey(phaseId, index)];
+    }
+
+    function formatDays(days, isAr) {
+      if (days === 1) return isAr ? "1 يوم" : "1 day";
+      if (Number.isInteger(days)) return isAr ? `${days} أيام` : `${days} days`;
+      const whole = Math.floor(days);
+      const frac = days - whole;
+      if (isAr) {
+        if (whole === 0) return "نصف يوم";
+        return frac ? `${whole}.5 يوم` : `${whole} أيام`;
+      }
+      if (whole === 0) return "0.5 day";
+      return frac ? `${whole}.5 days` : `${whole} days`;
+    }
+
+    function getMigrateStats(progress) {
+      const count = MOCK_TO_SUPABASE.steps.en.length;
+      let doneCount = 0;
+      for (let i = 0; i < count; i++) {
+        if (isTaskDone(progress, MOCK_TO_SUPABASE.id, i)) doneCount += 1;
+      }
+      return { count, doneCount };
+    }
+
+    function getPhaseStats(p, progress) {
+      if (p.id === "p0") return { count: 0, doneCount: 0, totalDays: 0, remainingDays: 0 };
+      const count = p.steps.en.length;
+      const days = DAY_MAP[p.id] || Array(count).fill(1);
+      let doneCount = 0;
+      let totalDays = 0;
+      let remainingDays = 0;
+      for (let i = 0; i < count; i++) {
+        const d = days[i] ?? 1;
+        totalDays += d;
+        if (isTaskDone(progress, p.id, i)) doneCount += 1;
+        else remainingDays += d;
+      }
+      return { count, doneCount, totalDays, remainingDays };
+    }
+
+    function updateFloatProgress(pct, doneTasks, totalTasks) {
+      const ring = document.getElementById("float-progress-ring");
+      const pctEl = document.getElementById("float-progress-pct");
+      const floatEl = document.getElementById("float-progress");
+      const r = 28;
+      const circumference = 2 * Math.PI * r;
+      ring.style.strokeDasharray = circumference;
+      ring.style.strokeDashoffset = circumference - (pct / 100) * circumference;
+      pctEl.textContent = `${pct}%`;
+      const isAr = currentLang === "ar";
+      floatEl.setAttribute(
+        "aria-label",
+        isAr ? `${pct}% مكتمل — ${doneTasks} من ${totalTasks} مهام` : `${pct}% done — ${doneTasks} of ${totalTasks} tasks`
+      );
+    }
+
+    function updateGlobalProgress(progress) {
+      const el = document.getElementById("global-progress");
+      const isAr = currentLang === "ar";
+
+      if (currentTab === "migrate") {
+        const s = getMigrateStats(progress);
+        const pct = s.count ? Math.round((s.doneCount / s.count) * 100) : 0;
+        el.innerHTML = isAr
+          ? `<strong>${s.doneCount}/${s.count}</strong> مهام ترحيل · ${pct}%`
+          : `<strong>${s.doneCount}/${s.count}</strong> migration tasks · ${pct}%`;
+        updateFloatProgress(pct, s.doneCount, s.count);
+        return;
+      }
+
+      let totalTasks = 0;
+      let doneTasks = 0;
+      let totalDays = 0;
+      let remainingDays = 0;
+      PHASES.filter((p) => p.id !== "p0").forEach((p) => {
+        const s = getPhaseStats(p, progress);
+        totalTasks += s.count;
+        doneTasks += s.doneCount;
+        totalDays += s.totalDays;
+        remainingDays += s.remainingDays;
+      });
+      const pct = totalTasks ? Math.round((doneTasks / totalTasks) * 100) : 0;
+      el.innerHTML = isAr
+        ? `<strong>${doneTasks}/${totalTasks}</strong> مهام
+           <span class="progress-bar-wrap"><span class="progress-bar-fill" style="width:${pct}%"></span></span>
+           ${pct}% · <strong>${remainingDays}</strong> يوم متبقي من ${totalDays}`
+        : `<strong>${doneTasks}/${totalTasks}</strong> tasks
+           <span class="progress-bar-wrap"><span class="progress-bar-fill" style="width:${pct}%"></span></span>
+           ${pct}% · <strong>${remainingDays}</strong> days left of ${totalDays}`;
+      updateFloatProgress(pct, doneTasks, totalTasks);
+    }
+
+    function setTab(tab) {
+      currentTab = tab;
+      const isMigrate = tab === "migrate";
+      const isAr = currentLang === "ar";
+
+      document.getElementById("content").classList.toggle("panel-hidden", isMigrate);
+      document.getElementById("migrate-content").classList.toggle("panel-hidden", !isMigrate);
+      document.getElementById("sidebar-phases").classList.toggle("hidden", isMigrate);
+      document.getElementById("sidebar-migrate").classList.toggle("hidden", !isMigrate);
+      document.getElementById("nodb-legend").classList.toggle("panel-hidden", isMigrate);
+      document.getElementById("migrate-legend").classList.toggle("panel-hidden", !isMigrate);
+      document.getElementById("float-progress").classList.toggle("panel-hidden", false);
+
+      document.getElementById("tab-phases").classList.toggle("active", !isMigrate && !isAr);
+      document.getElementById("tab-phases-ar").classList.toggle("active", !isMigrate && isAr);
+      document.getElementById("tab-migrate").classList.toggle("active", isMigrate && !isAr);
+      document.getElementById("tab-migrate-ar").classList.toggle("active", isMigrate && isAr);
+
+      if (isMigrate) window.scrollTo({ top: 0, behavior: "smooth" });
+      updateGlobalProgress(initDefaultProgress());
+    }
+
+    function renderMigratePanel(lang, progress) {
+      const isAr = lang === "ar";
+      const m = MOCK_TO_SUPABASE;
+      const steps = isAr ? m.steps.ar : m.steps.en;
+      const mockFiles = isAr ? m.mockFiles.ar : m.mockFiles.en;
+      const stats = getMigrateStats(progress);
+
+      const stepsHtml = steps
+        .map((text, i) => {
+          const done = isTaskDone(progress, m.id, i);
+          const key = taskKey(m.id, i);
+          const statusClass = done ? "done" : "pending";
+          const statusLabel = done ? (isAr ? "مكتمل" : "Done") : (isAr ? "معلق" : "Pending");
+          return `<li class="${done ? "is-done" : ""}" data-phase="${m.id}" data-index="${i}">
+            <input type="checkbox" class="task-check" ${done ? "checked" : ""}
+              aria-label="${isAr ? "تمت المهمة" : "Mark task done"}" />
+            <span class="task-id" title="${isAr ? "معرّف المهمة" : "Task ID"}">${key}</span>
+            <span class="task-text">${text}</span>
+            <span class="task-badges">
+              <span class="task-status ${statusClass}">${statusLabel}</span>
+            </span>
+          </li>`;
+        })
+        .join("");
+
+      const mockFilesHtml = mockFiles.map((f) => `<li>${f}</li>`).join("");
+      const pct = stats.count ? Math.round((stats.doneCount / stats.count) * 100) : 0;
+
+      document.getElementById("migrate-content").innerHTML = `
+        <div class="migration-block" id="mock-supabase">
+          <section class="phase-block" id="migrate-overview">
+            <h2>${isAr ? m.title.ar : m.title.en}</h2>
+            <div class="phase-meta">
+              <span class="tag gate">${isAr ? "بعد تسجيل Supabase" : "AFTER SUPABASE SIGNUP"}</span>
+              <span class="tag mvp">${isAr ? "قبل Phase 2" : "BEFORE PHASE 2"}</span>
+            </div>
+            <p class="migrate-progress">${
+              isAr
+                ? `<strong>${stats.doneCount}/${stats.count}</strong> مهام · ${pct}%`
+                : `<strong>${stats.doneCount}/${stats.count}</strong> tasks · ${pct}%`
+            }</p>
+            <div class="card">
+              <h3>${isAr ? "الهدف" : "Objective"}</h3>
+              <p>${isAr ? m.objective.ar : m.objective.en}</p>
+            </div>
+            <div class="card">
+              <h3>${isAr ? "المخرجات" : "Deliverables"}</h3>
+              <p class="deliverables"><strong>${isAr ? "جاهز للمراجعة:" : "Ready for review:"}</strong> ${isAr ? m.deliverables.ar : m.deliverables.en}</p>
+              <p style="margin-top:0.75rem;font-size:0.78rem;display:flex;flex-wrap:wrap;gap:0.75rem 1.25rem">
+                <a href="todo-ebody-erd.html" style="color:var(--tech);text-decoration:none;border-bottom:1px solid rgba(56,189,248,0.35)">
+                  ${isAr ? "→ مخطط ERD" : "→ ERD schema"}
+                </a>
+                <a href="database/README.md" style="color:var(--tech);text-decoration:none;border-bottom:1px solid rgba(56,189,248,0.35)">
+                  ${isAr ? "→ database/README.md" : "→ database/README.md"}
+                </a>
+                <a href="database/mbody_init.sql" style="color:var(--tech);text-decoration:none;border-bottom:1px solid rgba(56,189,248,0.35)">
+                  ${isAr ? "→ mbody_init.sql" : "→ mbody_init.sql"}
+                </a>
+              </p>
+            </div>
+          </section>
+
+          <section class="phase-block" id="migrate-actions">
+            <div class="card">
+              <h3>${isAr ? "إجراءات الترحيل" : "Migration Actions"}</h3>
+              <ol class="steps steps-compact">${stepsHtml}</ol>
+            </div>
+          </section>
+
+          <section class="phase-block" id="migrate-files">
+            <div class="card">
+              <h3>${isAr ? "ملفات mock للاستبدال" : "Mock Files to Replace"}</h3>
+              <ul class="mock-files">${mockFilesHtml}</ul>
+            </div>
+          </section>
+        </div>`;
+    }
+
+    function renderPhases(lang) {
+      currentLang = lang;
+      const isAr = lang === "ar";
+      const progress = initDefaultProgress();
+      const phasesHtml = PHASES.map((p) => {
+        const week = typeof p.week === "object" ? (isAr ? p.week.ar : p.week.en) : p.week;
+        const tagClass = p.tag === "mvp" ? "mvp" : p.tag === "tbd" ? "tbd" : p.tag === "done" ? "done" : "later";
+        const steps = isAr ? p.steps.ar : p.steps.en;
+        const isDonePhase = p.id === "p0";
+        let stepsHtml;
+        let phaseProgressHtml = "";
+        if (isDonePhase) {
+          stepsHtml = steps
+            .map((text, i) => {
+              const key = taskKey(p.id, i);
+              return `<li class="is-done">
+              <span class="task-id">${key}</span>
+              <span class="task-text">${text}</span>
+            </li>`;
+            })
+            .join("");
+        } else {
+          const days = DAY_MAP[p.id] || steps.map(() => 1);
+          const stats = getPhaseStats(p, progress);
+          stepsHtml = steps
+            .map((text, i) => {
+              const done = isTaskDone(progress, p.id, i);
+              const noDb = isNoDbStep(p.id, i);
+              const statusClass = done ? "done" : "pending";
+              const statusLabel = done ? (isAr ? "مكتمل" : "Done") : (isAr ? "معلق" : "Pending");
+              const noDbBadge = noDb
+                ? `<span class="task-nodb" title="${isAr ? "لا يحتاج اتصال Supabase — بيانات وهمية/ثابتة" : "No Supabase needed — mock/static data"}">${isAr ? "بدون DB" : "No DB"}</span>`
+                : "";
+              const key = taskKey(p.id, i);
+              return `<li class="${done ? "is-done" : ""}" data-phase="${p.id}" data-index="${i}">
+                <input type="checkbox" class="task-check" ${done ? "checked" : ""}
+                  aria-label="${isAr ? "تمت المهمة" : "Mark task done"}" />
+                <span class="task-id" title="${isAr ? "معرّف المهمة" : "Task ID"}">${key}</span>
+                <span class="step-num" title="${isAr ? "رقم الخطوة في المرحلة" : "Step in phase"}">${i + 1}</span>
+                <span class="task-text">${text}</span>
+                <span class="task-days">${formatDays(days[i] ?? 1, isAr)}</span>
+                <span class="task-badges">${noDbBadge}<span class="task-status ${statusClass}">${statusLabel}</span></span>
+              </li>`;
+            })
+            .join("");
+          phaseProgressHtml = `<p class="phase-progress">${
+            isAr
+              ? `<strong>${stats.doneCount}/${stats.count}</strong> مهام · <strong>${stats.remainingDays}</strong> يوم متبقي من ${stats.totalDays}`
+              : `<strong>${stats.doneCount}/${stats.count}</strong> tasks · <strong>${stats.remainingDays}</strong> days left of ${stats.totalDays}`
+          }</p>`;
+        }
+        const stepsClass = isDonePhase ? "steps steps-simple" : "steps";
+        return `
+          <section class="phase-block" id="${p.id}">
+            <h2>${isAr ? p.title.ar : p.title.en}</h2>
+            <div class="phase-meta">
+              <span class="tag week">${week}</span>
+              <span class="tag ${tagClass}">${p.tag.toUpperCase()}</span>
+            </div>
+            ${phaseProgressHtml}
+            <div class="card">
+              <h3>${isAr ? "الهدف" : "Objective"}</h3>
+              <p>${isAr ? p.objective.ar : p.objective.en}</p>
+            </div>
+            <div class="grid2">
+              <div class="card">
+                <h3>${isAr ? "خطوات التنفيذ" : "Implementation Steps"}</h3>
+                <ol class="${stepsClass}">${stepsHtml}</ol>
+              </div>
+              <div class="card">
+                <h3>${isAr ? "المخرجات" : "Deliverables"}</h3>
+                <p class="deliverables"><strong>${isAr ? "جاهز للمراجعة:" : "Ready for review:"}</strong> ${isAr ? p.deliverables.ar : p.deliverables.en}</p>
+              </div>
+            </div>
+          </section>`;
+      }).join("");
+
+      document.getElementById("content").innerHTML = phasesHtml;
+      renderMigratePanel(lang, progress);
+      updateGlobalProgress(progress);
+    }
+
+    function refreshAll(lang) {
+      renderPhases(lang);
+      setTab(currentTab);
+    }
+
+    function onTaskToggle(e) {
+      const li = e.target.closest("li[data-phase]");
+      if (!li || e.target.type !== "checkbox") return;
+      const phaseId = li.dataset.phase;
+      const index = Number(li.dataset.index);
+      const progress = loadProgress();
+      progress[taskKey(phaseId, index)] = e.target.checked;
+      saveProgress(progress);
+      renderPhases(currentLang);
+      if (window.GlossaryTooltips) {
+        GlossaryTooltips.refresh(document.getElementById("content"));
+        GlossaryTooltips.refresh(document.getElementById("migrate-content"));
+      }
+    }
+
+    function setLang(lang) {
+      const isAr = lang === "ar";
+      document.documentElement.lang = isAr ? "ar" : "en";
+      document.body.dir = isAr ? "rtl" : "ltr";
+      document.querySelectorAll("[data-en]").forEach((el) => el.classList.toggle("hidden", isAr));
+      document.querySelectorAll("[data-ar]").forEach((el) => el.classList.toggle("hidden", !isAr));
+      document.getElementById("btn-en").classList.toggle("active", !isAr);
+      document.getElementById("btn-ar").classList.toggle("active", isAr);
+      document.getElementById("float-progress-label").classList.toggle("hidden", isAr);
+      document.getElementById("float-progress-label-ar").classList.toggle("hidden", !isAr);
+      refreshAll(lang);
+    }
+
+    document.getElementById("btn-en").addEventListener("click", () => setLang("en"));
+    document.getElementById("btn-ar").addEventListener("click", () => setLang("ar"));
+    document.getElementById("tab-phases").addEventListener("click", () => setTab("phases"));
+    document.getElementById("tab-phases-ar").addEventListener("click", () => setTab("phases"));
+    document.getElementById("tab-migrate").addEventListener("click", () => setTab("migrate"));
+    document.getElementById("tab-migrate-ar").addEventListener("click", () => setTab("migrate"));
+    document.getElementById("content").addEventListener("change", onTaskToggle);
+    document.getElementById("migrate-content").addEventListener("change", onTaskToggle);
+    GlossaryTooltips.init(document.body);
+    setLang("en");
+  </script>
+</body>
+</html>

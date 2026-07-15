@@ -22,6 +22,12 @@ export function countWaitingForProduct(productId: string): number {
   return unique.size;
 }
 
+export function listMockStockNotifications(): StockNotificationRecord[] {
+  return [...getStore()].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+}
+
 export function addMockStockNotification(
   input: Omit<StockNotificationRecord, "id" | "createdAt">,
 ): { record: StockNotificationRecord; alreadySubscribed: boolean } {

@@ -17,6 +17,7 @@ export function buildLowStockAlerts(products: AdminProductRow[]): AdminLowStockA
       slug: product.slug,
       stock: product.stock,
       lowStockThreshold: product.lowStockThreshold,
+      waitingCount: product.waitingCount,
       imageUrl: product.imageUrl,
       status: isOutOfStockProduct(product.stock) ? "out" : "low",
     }))

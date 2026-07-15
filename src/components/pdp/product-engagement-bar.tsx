@@ -9,15 +9,31 @@ import {
   markPdpViewRecorded,
   type ProductStats,
 } from "@/lib/product-stats";
+import { LIKE_COUNT_UPDATE_EVENT } from "@/lib/wishlist-storage";
 
 type ProductEngagementBarProps = {
+  productId: string;
   slug: string;
   initialStats: ProductStats;
 };
 
-export function ProductEngagementBar({ slug, initialStats }: ProductEngagementBarProps) {
+type LikeCountUpdateDetail = {
+  productId?: string;
+  likeCount?: number;
+  delta?: number;
+};
+
+export function ProductEngagementBar({
+  productId,
+  slug,
+  initialStats,
+}: ProductEngagementBarProps) {
   const t = useTranslations("pdp.engagement");
   const [stats, setStats] = useState(initialStats);
+
+  useEffect(() => {
+    setStats(initialStats);
+  }, [initialStats, productId]);
 
   useEffect(() => {
     if (hasRecordedPdpView(slug)) return;
@@ -34,16 +50,29 @@ export function ProductEngagementBar({ slug, initialStats }: ProductEngagementBa
       signal: controller.signal,
     })
       .then((res) => (res.ok ? res.json() : null))
-      .then((data: { viewCount?: number; waitingCount?: number } | null) => {
-        if (data?.viewCount != null || data?.waitingCount != null) {
-          setStats((prev) => ({
-            ...prev,
-            ...(data.viewCount != null ? { viewCount: data.viewCount } : {}),
-            ...(data.waitingCount != null ? { waitingCount: data.waitingCount } : {}),
-          }));
-        }
-        markPdpViewRecorded(slug);
-      })
+      .then(
+        (data: {
+          viewCount?: number;
+          waitingCount?: number;
+          likeCount?: number;
+        } | null) => {
+          if (
+            data?.viewCount != null ||
+            data?.waitingCount != null ||
+            data?.likeCount != null
+          ) {
+            setStats((prev) => ({
+              ...prev,
+              ...(data.viewCount != null ? { viewCount: data.viewCount } : {}),
+              ...(data.waitingCount != null
+                ? { waitingCount: data.waitingCount }
+                : {}),
+              ...(data.likeCount != null ? { likeCount: data.likeCount } : {}),
+            }));
+          }
+          markPdpViewRecorded(slug);
+        },
+      )
       .catch(() => {
         /* non-blocking — keep seeded stats */
       });
@@ -61,6 +90,28 @@ export function ProductEngagementBar({ slug, initialStats }: ProductEngagementBa
     window.addEventListener("mbody-waiting-count-update", onWaitingUpdate);
     return () => window.removeEventListener("mbody-waiting-count-update", onWaitingUpdate);
   }, [slug]);
+
+  useEffect(() => {
+    const onLikeUpdate = (event: Event) => {
+      const detail = (event as CustomEvent<LikeCountUpdateDetail>).detail;
+      if (!detail || detail.productId !== productId) return;
+
+      setStats((prev) => {
+        if (typeof detail.likeCount === "number") {
+          return { ...prev, likeCount: Math.max(0, detail.likeCount) };
+        }
+        if (typeof detail.delta === "number") {
+          return {
+            ...prev,
+            likeCount: Math.max(0, prev.likeCount + detail.delta),
+          };
+        }
+        return prev;
+      });
+    };
+    window.addEventListener(LIKE_COUNT_UPDATE_EVENT, onLikeUpdate);
+    return () => window.removeEventListener(LIKE_COUNT_UPDATE_EVENT, onLikeUpdate);
+  }, [productId]);
 
   const items = [
     {

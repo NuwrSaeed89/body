@@ -34,6 +34,7 @@ export type AdminLowStockAlert = {
   slug: string;
   stock: number;
   lowStockThreshold: number;
+  waitingCount: number;
   imageUrl: string | null;
   status: "low" | "out";
 };

@@ -2,6 +2,9 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { mapShippingRateRow, type DbShippingRate } from "./format";
 import type { ShippingRateDetail, ShippingRateWriteInput } from "./types";
 
+const SHIPPING_RATE_SELECT =
+  "id, carrier, service, zone_code, zone_label, countries, price_usd, eta_min_days, eta_max_days, is_active, sort_order";
+
 function toDetail(row: DbShippingRate): ShippingRateDetail {
   return {
     id: row.id,
@@ -10,7 +13,7 @@ function toDetail(row: DbShippingRate): ShippingRateDetail {
     zoneCode: row.zone_code,
     zoneLabel: row.zone_label,
     countries: row.countries ?? [],
-    priceSek: Number(row.price_sek ?? 0),
+    priceUsd: Number(row.price_usd ?? 0),
     etaMinDays: Number(row.eta_min_days ?? 0),
     etaMaxDays: Number(row.eta_max_days ?? 0),
     isActive: Boolean(row.is_active),
@@ -25,7 +28,7 @@ function toDbPayload(input: ShippingRateWriteInput) {
     zone_code: input.zoneCode,
     zone_label: input.zoneLabel,
     countries: input.countries,
-    price_sek: input.priceSek,
+    price_usd: input.priceUsd,
     eta_min_days: input.etaMinDays,
     eta_max_days: input.etaMaxDays,
     is_active: input.isActive,
@@ -42,9 +45,7 @@ export async function createShippingRate(
   const { data, error } = await supabase
     .from("shipping_rates")
     .insert(toDbPayload(input))
-    .select(
-      "id, carrier, service, zone_code, zone_label, countries, price_sek, eta_min_days, eta_max_days, is_active, sort_order",
-    )
+    .select(SHIPPING_RATE_SELECT)
     .single();
 
   if (error) throw error;
@@ -61,9 +62,7 @@ export async function updateShippingRate(
     .from("shipping_rates")
     .update(toDbPayload(input))
     .eq("id", id)
-    .select(
-      "id, carrier, service, zone_code, zone_label, countries, price_sek, eta_min_days, eta_max_days, is_active, sort_order",
-    )
+    .select(SHIPPING_RATE_SELECT)
     .single();
 
   if (error) throw error;
@@ -85,6 +84,15 @@ export function mapSupabaseShippingCrudError(error: unknown): string {
     if (code === "42P01") {
       return "shipping_rates table missing — run database/014_shipping_rates.sql";
     }
+  }
+  const message =
+    error && typeof error === "object" && "message" in error
+      ? String((error as { message: unknown }).message)
+      : error instanceof Error
+        ? error.message
+        : "";
+  if (message.toLowerCase().includes("price_usd") || message.toLowerCase().includes("price_sek")) {
+    return "Shipping price column mismatch — run database/017_shipping_rates_usd.sql";
   }
   if (error instanceof Error && error.message) return error.message;
   return "Could not save shipping rate.";

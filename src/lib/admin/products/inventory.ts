@@ -1,4 +1,8 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import {
+  findRestockedVariantIds,
+  scheduleWaitingListRestockNotify,
+} from "@/lib/waiting-list/notify-on-restock";
 import { getProductById } from "./crud";
 import { DEFAULT_COLOR_CODE, DEFAULT_SIZE_CODE } from "./constants";
 import { buildVariantSku } from "./variant-sku";
@@ -22,7 +26,7 @@ async function upsertDefaultVariantStock(
   productId: string,
   slug: string,
   stock: number,
-) {
+): Promise<string[]> {
   const { data: variants, error: listError } = await supabase
     .from("product_variants")
     .select("id, stock_quantity")
@@ -32,20 +36,31 @@ async function upsertDefaultVariantStock(
 
   if (listError) throw listError;
 
-  if (!variants?.length) {
-    const { sizeId, colorId } = await resolveDefaultSizeAndColor(supabase);
-    if (!sizeId || !colorId) return;
+  const previous = (variants ?? []).map((row) => ({
+    id: row.id as string,
+    stock_quantity: Number(row.stock_quantity ?? 0),
+  }));
 
-    const { error } = await supabase.from("product_variants").insert({
-      product_id: productId,
-      size_id: sizeId,
-      color_id: colorId,
-      sku: buildSku(slug),
-      stock_quantity: stock,
-      is_active: true,
-    });
+  if (!variants?.length) {
+    if (stock <= 0) return [];
+
+    const { sizeId, colorId } = await resolveDefaultSizeAndColor(supabase);
+    if (!sizeId || !colorId) return [];
+
+    const { data: inserted, error } = await supabase
+      .from("product_variants")
+      .insert({
+        product_id: productId,
+        size_id: sizeId,
+        color_id: colorId,
+        sku: buildSku(slug),
+        stock_quantity: stock,
+        is_active: true,
+      })
+      .select("id")
+      .single();
     if (error) throw error;
-    return;
+    return inserted?.id ? [inserted.id as string] : [];
   }
 
   if (variants.length === 1) {
@@ -54,10 +69,13 @@ async function upsertDefaultVariantStock(
       .update({ stock_quantity: stock })
       .eq("id", variants[0].id);
     if (error) throw error;
-    return;
+
+    return findRestockedVariantIds(previous, new Map([[variants[0].id as string, stock]]));
   }
 
   const currentTotal = variants.reduce((sum, variant) => sum + Number(variant.stock_quantity ?? 0), 0);
+  const nextById = new Map<string, number>();
+
   if (currentTotal <= 0) {
     const { error: resetError } = await supabase
       .from("product_variants")
@@ -71,7 +89,11 @@ async function upsertDefaultVariantStock(
       .update({ stock_quantity: stock })
       .eq("id", variants[0].id);
     if (error) throw error;
-    return;
+
+    for (const variant of variants) {
+      nextById.set(variant.id as string, variant.id === variants[0].id ? stock : 0);
+    }
+    return findRestockedVariantIds(previous, nextById);
   }
 
   let assigned = 0;
@@ -82,6 +104,7 @@ async function upsertDefaultVariantStock(
       ? Math.max(0, stock - assigned)
       : Math.round((Number(variant.stock_quantity) / currentTotal) * stock);
     assigned += nextQty;
+    nextById.set(variant.id as string, nextQty);
 
     const { error } = await supabase
       .from("product_variants")
@@ -89,6 +112,8 @@ async function upsertDefaultVariantStock(
       .eq("id", variant.id);
     if (error) throw error;
   }
+
+  return findRestockedVariantIds(previous, nextById);
 }
 
 export async function updateProductInventory(
@@ -116,7 +141,19 @@ export async function updateProductInventory(
   }
 
   if (input.stock !== undefined) {
-    await upsertDefaultVariantStock(supabase, id, existing.slug, input.stock);
+    const restockedVariantIds = await upsertDefaultVariantStock(
+      supabase,
+      id,
+      existing.slug,
+      input.stock,
+    );
+    if (restockedVariantIds.length > 0) {
+      scheduleWaitingListRestockNotify({
+        productId: id,
+        restockedVariantIds,
+        locale,
+      });
+    }
   }
 
   const detail = await getProductById(id, locale);

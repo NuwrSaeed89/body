@@ -19,6 +19,7 @@ function activeKey(pathname: string): AdminNavKey {
   if (pathname.startsWith("/admin/categories")) return "categories";
   if (pathname.startsWith("/admin/discounts")) return "discounts";
   if (pathname.startsWith("/admin/shipping")) return "shipping";
+  if (pathname.startsWith("/admin/waiting-list")) return "waiting-list";
   if (pathname.startsWith("/admin/media")) return "media";
 
   if (pathname.startsWith("/admin/customers")) return "customers";

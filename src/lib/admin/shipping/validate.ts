@@ -64,9 +64,11 @@ export function parseShippingRateWriteBody(
   const countries = readCountries(raw.countries);
   if (!countries.ok) return countries;
 
-  const priceSek = Number(raw.priceSek);
-  if (!Number.isFinite(priceSek) || priceSek < 0) {
-    return { ok: false, error: "Price must be a number ≥ 0 (SEK)" };
+  const priceUsd = Number(
+    raw.priceUsd !== undefined ? raw.priceUsd : raw.priceSek,
+  );
+  if (!Number.isFinite(priceUsd) || priceUsd < 0) {
+    return { ok: false, error: "Price must be a number ≥ 0 (USD)" };
   }
 
   const etaMinDays = Number(raw.etaMinDays);
@@ -91,7 +93,7 @@ export function parseShippingRateWriteBody(
       zoneCode: zoneCode.value.toUpperCase().replace(/[^A-Z0-9_]/g, "_"),
       zoneLabel: zoneLabel.value,
       countries: countries.value,
-      priceSek,
+      priceUsd,
       etaMinDays,
       etaMaxDays,
       isActive: raw.isActive !== false,

@@ -5,6 +5,7 @@ export type AdminNavKey =
   | "categories"
   | "discounts"
   | "shipping"
+  | "waiting-list"
   | "media"
   | "customers"
   | "settings";
@@ -20,6 +21,7 @@ export type AdminNavItem = {
     | "/admin/categories"
     | "/admin/discounts"
     | "/admin/shipping"
+    | "/admin/waiting-list"
     | "/admin/media"
     | "/admin/customers"
     | "/admin/settings";
@@ -49,6 +51,13 @@ export const ADMIN_NAV: AdminNavItem[] = [
     label: "Shipping",
     icon: "local_shipping",
     href: "/admin/shipping",
+    enabled: true,
+  },
+  {
+    key: "waiting-list",
+    label: "Waiting List",
+    icon: "notifications_active",
+    href: "/admin/waiting-list",
     enabled: true,
   },
   { key: "media", label: "Media", icon: "perm_media", href: "/admin/media", enabled: true },

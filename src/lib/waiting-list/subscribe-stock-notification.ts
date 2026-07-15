@@ -30,16 +30,6 @@ export async function subscribeStockNotification(
     };
   }
 
-  const mockProduct = getProductBySlug(input.slug);
-  if (mockProduct && mockProduct.id !== input.productId) {
-    return {
-      ok: false,
-      alreadySubscribed: false,
-      waitingCount: 0,
-      error: "product_not_found",
-    };
-  }
-
   if (!input.productId?.trim()) {
     return {
       ok: false,
@@ -57,7 +47,18 @@ export async function subscribeStockNotification(
       color: input.color,
     });
 
+  // Mock catalog uses slug-as-id; live Supabase uses UUIDs — only validate IDs in mock mode.
   if (publicEnv.useMockData || !hasSupabaseConfig()) {
+    const mockProduct = getProductBySlug(input.slug);
+    if (mockProduct && mockProduct.id !== input.productId) {
+      return {
+        ok: false,
+        alreadySubscribed: false,
+        waitingCount: 0,
+        error: "product_not_found",
+      };
+    }
+
     const { alreadySubscribed } = addMockStockNotification({
       email,
       productId: input.productId,

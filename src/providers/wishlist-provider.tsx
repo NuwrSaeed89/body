@@ -13,6 +13,7 @@ import {
   readWishlist,
   WISHLIST_CHANGE_EVENT,
   writeWishlist,
+  dispatchLikeCountUpdate,
 } from "@/lib/wishlist-storage";
 import { publicEnv } from "@/lib/env";
 import { useAuth } from "@/providers/auth-provider";
@@ -107,13 +108,20 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
           body: JSON.stringify({ productId }),
         });
         if (!response.ok) throw new Error("add failed");
-        const body = (await response.json()) as { productIds?: string[] };
+        const body = (await response.json()) as {
+          productIds?: string[];
+          likeCount?: number;
+        };
         if (Array.isArray(body.productIds)) {
           persistLocal(body.productIds);
+        }
+        if (typeof body.likeCount === "number") {
+          dispatchLikeCountUpdate(productId, { likeCount: body.likeCount });
         }
       } catch {
         // Rollback optimistic local add on failure.
         persistLocal(readWishlist(user.id).filter((id) => id !== productId));
+        dispatchLikeCountUpdate(productId, { delta: -1 });
       }
     },
     [live, user, persistLocal],
@@ -128,15 +136,22 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
           { method: "DELETE", credentials: "include" },
         );
         if (!response.ok) throw new Error("remove failed");
-        const body = (await response.json()) as { productIds?: string[] };
+        const body = (await response.json()) as {
+          productIds?: string[];
+          likeCount?: number;
+        };
         if (Array.isArray(body.productIds)) {
           persistLocal(body.productIds);
+        }
+        if (typeof body.likeCount === "number") {
+          dispatchLikeCountUpdate(productId, { likeCount: body.likeCount });
         }
       } catch {
         const current = readWishlist(user.id);
         if (!current.includes(productId)) {
           persistLocal([...current, productId]);
         }
+        dispatchLikeCountUpdate(productId, { delta: 1 });
       }
     },
     [live, user, persistLocal],
@@ -148,20 +163,26 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
       if (productIds.includes(productId)) return true;
       const next = [...productIds, productId];
       persistLocal(next);
-      void syncAdd(productId);
+      dispatchLikeCountUpdate(productId, { delta: 1 });
+      if (live) {
+        void syncAdd(productId);
+      }
       return true;
     },
-    [isAuthenticated, user, productIds, persistLocal, syncAdd],
+    [isAuthenticated, user, productIds, persistLocal, syncAdd, live],
   );
 
   const remove = useCallback(
     (productId: string) => {
       if (!isAuthenticated || !user) return false;
       persistLocal(productIds.filter((id) => id !== productId));
-      void syncRemove(productId);
+      dispatchLikeCountUpdate(productId, { delta: -1 });
+      if (live) {
+        void syncRemove(productId);
+      }
       return true;
     },
-    [isAuthenticated, user, productIds, persistLocal, syncRemove],
+    [isAuthenticated, user, productIds, persistLocal, syncRemove, live],
   );
 
   const toggle = useCallback(

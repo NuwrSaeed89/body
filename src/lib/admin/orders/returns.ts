@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { scheduleWaitingListRestockNotify } from "@/lib/waiting-list/notify-on-restock";
 
 type ReturnStatus = "pending" | "approved" | "rejected";
 
@@ -106,13 +107,14 @@ export async function approveOrderReturn(input: ApproveReturnInput) {
 
   const { data: variant, error: variantError } = await supabase
     .from("product_variants")
-    .select("id, stock_quantity")
+    .select("id, product_id, stock_quantity")
     .eq("id", row.variant_id)
     .maybeSingle();
   if (variantError) throw variantError;
   if (!variant) throw new Error("Variant not found for return item");
 
-  const nextStock = Number((variant as { stock_quantity: number }).stock_quantity ?? 0) + row.quantity;
+  const previousStock = Number((variant as { stock_quantity: number }).stock_quantity ?? 0);
+  const nextStock = previousStock + row.quantity;
   const { error: stockError } = await supabase
     .from("product_variants")
     .update({ stock_quantity: nextStock })
@@ -134,6 +136,14 @@ export async function approveOrderReturn(input: ApproveReturnInput) {
     .maybeSingle();
   if (approveError) throw approveError;
   if (!approved) throw new Error("Return was updated by another admin; try again");
-  
+
+  if (previousStock <= 0 && nextStock > 0) {
+    const productId = String((variant as { product_id: string }).product_id);
+    scheduleWaitingListRestockNotify({
+      productId,
+      restockedVariantIds: [row.variant_id],
+    });
+  }
+
   return approved as DbReturn;
 }

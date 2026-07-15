@@ -203,7 +203,11 @@ export function ProductPurchasePanel({ product, initialRatingSummary }: ProductP
       </div>
 
       <div className="rounded-lg border border-outline-variant/30 bg-surface-container-low p-4">
-        <ProductEngagementBar slug={product.slug} initialStats={product.stats} />
+        <ProductEngagementBar
+          productId={product.id}
+          slug={product.slug}
+          initialStats={product.stats}
+        />
       </div>
 
       <div className="space-y-5">

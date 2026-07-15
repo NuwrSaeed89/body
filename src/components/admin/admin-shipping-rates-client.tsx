@@ -10,6 +10,7 @@ import type {
 } from "@/lib/admin/shipping/types";
 import { adminCardToolbarClass } from "./admin-layout-styles";
 import { AdminConfirmDialog } from "./admin-confirm-dialog";
+import { AdminPageHeader } from "./admin-page-header";
 import { AdminShippingRateFormModal } from "./admin-shipping-rate-form-modal";
 import {
   AdminShippingRatesTable,
@@ -18,7 +19,9 @@ import {
 
 type AdminShippingRatesClientProps = {
   rates: AdminShippingRateRow[];
+  source: "supabase" | "mock";
   canMutate: boolean;
+  loadError?: string | null;
 };
 
 function rowToDetail(rate: AdminShippingRateRow): ShippingRateDetail {
@@ -29,7 +32,7 @@ function rowToDetail(rate: AdminShippingRateRow): ShippingRateDetail {
     zoneCode: rate.zoneCode,
     zoneLabel: rate.zoneLabel,
     countries: rate.countries,
-    priceSek: rate.priceSek,
+    priceUsd: rate.priceUsd,
     etaMinDays: rate.etaMinDays,
     etaMaxDays: rate.etaMaxDays,
     isActive: rate.isActive,
@@ -39,7 +42,9 @@ function rowToDetail(rate: AdminShippingRateRow): ShippingRateDetail {
 
 export function AdminShippingRatesClient({
   rates,
+  source,
   canMutate,
+  loadError = null,
 }: AdminShippingRatesClientProps) {
   const router = useRouter();
   const [formOpen, setFormOpen] = useState(false);
@@ -72,8 +77,9 @@ export function AdminShippingRatesClient({
     });
   }, [rates, searchQuery, carrierFilter, serviceFilter, statusFilter]);
 
-  const emptyMessage =
-    rates.length === 0
+  const emptyMessage = loadError
+    ? "Shipping rates could not be loaded."
+    : rates.length === 0
       ? "No shipping rates yet. Add PostNord / DHL zones for Europe."
       : "No shipping rates match your filters.";
 
@@ -112,15 +118,13 @@ export function AdminShippingRatesClient({
 
   return (
     <>
-      <section className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
-        <div className="min-w-0">
-          <h2 className="mb-1 text-xl font-medium tracking-tight text-primary sm:text-2xl">
-            Shipping Rates
-          </h2>
-          <p className="max-w-2xl text-sm leading-relaxed text-on-surface-variant sm:text-base">
-            PostNord and DHL zones for Europe — price (SEK), ETA, and country coverage.
-          </p>
-        </div>
+      <AdminPageHeader
+        title="Shipping Rates"
+        description="PostNord and DHL zones for Europe — price (USD), ETA, and country coverage."
+        source={source}
+        count={rates.length}
+        countLabel="rates"
+      >
         {canMutate ? (
           <button
             type="button"
@@ -130,12 +134,20 @@ export function AdminShippingRatesClient({
             <span className="material-symbols-outlined text-[18px]">add</span>
             Add Rate
           </button>
-        ) : (
-          <p className="text-sm text-on-surface-variant">
-            Enable live Supabase to create, edit, or delete shipping rates.
-          </p>
-        )}
-      </section>
+        ) : null}
+      </AdminPageHeader>
+
+      {loadError && (
+        <p className="mb-4 rounded-lg border border-error/30 bg-error/10 px-4 py-3 text-sm text-error">
+          {loadError}
+        </p>
+      )}
+
+      {!canMutate && !loadError && source === "mock" && (
+        <p className="mb-4 rounded-lg border border-outline-variant bg-surface-container-high px-4 py-3 text-sm text-on-surface-variant">
+          Enable live Supabase to create, edit, or delete shipping rates.
+        </p>
+      )}
 
       {actionError && (
         <p className="mb-4 rounded-lg border border-outline-variant bg-surface-container-high px-4 py-3 text-sm text-primary">

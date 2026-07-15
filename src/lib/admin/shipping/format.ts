@@ -1,3 +1,4 @@
+import { ADMIN_DISPLAY_CURRENCY } from "@/lib/currency";
 import { formatAdminAmount } from "@/lib/admin/format";
 import type {
   AdminShippingRateRow,
@@ -12,7 +13,7 @@ export type DbShippingRate = {
   zone_code: string;
   zone_label: string;
   countries: string[] | null;
-  price_sek: number;
+  price_usd: number;
   eta_min_days: number;
   eta_max_days: number;
   is_active: boolean;
@@ -33,6 +34,7 @@ export function mapShippingRateRow(row: DbShippingRate, locale: string): AdminSh
   const countries = row.countries ?? [];
   const etaMin = Number(row.eta_min_days ?? 0);
   const etaMax = Number(row.eta_max_days ?? 0);
+  const priceUsd = Number(row.price_usd ?? 0);
 
   return {
     id: row.id,
@@ -44,8 +46,8 @@ export function mapShippingRateRow(row: DbShippingRate, locale: string): AdminSh
     zoneLabel: row.zone_label,
     countries,
     countriesLabel: countries.join(", "),
-    priceSek: Number(row.price_sek ?? 0),
-    priceLabel: formatAdminAmount(Number(row.price_sek ?? 0), locale, "SEK"),
+    priceUsd,
+    priceLabel: formatAdminAmount(priceUsd, locale, ADMIN_DISPLAY_CURRENCY),
     etaMinDays: etaMin,
     etaMaxDays: etaMax,
     etaLabel: etaMin === etaMax ? `${etaMin}d` : `${etaMin}–${etaMax}d`,

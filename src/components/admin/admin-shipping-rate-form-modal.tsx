@@ -19,7 +19,7 @@ type ShippingRateFormValues = {
   zoneCode: string;
   zoneLabel: string;
   countries: string;
-  priceSek: string;
+  priceUsd: string;
   etaMinDays: string;
   etaMaxDays: string;
   sortOrder: string;
@@ -41,7 +41,7 @@ const EMPTY_FORM: ShippingRateFormValues = {
   zoneCode: "",
   zoneLabel: "",
   countries: "",
-  priceSek: "79",
+  priceUsd: "8",
   etaMinDays: "2",
   etaMaxDays: "5",
   sortOrder: "0",
@@ -56,7 +56,7 @@ function toFormValues(rate?: ShippingRateDetail | null): ShippingRateFormValues 
     zoneCode: rate.zoneCode,
     zoneLabel: rate.zoneLabel,
     countries: rate.countries.join(", "),
-    priceSek: String(rate.priceSek),
+    priceUsd: String(rate.priceUsd),
     etaMinDays: String(rate.etaMinDays),
     etaMaxDays: String(rate.etaMaxDays),
     sortOrder: String(rate.sortOrder),
@@ -127,7 +127,7 @@ export function AdminShippingRateFormModal({
       zoneCode: form.zoneCode,
       zoneLabel: form.zoneLabel,
       countries: form.countries,
-      priceSek: Number(form.priceSek),
+      priceUsd: Number(form.priceUsd),
       etaMinDays: Number(form.etaMinDays),
       etaMaxDays: Number(form.etaMaxDays),
       sortOrder: Number(form.sortOrder),
@@ -303,7 +303,7 @@ export function AdminShippingRateFormModal({
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className={adminLabelClassName} htmlFor="shipping-price">
-                  Price (SEK)
+                  Price (USD)
                 </label>
                 <input
                   id="shipping-price"
@@ -312,8 +312,8 @@ export function AdminShippingRateFormModal({
                   step="0.01"
                   required
                   disabled={!canMutate}
-                  value={form.priceSek}
-                  onChange={(event) => updateField("priceSek", event.target.value)}
+                  value={form.priceUsd}
+                  onChange={(event) => updateField("priceUsd", event.target.value)}
                   className={adminFieldClassName}
                 />
               </div>
