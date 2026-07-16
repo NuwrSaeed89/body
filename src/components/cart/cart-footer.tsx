@@ -3,11 +3,11 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LEGAL_PATHS } from "@/lib/legal-pages";
+import { NewsletterSignupForm } from "@/components/newsletter/newsletter-signup-form";
 
 export function CartFooter() {
   const t = useTranslations("cart");
   const footer = useTranslations("footer");
-  const newsletter = useTranslations("newsletter");
 
   return (
     <footer className="mt-20 border-t border-outline-variant/20 bg-surface-container-low py-16">
@@ -33,7 +33,10 @@ export function CartFooter() {
           >
             {footer("links.collections")}
           </Link>
-          <Link href="#" className="text-sm text-secondary transition-all hover:text-primary">
+          <Link
+            href="/size-guide"
+            className="text-sm text-secondary transition-all hover:text-primary"
+          >
             {t("nav.sizeGuide")}
           </Link>
         </div>
@@ -57,17 +60,7 @@ export function CartFooter() {
           <h5 className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">
             {footer("connect")}
           </h5>
-          <div className="relative">
-            <input
-              type="email"
-              placeholder={newsletter("emailLabel")}
-              className="w-full border-b border-outline-variant bg-transparent py-2 text-sm transition-colors focus:border-primary focus:outline-none"
-              aria-label={newsletter("emailLabel")}
-            />
-            <button type="button" className="absolute bottom-2 right-0" aria-hidden>
-              <span className="material-symbols-outlined text-primary">arrow_forward</span>
-            </button>
-          </div>
+          <NewsletterSignupForm source="cart" variant="cart" />
           <p className="mt-4 text-[10px] uppercase tracking-wider text-secondary">
             {t("footerNewsletterHint")}
           </p>

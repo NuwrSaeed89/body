@@ -8,9 +8,12 @@ import { ProductRatingHeader } from "@/components/pdp/product-rating-header";
 import { ProductRatingsSection } from "@/components/pdp/product-ratings-section";
 import { FormattedPrice } from "@/components/ui/formatted-price";
 import { NotifyWhenBackForm } from "@/components/stock-notify/notify-when-back-form";
+import { SmartSizeGuideBanner } from "@/components/size-guide/smart-size-guide-banner";
+import { SmartSizeGuideDialog } from "@/components/size-guide/smart-size-guide-dialog";
 import { WishlistToggleButton } from "@/components/wishlist/wishlist-toggle-button";
 import type { ProductDetail } from "@/lib/shop-data";
 import type { ProductRatingSummary } from "@/lib/product-ratings/types";
+import type { MbodySize } from "@/lib/size-guide";
 import { useAuth } from "@/providers/auth-provider";
 import { useCart } from "@/providers/cart-provider";
 
@@ -113,6 +116,7 @@ export function ProductPurchasePanel({ product, initialRatingSummary }: ProductP
   const [selectedColor, setSelectedColor] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [wishlistFeedback, setWishlistFeedback] = useState<string | null>(null);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [tab, setTab] = useState<DetailTab>("fabric");
   const [timerText, setTimerText] = useState("03:00:00");
   const selectedColorName = product.colors[selectedColor]?.name ?? null;
@@ -162,6 +166,12 @@ export function ProductPurchasePanel({ product, initialRatingSummary }: ProductP
 
   const onAddToBag = () => {
     void handleAddToBag(selectedVariantId, quantity);
+  };
+
+  const onApplyRecommendedSize = (size: MbodySize) => {
+    if (product.sizes.includes(size)) {
+      setSelectedSize(size);
+    }
   };
 
   const tabContent =
@@ -240,6 +250,7 @@ export function ProductPurchasePanel({ product, initialRatingSummary }: ProductP
             </span>
             <button
               type="button"
+              onClick={() => setSizeGuideOpen(true)}
               className="text-[11px] font-semibold uppercase tracking-[0.1em] text-secondary underline underline-offset-4"
             >
               {t("sizeGuide")}
@@ -389,6 +400,15 @@ export function ProductPurchasePanel({ product, initialRatingSummary }: ProductP
           <span className="material-symbols-outlined text-[18px]">info</span>
         </button>
       </div>
+
+      <SmartSizeGuideBanner onOpen={() => setSizeGuideOpen(true)} />
+
+      <SmartSizeGuideDialog
+        open={sizeGuideOpen}
+        onClose={() => setSizeGuideOpen(false)}
+        availableSizes={product.sizes}
+        onApplySize={onApplyRecommendedSize}
+      />
 
       <section className="border-t border-outline-variant/30 pt-8">
         <div className="mb-5 flex gap-8 border-b border-outline-variant/30">

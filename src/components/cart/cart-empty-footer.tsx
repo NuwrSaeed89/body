@@ -3,11 +3,11 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LEGAL_PATHS } from "@/lib/legal-pages";
+import { NewsletterSignupForm } from "@/components/newsletter/newsletter-signup-form";
 
 export function CartEmptyFooter() {
   const t = useTranslations("cart");
   const footer = useTranslations("footer");
-  const newsletter = useTranslations("newsletter");
 
   return (
     <footer className="hidden w-full border-t border-outline-variant/30 bg-surface-container-low py-16 md:block">
@@ -84,16 +84,7 @@ export function CartEmptyFooter() {
             {footer("connect")}
           </h4>
           <p className="text-sm text-secondary">{t("empty.newsletterHint")}</p>
-          <div className="relative mt-2">
-            <input
-              type="email"
-              placeholder={newsletter("emailLabel")}
-              className="w-full border-b border-outline-variant bg-transparent py-2 text-sm transition-colors focus:border-primary focus:outline-none"
-            />
-            <button type="button" className="absolute bottom-2 right-0" aria-hidden>
-              <span className="material-symbols-outlined text-sm text-primary">arrow_forward</span>
-            </button>
-          </div>
+          <NewsletterSignupForm source="cart-empty" variant="cart" className="mt-2" />
         </div>
       </div>
 

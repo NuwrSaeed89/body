@@ -139,7 +139,30 @@
     "description": "Sé la primera en acceder a nuestros nuevos lanzamientos y recibe información exclusiva sobre el futuro del performance wear.",
     "emailLabel": "Correo electrónico",
     "placeholder": "Tu correo electrónico",
-    "subscribe": "Suscribirse"
+    "subscribe": "Suscribirse",
+    "submitting": "Suscribiendo…",
+    "consent": "Acepto recibir newsletters y correos de marketing de Mbody.",
+    "privacyLink": "Política de privacidad",
+    "consentRequired": "Acepta los correos de marketing antes de suscribirte.",
+    "success": "Ya estás en la lista — bienvenida al movimiento.",
+    "pendingConfirmation": "Revisa tu bandeja de entrada — enviamos un enlace de confirmación para completar tu suscripción.",
+    "alreadySubscribed": "Ya estás suscrita.",
+    "invalidEmail": "Introduce un correo válido.",
+    "error": "No se pudo suscribir ahora. Inténtalo de nuevo.",
+    "confirm": {
+      "metaTitle": "Confirmar suscripción al newsletter",
+      "metaDescription": "Confirma tu suscripción al newsletter de Mbody.",
+      "successTitle": "Suscripción confirmada",
+      "successDescription": "Ya estás en la lista. Bienvenida al movimiento.",
+      "alreadyTitle": "Ya confirmada",
+      "alreadyDescription": "Esta dirección de correo ya está suscrita al newsletter de Mbody.",
+      "invalidTitle": "Enlace de confirmación no válido",
+      "invalidDescription": "Este enlace de confirmación no es válido o ya se utilizó.",
+      "expiredTitle": "Enlace de confirmación caducado",
+      "expiredDescription": "Este enlace ha caducado. Suscríbete de nuevo para recibir un nuevo correo de confirmación.",
+      "backHome": "Volver al inicio",
+      "shopCta": "Comprar ahora"
+    }
   },
   "cookieConsent": {
     "ariaLabel": "Consentimiento de cookies",
@@ -291,6 +314,81 @@
       "exitFullscreen": "Salir de pantalla completa"
     }
   },
+  "sizeGuide": {
+    "metaTitle": "Guía de tallas | Mbody",
+    "metaDescription": "Encuentra tu talla Mbody según altura, peso y tipo de cuerpo con nuestra tabla Smart Size.",
+    "eyebrow": "Mbody Smart Size™",
+    "title": "Encuentra tu talla",
+    "subtitle": "Responde tres preguntas rápidas para una recomendación según nuestra tabla de tallas.",
+    "close": "Cerrar guía de tallas",
+    "submit": "Obtener mi talla",
+    "units": {
+      "metric": "Métrico",
+      "imperial": "Imperial"
+    },
+    "fields": {
+      "height": "Altura",
+      "heightInches": "Pulgadas",
+      "weight": "Peso",
+      "bodyType": "Tipo de cuerpo"
+    },
+    "bodyTypes": {
+      "slim": {
+        "label": "Delgado",
+        "hint": "Silueta fina"
+      },
+      "athletic": {
+        "label": "Atlético",
+        "hint": "Músculo definido"
+      },
+      "curvy": {
+        "label": "Curvy",
+        "hint": "Caderas más llenas"
+      }
+    },
+    "errors": {
+      "invalid": "Introduce una altura y un peso válidos.",
+      "outOfRange": "Esas medidas están fuera del rango de nuestra tabla. Prueba valores dentro de la tabla.",
+      "noMatch": "No pudimos encontrar una talla para este producto. Consulta la tabla abajo."
+    },
+    "result": {
+      "eyebrow": "Talla recomendada",
+      "notes": {
+        "true_to_size": "Fiel a nuestra tabla para tu perfil.",
+        "size_down": "Bajamos un poco de talla para un ajuste de compresión más ceñido.",
+        "size_up": "Subimos un poco de talla para más comodidad en caderas y muslos.",
+        "between_sizes": "Estás entre tallas — prueba ambas si dudas."
+      },
+      "confidence": {
+        "high": "Alta confianza",
+        "medium": "Buena coincidencia",
+        "low": "Coincidencia aproximada — verifica con la tabla"
+      },
+      "alternate": "También considera {size}",
+      "apply": "Seleccionar talla {size}"
+    },
+    "chart": {
+      "title": "Tabla de tallas",
+      "subtitle": "Mujer · ajuste performance · cm / kg",
+      "size": "Talla",
+      "height": "Altura (cm)",
+      "weight": "Peso (kg)",
+      "bust": "Busto (cm)",
+      "waist": "Cintura (cm)",
+      "hip": "Cadera (cm)",
+      "disclaimer": "Esta tabla es un punto de partida. El stretch del tejido y la compresión deseada pueden variar — si estás entre tallas, elige según tu preferencia."
+    },
+    "banner": {
+      "title": "Mbody Smart Size™",
+      "description": "Obtén tu recomendación de talla perfecta según tu perfil en menos de 30 segundos.",
+      "cta": "Encontrar mi talla"
+    },
+    "page": {
+      "title": "Guía de tallas",
+      "description": "Usa Smart Size para una recomendación personal, o compárate con la tabla completa de Mbody abajo.",
+      "shopCta": "Seguir comprando"
+    }
+  },
   "newDrops": {
     "eyebrow": "Lanzamiento de temporada",
     "title": "Novedades",
@@ -363,6 +461,7 @@
       "cod": "Contra reembolso",
       "codDescription": "Paga al recibir el pedido",
       "card": "Tarjeta",
+      "cardPendingDescription": "El pedido se guarda como pago pendiente hasta que se conecte la pasarela de tarjeta.",
       "cardSoon": "Próximamente",
       "billing": "Facturación",
       "sameAsShipping": "Igual que la dirección de envío",

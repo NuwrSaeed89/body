@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { NewsletterSignupForm } from "@/components/newsletter/newsletter-signup-form";
 
 export async function NewsletterSection() {
   const t = await getTranslations("newsletter");
@@ -13,19 +14,11 @@ export async function NewsletterSection() {
           {t("description")}
         </p>
 
-        <form className="mx-auto flex max-w-md gap-0 border-b border-white/30 pb-2 transition-colors focus-within:border-white">
-          <input
-            type="email"
-            placeholder={t("placeholder")}
-            className="w-full border-none bg-transparent text-xs font-semibold uppercase tracking-[0.1em] placeholder:text-white/40 focus:ring-0"
-          />
-          <button
-            type="submit"
-            className="px-4 text-xs font-semibold uppercase tracking-[0.1em]"
-          >
-            {t("subscribe")}
-          </button>
-        </form>
+        <NewsletterSignupForm
+          source="homepage"
+          variant="hero"
+          className="mx-auto max-w-md text-left"
+        />
       </div>
     </section>
   );

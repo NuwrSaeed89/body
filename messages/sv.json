@@ -139,7 +139,30 @@
     "description": "Var först med att få tillgång till nya släpp och exklusiva insikter om framtidens performance wear.",
     "emailLabel": "E-postadress",
     "placeholder": "Din e-postadress",
-    "subscribe": "Prenumerera"
+    "subscribe": "Prenumerera",
+    "submitting": "Prenumererar…",
+    "consent": "Jag godkänner att få nyhetsbrev och marknadsföringsmejl från Mbody.",
+    "privacyLink": "Integritetspolicy",
+    "consentRequired": "Godkänn marknadsföringsmejl innan du prenumererar.",
+    "success": "Du är med på listan — välkommen till rörelsen.",
+    "pendingConfirmation": "Kolla din inkorg — vi skickade en bekräftelselänk för att slutföra prenumerationen.",
+    "alreadySubscribed": "Du prenumererar redan.",
+    "invalidEmail": "Ange en giltig e-postadress.",
+    "error": "Kunde inte prenumerera just nu. Försök igen.",
+    "confirm": {
+      "metaTitle": "Bekräfta nyhetsbrevsprenumeration",
+      "metaDescription": "Bekräfta din prenumeration på Mbody-nyhetsbrevet.",
+      "successTitle": "Prenumeration bekräftad",
+      "successDescription": "Du är med på listan. Välkommen till rörelsen.",
+      "alreadyTitle": "Redan bekräftad",
+      "alreadyDescription": "Den här e-postadressen prenumererar redan på Mbody-nyhetsbrevet.",
+      "invalidTitle": "Ogiltig bekräftelselänk",
+      "invalidDescription": "Bekräftelselänken är ogiltig eller har redan använts.",
+      "expiredTitle": "Bekräftelselänken har gått ut",
+      "expiredDescription": "Länken har gått ut. Prenumerera igen för att få ett nytt bekräftelsemejl.",
+      "backHome": "Till startsidan",
+      "shopCta": "Handla nu"
+    }
   },
   "cookieConsent": {
     "ariaLabel": "Cookie-samtycke",
@@ -291,6 +314,81 @@
       "exitFullscreen": "Avsluta helskärm"
     }
   },
+  "sizeGuide": {
+    "metaTitle": "Storleksguide | Mbody",
+    "metaDescription": "Hitta din Mbody-storlek utifrån längd, vikt och kroppstyp med vår Smart Size-tabell.",
+    "eyebrow": "Mbody Smart Size™",
+    "title": "Hitta din storlek",
+    "subtitle": "Svara på tre korta frågor för en passformsrekommendation från vår storlekstabell.",
+    "close": "Stäng storleksguiden",
+    "submit": "Hämta min storlek",
+    "units": {
+      "metric": "Metriskt",
+      "imperial": "Imperial"
+    },
+    "fields": {
+      "height": "Längd",
+      "heightInches": "Tum",
+      "weight": "Vikt",
+      "bodyType": "Kroppstyp"
+    },
+    "bodyTypes": {
+      "slim": {
+        "label": "Smal",
+        "hint": "Smal ram"
+      },
+      "athletic": {
+        "label": "Atletisk",
+        "hint": "Markerad muskulatur"
+      },
+      "curvy": {
+        "label": "Kurvig",
+        "hint": "Fylligare höfter"
+      }
+    },
+    "errors": {
+      "invalid": "Ange en giltig längd och vikt.",
+      "outOfRange": "Måtten ligger utanför vår tabell. Prova värden inom storlekstabellen.",
+      "noMatch": "Vi kunde inte matcha en storlek för den här produkten. Se tabellen nedan."
+    },
+    "result": {
+      "eyebrow": "Rekommenderad storlek",
+      "notes": {
+        "true_to_size": "Enligt vår tabell för din profil.",
+        "size_down": "Vi gick lite ner i storlek för en tajtare kompressionspassform.",
+        "size_up": "Vi gick lite upp i storlek för mer komfort över höfter och lår.",
+        "between_sizes": "Du ligger mellan storlekar — prova båda om du är osäker."
+      },
+      "confidence": {
+        "high": "Hög träffsäkerhet",
+        "medium": "Bra matchning",
+        "low": "Ungefärlig matchning — kontrollera tabellen"
+      },
+      "alternate": "Överväg också {size}",
+      "apply": "Välj storlek {size}"
+    },
+    "chart": {
+      "title": "Storlekstabell",
+      "subtitle": "Dam · performance-passform · cm / kg",
+      "size": "Storlek",
+      "height": "Längd (cm)",
+      "weight": "Vikt (kg)",
+      "bust": "Byst (cm)",
+      "waist": "Midja (cm)",
+      "hip": "Höft (cm)",
+      "disclaimer": "Tabellen är en utgångspunkt. Tygets stretch och önskad kompression kan variera — vid mellanstorlek, välj efter preferens."
+    },
+    "banner": {
+      "title": "Mbody Smart Size™",
+      "description": "Få din perfekta storleksrekommendation utifrån din profil på under 30 sekunder.",
+      "cta": "Hitta min storlek"
+    },
+    "page": {
+      "title": "Storleksguide",
+      "description": "Använd Smart Size för en personlig rekommendation, eller jämför dig med hela Mbody-tabellen nedan.",
+      "shopCta": "Fortsätt handla"
+    }
+  },
   "newDrops": {
     "eyebrow": "Säsongslansering",
     "title": "Nya drops",
@@ -363,6 +461,7 @@
       "cod": "Postförskott",
       "codDescription": "Betala vid leverans",
       "card": "Kort",
+      "cardPendingDescription": "Ordern sparas som väntande betalning tills kortgatewayen är ansluten.",
       "cardSoon": "Kommer snart",
       "billing": "Fakturering",
       "sameAsShipping": "Samma som leveransadress",

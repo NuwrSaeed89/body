@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { ImageWithShimmer as Image } from "@/components/ui/image-with-shimmer";
 import { useTranslations } from "next-intl";
 import { FormattedPrice } from "@/components/ui/formatted-price";
 import { ProductCardWishlistAction } from "@/components/product/product-card-wishlist-action";
@@ -53,6 +53,7 @@ export function ShopGridCard({ product }: ShopGridCardProps) {
             isOutOfStock ? "grayscale-[0.3]" : ""
           }`}
           sizes="(max-width: 768px) 50vw, 25vw"
+          quality={75}
         />
         {!isOutOfStock && (
           <div className="absolute left-3 top-3">

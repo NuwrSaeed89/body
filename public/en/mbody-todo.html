@@ -157,6 +157,17 @@
       font-size: 0.75rem; color: var(--muted); margin-bottom: 0.65rem;
     }
     .phase-progress strong { color: var(--accent); }
+    .phase-client-note {
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: #f87171;
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      margin-bottom: 0.85rem;
+    }
+    .phase-client-note strong { color: #fca5a5; font-weight: 600; }
     .global-progress {
       font-size: 0.75rem; color: var(--muted); padding: 0.35rem 0.75rem;
       background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
@@ -875,11 +886,15 @@
         deliverables: { en: "Admin panel on staging with full product/order management", ar: "لوحة أدمن على staging بإدارة منتجات/طلبات كاملة" }
       },
       {
-        id: "p6", week: "Week 6", tag: "mvp",
+        id: "p6", week: { en: "Complete", ar: "مكتمل" }, tag: "done",
         title: { en: "Phase 6 — Shipping & Waiting List", ar: "المرحلة 6 — الشحن وقائمة الانتظار" },
         objective: {
           en: "Carriers, waiting list notifications, newsletter integration.",
           ar: "شركات الشحن، إشعارات قائمة الانتظار، تكامل النشرة."
+        },
+        clientNote: {
+          en: "<strong>Client action required:</strong> Choose newsletter platform — Klaviyo or Mailchimp — and provide API keys + list ID before live ESP sync. Code is ready; sync stays pending until client selects.",
+          ar: "<strong>إجراء مطلوب من العميل:</strong> اختيار منصة النشرة — Klaviyo أو Mailchimp — وتوفير مفاتيح API ومعرّف القائمة قبل تفعيل المزامنة الحية. الكود جاهز؛ المزامنة تبقى معلّقة حتى يختار العميل."
         },
         steps: {
           en: [
@@ -1086,7 +1101,7 @@
     };
 
     const STORAGE_KEY = "mbody-sh-technical-progress";
-    const PROGRESS_VERSION = 42;
+    const PROGRESS_VERSION = 49;
 
 
 
@@ -1103,7 +1118,7 @@
       "p3-8", "p3-9",
       "p4-0", "p4-6",
       "p5-13",
-      "p6-1", "p6-3", "p6-4", "p6-10", "p6-11",
+      "p6-1", "p6-3", "p6-4", "p6-11",
       "p7-0", "p7-1", "p7-2", "p7-3", "p7-4", "p7-5", "p7-6", "p7-7", "p7-8", "p7-9",
       "p8-1", "p8-5", "p8-6", "p8-11", "p8-12",
     ]);
@@ -1144,6 +1159,7 @@
       "p3-4": true,
       "p3-5": true,
       "p3-6": true,
+      "p3-7": true,
       "p3-8": true,
       "p3-9": true,
       "p4-0": true,
@@ -1170,13 +1186,19 @@
       "p6-5": true,
       "p6-6": true,
       "p6-7": true,
+      "p6-8": true,
+      "p6-9": true,
+      "p6-10": true,
+      "p6-11": true,
       "p7-0": true,
       "p7-1": true,
+      "p7-2": true,
       "p7-3": true,
       "p7-4": true,
       "p7-5": true,
       "p7-6": true,
       "p7-7": true,
+      "p7-8": true,
       "migrate-0": true,
       "migrate-1": true,
       "migrate-2": true,
@@ -1233,6 +1255,13 @@
             changed = true;
           }
         });
+        for (let i = 0; i < 12; i++) {
+          const key = `p6-${i}`;
+          if (!progress[key]) {
+            progress[key] = true;
+            changed = true;
+          }
+        }
         localStorage.setItem(VERSION_KEY, String(PROGRESS_VERSION));
       }
       PHASES.filter((p) => p.id !== "p0").forEach((p) => {
@@ -1501,6 +1530,9 @@
               : `<strong>${stats.doneCount}/${stats.count}</strong> tasks · <strong>${stats.remainingDays}</strong> days left of ${stats.totalDays}`
           }</p>`;
         }
+        const clientNoteHtml = p.clientNote
+          ? `<p class="phase-client-note">${isAr ? p.clientNote.ar : p.clientNote.en}</p>`
+          : "";
         const stepsClass = isDonePhase ? "steps steps-simple" : "steps";
         return `
           <section class="phase-block" id="${p.id}">
@@ -1510,6 +1542,7 @@
               <span class="tag ${tagClass}">${p.tag.toUpperCase()}</span>
             </div>
             ${phaseProgressHtml}
+            ${clientNoteHtml}
             <div class="card">
               <h3>${isAr ? "الهدف" : "Objective"}</h3>
               <p>${isAr ? p.objective.ar : p.objective.en}</p>

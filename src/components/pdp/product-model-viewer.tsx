@@ -10,6 +10,10 @@ type ProductModelViewerProps = {
   className?: string;
 };
 
+/**
+ * Lazy GLB viewer: mounts model-viewer only when near viewport,
+ * then loads the @google/model-viewer chunk + asset on demand (CWV-friendly).
+ */
 export function ProductModelViewer({
   src,
   alt,
@@ -17,12 +21,39 @@ export function ProductModelViewer({
   className = "",
 }: ProductModelViewerProps) {
   const t = useTranslations("pdp.viewer");
+  const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
   const [moduleReady, setModuleReady] = useState(false);
   const [modelLoaded, setModelLoaded] = useState(false);
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px 0px", threshold: 0.01 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!inView) return;
+
     let cancelled = false;
 
     import("@google/model-viewer")
@@ -36,7 +67,7 @@ export function ProductModelViewer({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [inView]);
 
   useEffect(() => {
     setModelLoaded(false);
@@ -59,11 +90,12 @@ export function ProductModelViewer({
     };
   }, [moduleReady, src]);
 
-  const isLoading = !moduleReady || !modelLoaded;
+  const isLoading = !inView || !moduleReady || !modelLoaded;
 
   if (error) {
     return (
       <div
+        ref={containerRef}
         className={`flex flex-col items-center justify-center gap-3 bg-surface-container-low p-8 text-center ${className}`}
         role="alert"
       >
@@ -76,17 +108,27 @@ export function ProductModelViewer({
   }
 
   return (
-    <div className={`relative ${className}`}>
+    <div ref={containerRef} className={`relative ${className}`}>
       {isLoading && (
         <div
           className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-surface-container-low"
           aria-live="polite"
           aria-busy="true"
         >
-          <span className="material-symbols-outlined animate-spin text-4xl text-secondary">
+          {poster ? (
+            // eslint-disable-next-line @next/next/no-img-element -- lightweight poster before model-viewer mounts
+            <img
+              src={poster}
+              alt=""
+              className="absolute inset-0 size-full object-cover opacity-40"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : null}
+          <span className="material-symbols-outlined relative z-[1] animate-spin text-4xl text-secondary">
             progress_activity
           </span>
-          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-secondary">
+          <p className="relative z-[1] text-xs font-semibold uppercase tracking-[0.1em] text-secondary">
             {t("loading")}
           </p>
         </div>
@@ -98,7 +140,7 @@ export function ProductModelViewer({
           src={src}
           alt={alt}
           poster={poster}
-          loading="eager"
+          loading="lazy"
           reveal="auto"
           camera-controls
           touch-action="pan-y"

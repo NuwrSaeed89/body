@@ -139,7 +139,30 @@
     "description": "Sei die Erste, die Zugang zu neuen Drops erhält und exklusive Einblicke in die Zukunft von Performance Wear bekommt.",
     "emailLabel": "E-Mail-Adresse",
     "placeholder": "Deine E-Mail-Adresse",
-    "subscribe": "Abonnieren"
+    "subscribe": "Abonnieren",
+    "submitting": "Wird abonniert…",
+    "consent": "Ich stimme zu, Newsletter und Marketing-E-Mails von Mbody zu erhalten.",
+    "privacyLink": "Datenschutzerklärung",
+    "consentRequired": "Bitte stimme Marketing-E-Mails zu, bevor du dich anmeldest.",
+    "success": "Du bist auf der Liste — willkommen in der Bewegung.",
+    "pendingConfirmation": "Prüfe deinen Posteingang — wir haben dir einen Bestätigungslink geschickt.",
+    "alreadySubscribed": "Du bist bereits angemeldet.",
+    "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "error": "Anmeldung gerade nicht möglich. Bitte erneut versuchen.",
+    "confirm": {
+      "metaTitle": "Newsletter-Abonnement bestätigen",
+      "metaDescription": "Bestätige dein Mbody-Newsletter-Abonnement.",
+      "successTitle": "Abonnement bestätigt",
+      "successDescription": "Du bist auf der Liste. Willkommen in der Bewegung.",
+      "alreadyTitle": "Bereits bestätigt",
+      "alreadyDescription": "Diese E-Mail-Adresse ist bereits für den Mbody-Newsletter angemeldet.",
+      "invalidTitle": "Ungültiger Bestätigungslink",
+      "invalidDescription": "Dieser Bestätigungslink ist ungültig oder wurde bereits verwendet.",
+      "expiredTitle": "Bestätigungslink abgelaufen",
+      "expiredDescription": "Dieser Link ist abgelaufen. Bitte melde dich erneut an, um eine neue Bestätigungs-E-Mail zu erhalten.",
+      "backHome": "Zur Startseite",
+      "shopCta": "Jetzt shoppen"
+    }
   },
   "cookieConsent": {
     "ariaLabel": "Cookie-Einwilligung",
@@ -291,6 +314,81 @@
       "exitFullscreen": "Vollbild beenden"
     }
   },
+  "sizeGuide": {
+    "metaTitle": "Größentabelle | Mbody",
+    "metaDescription": "Finde deine Mbody-Größe anhand von Größe, Gewicht und Körpertyp mit unserer Smart-Size-Tabelle.",
+    "eyebrow": "Mbody Smart Size™",
+    "title": "Finde deine Größe",
+    "subtitle": "Beantworte drei kurze Fragen für eine Passform-Empfehlung aus unserer Größentabelle.",
+    "close": "Größentabelle schließen",
+    "submit": "Meine Größe finden",
+    "units": {
+      "metric": "Metrisch",
+      "imperial": "Imperial"
+    },
+    "fields": {
+      "height": "Körpergröße",
+      "heightInches": "Zoll",
+      "weight": "Gewicht",
+      "bodyType": "Körpertyp"
+    },
+    "bodyTypes": {
+      "slim": {
+        "label": "Schlank",
+        "hint": "Schlanke Figur"
+      },
+      "athletic": {
+        "label": "Athletisch",
+        "hint": "Definierte Muskeln"
+      },
+      "curvy": {
+        "label": "Curvy",
+        "hint": "Vollere Hüften"
+      }
+    },
+    "errors": {
+      "invalid": "Bitte gültige Größe und Gewicht eingeben.",
+      "outOfRange": "Diese Maße liegen außerhalb unserer Tabelle. Bitte Werte innerhalb der Größentabelle wählen.",
+      "noMatch": "Für dieses Produkt konnte keine Größe gefunden werden. Siehe die Tabelle unten."
+    },
+    "result": {
+      "eyebrow": "Empfohlene Größe",
+      "notes": {
+        "true_to_size": "Passend zu unserer Tabelle für dein Profil.",
+        "size_down": "Wir sind etwas runtergegangen für eine engere Kompressionspassform.",
+        "size_up": "Wir sind etwas hochgegangen für mehr Komfort an Hüfte und Oberschenkel.",
+        "between_sizes": "Du liegst zwischen den Größen — probiere bei Unsicherheit beide."
+      },
+      "confidence": {
+        "high": "Hohe Treffsicherheit",
+        "medium": "Gute Übereinstimmung",
+        "low": "Ungefähre Übereinstimmung — Tabelle prüfen"
+      },
+      "alternate": "Auch {size} in Betracht ziehen",
+      "apply": "Größe {size} wählen"
+    },
+    "chart": {
+      "title": "Größentabelle",
+      "subtitle": "Damen · Performance-Fit · cm / kg",
+      "size": "Größe",
+      "height": "Körpergröße (cm)",
+      "weight": "Gewicht (kg)",
+      "bust": "Brust (cm)",
+      "waist": "Taille (cm)",
+      "hip": "Hüfte (cm)",
+      "disclaimer": "Diese Tabelle ist ein Ausgangspunkt. Stoffdehnung und gewünschte Kompression können variieren — bei Zwischengrößen nach Vorliebe wählen."
+    },
+    "banner": {
+      "title": "Mbody Smart Size™",
+      "description": "Erhalte deine Passform-Empfehlung anhand deines Profils in unter 30 Sekunden.",
+      "cta": "Meine Größe finden"
+    },
+    "page": {
+      "title": "Größentabelle",
+      "description": "Nutze Smart Size für eine persönliche Empfehlung oder vergleiche dich mit der vollständigen Mbody-Tabelle unten.",
+      "shopCta": "Weiter einkaufen"
+    }
+  },
   "newDrops": {
     "eyebrow": "Saisonales Release",
     "title": "Neue Drops",
@@ -363,6 +461,7 @@
       "cod": "Nachnahme",
       "codDescription": "Bezahle bei Lieferung",
       "card": "Kreditkarte",
+      "cardPendingDescription": "Bestellung wird als ausstehende Zahlung gespeichert, bis die Karten-Gateway verbunden ist.",
       "cardSoon": "Demnächst",
       "billing": "Rechnung",
       "sameAsShipping": "Wie Lieferadresse",

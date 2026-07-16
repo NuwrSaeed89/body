@@ -139,7 +139,30 @@
     "description": "Be the first to access our new drops and receive exclusive insights into the future of performance wear.",
     "emailLabel": "Email Address",
     "placeholder": "Your Email Address",
-    "subscribe": "Subscribe"
+    "subscribe": "Subscribe",
+    "submitting": "Subscribing…",
+    "consent": "I agree to receive Mbody newsletters and marketing emails.",
+    "privacyLink": "Privacy Policy",
+    "consentRequired": "Please agree to receive marketing emails before subscribing.",
+    "success": "You're on the list — welcome to the movement.",
+    "pendingConfirmation": "Check your inbox — we sent a confirmation link to complete your subscription.",
+    "alreadySubscribed": "You're already subscribed.",
+    "invalidEmail": "Enter a valid email address.",
+    "error": "Could not subscribe right now. Please try again.",
+    "confirm": {
+      "metaTitle": "Confirm newsletter subscription",
+      "metaDescription": "Confirm your Mbody newsletter subscription.",
+      "successTitle": "Subscription confirmed",
+      "successDescription": "You're on the list. Welcome to the movement.",
+      "alreadyTitle": "Already confirmed",
+      "alreadyDescription": "This email address is already subscribed to the Mbody newsletter.",
+      "invalidTitle": "Invalid confirmation link",
+      "invalidDescription": "This confirmation link is invalid or has already been used.",
+      "expiredTitle": "Confirmation link expired",
+      "expiredDescription": "This link has expired. Please subscribe again to receive a new confirmation email.",
+      "backHome": "Back to home",
+      "shopCta": "Shop now"
+    }
   },
   "cookieConsent": {
     "ariaLabel": "Cookie consent",
@@ -291,6 +314,81 @@
       "exitFullscreen": "Exit full screen"
     }
   },
+  "sizeGuide": {
+    "metaTitle": "Size Guide | Mbody",
+    "metaDescription": "Find your Mbody size from height, weight, and body type using our Smart Size chart.",
+    "eyebrow": "Mbody Smart Size™",
+    "title": "Find your size",
+    "subtitle": "Answer three quick questions for a fit recommendation from our size chart.",
+    "close": "Close size guide",
+    "submit": "Get my size",
+    "units": {
+      "metric": "Metric",
+      "imperial": "Imperial"
+    },
+    "fields": {
+      "height": "Height",
+      "heightInches": "Inches",
+      "weight": "Weight",
+      "bodyType": "Body type"
+    },
+    "bodyTypes": {
+      "slim": {
+        "label": "Slim",
+        "hint": "Lean frame"
+      },
+      "athletic": {
+        "label": "Athletic",
+        "hint": "Defined muscle"
+      },
+      "curvy": {
+        "label": "Curvy",
+        "hint": "Fuller hips"
+      }
+    },
+    "errors": {
+      "invalid": "Enter a valid height and weight.",
+      "outOfRange": "Those measurements are outside our chart range. Try values within the size table.",
+      "noMatch": "We could not match a size for this product. Check the chart below."
+    },
+    "result": {
+      "eyebrow": "Recommended size",
+      "notes": {
+        "true_to_size": "True to our chart for your profile.",
+        "size_down": "We sized you slightly down for a closer compression fit.",
+        "size_up": "We sized you slightly up for comfort through the hips and thighs.",
+        "between_sizes": "You sit between sizes — try both if unsure."
+      },
+      "confidence": {
+        "high": "High confidence match",
+        "medium": "Good match",
+        "low": "Approximate match — use the chart as a check"
+      },
+      "alternate": "Also consider {size}",
+      "apply": "Select size {size}"
+    },
+    "chart": {
+      "title": "Size chart",
+      "subtitle": "Women's performance fit · centimetres / kilograms",
+      "size": "Size",
+      "height": "Height (cm)",
+      "weight": "Weight (kg)",
+      "bust": "Bust (cm)",
+      "waist": "Waist (cm)",
+      "hip": "Hip (cm)",
+      "disclaimer": "This chart is a starting point. Fabric stretch and preferred compression may vary — when between sizes, choose based on fit preference."
+    },
+    "banner": {
+      "title": "Mbody Smart Size™",
+      "description": "Get your perfect fit recommendation based on your unique profile in under 30 seconds.",
+      "cta": "Find My Size"
+    },
+    "page": {
+      "title": "Size Guide",
+      "description": "Use Smart Size to get a personal recommendation, or compare yourself against the full Mbody chart below.",
+      "shopCta": "Continue shopping"
+    }
+  },
   "newDrops": {
     "eyebrow": "Seasonal Release",
     "title": "New Drops",
@@ -363,6 +461,7 @@
       "cod": "Cash on Delivery",
       "codDescription": "Pay when your order arrives",
       "card": "Credit Card",
+      "cardPendingDescription": "Order saved as pending payment until the card gateway is connected.",
       "cardSoon": "Coming soon",
       "billing": "Billing",
       "sameAsShipping": "Same as shipping address",

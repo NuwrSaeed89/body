@@ -1,9 +1,10 @@
 "use client";
 
-import Image from "next/image";
+import { ImageWithShimmer as Image } from "@/components/ui/image-with-shimmer";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { shouldSkipImageOptimization } from "@/lib/performance/image-src";
 import type { ProductDetail } from "@/lib/shop-data";
 
 const ProductModelViewer = dynamic(
@@ -28,10 +29,6 @@ type ProductGalleryProps = {
 };
 
 type ViewMode = "images" | "3d";
-
-function isExternalImage(src: string): boolean {
-  return src.startsWith("http");
-}
 
 export function ProductGallery({ product }: ProductGalleryProps) {
   const t = useTranslations("pdp.viewer");
@@ -146,7 +143,8 @@ export function ProductGallery({ product }: ProductGalleryProps) {
             className="object-cover"
             sizes="100vw"
             priority={index === 0}
-            unoptimized={isExternalImage(image.src)}
+            quality={85}
+            unoptimized={shouldSkipImageOptimization(image.src)}
           />
         </div>
       ))}
@@ -161,7 +159,8 @@ export function ProductGallery({ product }: ProductGalleryProps) {
       className="object-cover"
       sizes="(max-width: 768px) 100vw, 50vw"
       priority
-      unoptimized={isExternalImage(image.src)}
+      quality={85}
+      unoptimized={shouldSkipImageOptimization(image.src)}
     />
   );
 
@@ -176,7 +175,8 @@ export function ProductGallery({ product }: ProductGalleryProps) {
           className="object-cover"
           sizes="45vw"
           priority={activeImageIndex === 0}
-          unoptimized={isExternalImage(activeImage.src)}
+          quality={85}
+          unoptimized={shouldSkipImageOptimization(activeImage.src)}
         />
       );
     }
@@ -210,7 +210,8 @@ export function ProductGallery({ product }: ProductGalleryProps) {
                 className="object-cover"
                 sizes="50vw"
                 priority={index === 0}
-                unoptimized={isExternalImage(image.src)}
+                quality={85}
+                unoptimized={shouldSkipImageOptimization(image.src)}
               />
             </div>
           ))}
@@ -289,7 +290,8 @@ export function ProductGallery({ product }: ProductGalleryProps) {
                     fill
                     className="object-cover"
                     sizes="72px"
-                    unoptimized={isExternalImage(image.src)}
+                    quality={75}
+                    unoptimized={shouldSkipImageOptimization(image.src)}
                   />
                 </button>
               );

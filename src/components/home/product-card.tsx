@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ImageWithShimmer as Image } from "@/components/ui/image-with-shimmer";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { FormattedPrice } from "@/components/ui/formatted-price";
@@ -35,6 +35,7 @@ export async function ProductCard({
               ? "(max-width: 768px) 100vw, 66vw"
               : "(max-width: 768px) 100vw, 33vw"
           }
+          quality={75}
         />
         {product.badgeKey && (
           <div className="absolute left-6 top-6">

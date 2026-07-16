@@ -6,6 +6,7 @@ const footerLinksMobile = {
   shop: [
     { labelKey: "footer.links.newArrivals", href: "/new-drops" as const },
     { labelKey: "footer.links.collections", href: "/#collections" as const },
+    { labelKey: "footer.links.sizeGuide", href: "/size-guide" as const },
   ],
   support: [
     { labelKey: "footer.links.shipping", href: LEGAL_PATHS.returns },

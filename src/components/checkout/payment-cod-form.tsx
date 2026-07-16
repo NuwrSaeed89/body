@@ -11,6 +11,7 @@ type PaymentCodFormProps = {
 export function PaymentCodForm({ locale }: PaymentCodFormProps) {
   const t = useTranslations("checkout.payment");
   const router = useRouter();
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cod">("card");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -34,7 +35,9 @@ export function PaymentCodForm({ locale }: PaymentCodFormProps) {
     setError(null);
 
     try {
-      const response = await fetch("/api/checkout/cod", {
+      const endpoint =
+        paymentMethod === "cod" ? "/api/checkout/cod" : "/api/checkout/place-order";
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -68,8 +71,40 @@ export function PaymentCodForm({ locale }: PaymentCodFormProps) {
         <legend className="mb-4 text-sm font-semibold uppercase tracking-[0.1em] text-primary">
           {t("method")}
         </legend>
-        <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-primary bg-surface-container-low p-4">
-          <input type="radio" name="payment" defaultChecked className="text-primary" />
+        <label
+          className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 ${
+            paymentMethod === "card"
+              ? "border-primary bg-surface-container-low"
+              : "border-outline-variant"
+          }`}
+        >
+          <input
+            type="radio"
+            name="payment"
+            checked={paymentMethod === "card"}
+            onChange={() => setPaymentMethod("card")}
+            className="text-primary"
+          />
+          <span className="material-symbols-outlined">credit_card</span>
+          <div>
+            <p className="text-sm font-medium">{t("card")}</p>
+            <p className="text-sm text-secondary">{t("cardPendingDescription")}</p>
+          </div>
+        </label>
+        <label
+          className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 ${
+            paymentMethod === "cod"
+              ? "border-primary bg-surface-container-low"
+              : "border-outline-variant"
+          }`}
+        >
+          <input
+            type="radio"
+            name="payment"
+            checked={paymentMethod === "cod"}
+            onChange={() => setPaymentMethod("cod")}
+            className="text-primary"
+          />
           <span className="material-symbols-outlined">payments</span>
           <div>
             <p className="text-sm font-medium">{t("cod")}</p>

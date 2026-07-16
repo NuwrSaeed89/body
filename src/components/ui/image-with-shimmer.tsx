@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { type ImageProps } from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Shimmer } from "./shimmer";
 
 type ImageWithShimmerProps = ImageProps & {
@@ -15,6 +15,19 @@ export function ImageWithShimmer({
   ...props
 }: ImageWithShimmerProps) {
   const [loaded, setLoaded] = useState(false);
+  const startedAtRef = useRef<number>(Date.now());
+
+  const srcKey =
+    typeof props.src === "string"
+      ? props.src
+      : // StaticImport
+        (props.src as { src: string }).src;
+
+  // Reset shimmer state when Next/Image `src` changes.
+  useEffect(() => {
+    startedAtRef.current = Date.now();
+    setLoaded(false);
+  }, [srcKey]);
 
   return (
     <div className="relative h-full w-full">
@@ -27,7 +40,15 @@ export function ImageWithShimmer({
         {...props}
         className={`${className} ${loaded ? "opacity-100" : "opacity-0"} transition-opacity duration-500`}
         onLoad={(event) => {
-          setLoaded(true);
+          // Ensure users can visually perceive shimmer even if image is already cached.
+          const minVisibleMs = 120;
+          const elapsed = Date.now() - startedAtRef.current;
+          const remaining = minVisibleMs - elapsed;
+          if (remaining > 0) {
+            window.setTimeout(() => setLoaded(true), remaining);
+          } else {
+            setLoaded(true);
+          }
           onLoad?.(event);
         }}
       />
