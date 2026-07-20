@@ -198,6 +198,7 @@
   },
   "shop": {
     "title": "Shoppa allt",
+    "metaDescription": "Handla Mbody performance activewear — leggings, sport-BH, toppar, shorts och matchande set.",
     "sortBy": "Sortera",
     "filterSort": "Filtrera & sortera",
     "itemCount": "{count} artiklar",

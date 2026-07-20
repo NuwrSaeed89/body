@@ -1,9 +1,5 @@
 import "server-only";
 
-import { spawnSync } from "node:child_process";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { publicEnv } from "@/lib/env";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
@@ -12,12 +8,13 @@ import {
   buildProductModelStoragePath,
   fileNameFromModelUrl,
   getProductModelMimeType,
+  getProductModelUploadMaxBytes,
   isAllowedProductModelUrl,
   isExternalProductModelStoragePath,
   PRODUCT_MODEL_BUCKET,
   PRODUCT_MODEL_MAX_BYTES,
-  type ProductModelExtension,
 } from "./model-formats";
+import { optimizeGlbBytes } from "./optimize-glb";
 
 export type ProductModelMedia = {
   id: string;
@@ -55,49 +52,28 @@ async function optimizeGlbInStorage(storagePath: string): Promise<void> {
   }
 
   const sourceBytes = Buffer.from(await fileData.arrayBuffer());
-  const tempDir = await mkdtemp(join(tmpdir(), "mbody-glb-opt-"));
-  const inputPath = join(tempDir, "source.glb");
-  const outputPath = join(tempDir, "optimized.glb");
+  const { buffer, originalBytes, optimizedBytes, didOptimize } =
+    await optimizeGlbBytes(sourceBytes);
 
-  try {
-    await writeFile(inputPath, sourceBytes);
-    const optimizeResult = spawnSync(
-      "npx",
-      [
-        "--yes",
-        "@gltf-transform/cli",
-        "optimize",
-        inputPath,
-        outputPath,
-        "--compress",
-        "draco",
-      ],
-      { encoding: "utf8" },
+  if (buffer.length > PRODUCT_MODEL_MAX_BYTES) {
+    throw new Error(
+      `After optimization the model is still ${(buffer.length / (1024 * 1024)).toFixed(1)} MB (limit ${Math.round(PRODUCT_MODEL_MAX_BYTES / (1024 * 1024))} MB).`,
     );
-
-    if (optimizeResult.status !== 0) {
-      throw new Error(
-        optimizeResult.stderr?.trim() ||
-          optimizeResult.stdout?.trim() ||
-          "GLB optimize command failed",
-      );
-    }
-
-    const optimizedBytes = await readFile(outputPath);
-    if (optimizedBytes.length <= 0 || optimizedBytes.length >= sourceBytes.length) {
-      return;
-    }
-
-    const { error: uploadError } = await supabase.storage
-      .from(PRODUCT_MODEL_BUCKET)
-      .upload(storagePath, optimizedBytes, {
-        upsert: true,
-        contentType: "model/gltf-binary",
-      });
-    if (uploadError) throw uploadError;
-  } finally {
-    await rm(tempDir, { recursive: true, force: true });
   }
+
+  if (!didOptimize) return;
+
+  console.info(
+    `[admin] GLB optimized in storage: ${originalBytes} → ${optimizedBytes} bytes (${storagePath})`,
+  );
+
+  const { error: uploadError } = await supabase.storage
+    .from(PRODUCT_MODEL_BUCKET)
+    .upload(storagePath, buffer, {
+      upsert: true,
+      contentType: "model/gltf-binary",
+    });
+  if (uploadError) throw uploadError;
 }
 
 export async function getProductModelMedia(productId: string): Promise<ProductModelMedia | null> {
@@ -137,8 +113,9 @@ export async function createProductModelUploadSession(
   fileName: string,
   fileSize: number,
 ): Promise<ModelUploadSession> {
-  if (fileSize <= 0 || fileSize > PRODUCT_MODEL_MAX_BYTES) {
-    throw new Error("File exceeds the 50 MB upload limit");
+  const uploadMax = getProductModelUploadMaxBytes(fileName);
+  if (fileSize <= 0 || fileSize > uploadMax) {
+    throw new Error(`File exceeds the ${Math.round(uploadMax / 1024 / 1024)} MB upload limit`);
   }
 
   const supabase = createSupabaseAdminClient();
@@ -180,16 +157,23 @@ async function removeStorageObject(storagePath: string) {
   if (error) throw error;
 }
 
+type RegisterProductModelOptions = {
+  skipOptimize?: boolean;
+};
+
 export async function registerProductModelMedia(
   productId: string,
   storagePath: string,
   publicUrl: string,
   altText?: string | null,
+  options: RegisterProductModelOptions = {},
 ): Promise<ProductModelMedia> {
-  try {
-    await optimizeGlbInStorage(storagePath);
-  } catch (error) {
-    console.warn("[admin] GLB optimization skipped:", error);
+  if (!options.skipOptimize && process.env.VERCEL !== "1") {
+    try {
+      await optimizeGlbInStorage(storagePath);
+    } catch (error) {
+      console.warn("[admin] GLB optimization skipped:", error);
+    }
   }
 
   const supabase = createSupabaseAdminClient();

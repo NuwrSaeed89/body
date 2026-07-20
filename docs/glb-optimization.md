@@ -1,38 +1,35 @@
-# GLB Optimization Before Upload
+# GLB Optimization
 
-Use this workflow to compress 3D models before uploading to product media.
+## Automatic (admin upload — works on Vercel)
 
-## Why
+When you upload a **`.glb`** file from **Admin → Products → Edit**:
 
-- Faster 3D load on mobile and slow networks.
-- Lower storage and bandwidth cost.
-- Better UX for `model-viewer` in PDP.
+1. Your browser accepts raw files up to **100 MB**
+2. **Draco compression** runs in the browser (`@gltf-transform` + Google Draco WASM from CDN)
+3. The optimized file is uploaded **directly to Supabase** (signed URL — no large request through Vercel)
+4. The product is linked for the storefront 3D viewer
 
-## Commands
+This avoids Vercel’s **~4.5 MB serverless body limit** and function timeouts. Progress shows **“Uploading and optimizing…”**.
 
-Run from `mbody/`:
+**First upload** may take longer while Draco scripts load from the CDN (~1–2 MB).
+
+## Manual (CLI)
+
+For batch work or testing before upload, run from `mbody/`:
 
 ```bash
-# Default (draco)
 pnpm glb:optimize -- ./tmp/model-source.glb ./tmp/model-optimized.glb
-
-# Explicit draco
 pnpm glb:optimize:draco -- ./tmp/model-source.glb ./tmp/model-optimized.glb
-
-# Meshopt alternative
 pnpm glb:optimize:meshopt -- ./tmp/model-source.glb ./tmp/model-optimized.glb
 ```
 
-The script prints original size, optimized size, and saved percentage.
+## Recommended targets
 
-## Recommended Targets
+- GLB file target: **1–5 MB** for normal PDP use
+- Stored models must stay under **50 MB** (Supabase bucket limit)
+- `.gltf` and `.usdz` are **not** auto-optimized — compress manually if needed
 
-- GLB file target: 1-5 MB for normal PDP use.
-- Keep visual quality acceptable on iOS Safari and Android Chrome.
-- If quality drops too much, test the other method (`draco` vs `meshopt`).
+## Policy
 
-## Upload Policy
-
-- Keep original source file with design team.
-- Upload only the optimized `.glb` to storage.
-- Link optimized URL in product media (`kind = glb`).
+- Keep the original source file with the design team
+- On Vercel, never upload unoptimized GLB through the API — optimization is always client-side first

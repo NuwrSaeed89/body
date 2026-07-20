@@ -4,6 +4,7 @@ import type { OrderConfirmationEmailData, OrderConfirmationLocale } from "./orde
 
 export function buildSampleOrderConfirmationData(
   locale: OrderConfirmationLocale = "en",
+  paymentMethod: OrderConfirmationEmailData["paymentMethod"] = "card",
 ): OrderConfirmationEmailData {
   const subtotalSek = 1740;
   const summary = calculateCartSummary(subtotalSek, "EUR", locale);
@@ -18,8 +19,11 @@ export function buildSampleOrderConfirmationData(
     }).format(new Date()),
     customerEmail: "jane.doe@example.com",
     customerName: "Jane Doe",
-    paymentMethod: "card",
-    shippingMethod: "Standard Shipping · 3–5 business days",
+    paymentMethod,
+    shippingMethod:
+      paymentMethod === "cod"
+        ? "Standard Shipping · Pay on delivery"
+        : "Standard Shipping · 3–5 business days",
     shippingAddress: {
       name: "Jane Doe",
       line1: "Södermalmstorg 4",

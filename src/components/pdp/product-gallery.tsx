@@ -1,6 +1,7 @@
 "use client";
 
 import { ImageWithShimmer as Image } from "@/components/ui/image-with-shimmer";
+import { Shimmer } from "@/components/ui/shimmer";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -38,11 +39,17 @@ export function ProductGallery({ product }: ProductGalleryProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isMobileFullscreen3d, setIsMobileFullscreen3d] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [mainImageLoaded, setMainImageLoaded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const activeImage = product.images[activeImageIndex] ?? product.images[0];
   const show3d = has3d && viewMode === "3d";
   const useDesktopRail = hasMultipleImages;
+
+  // Reset shimmer when the active image changes.
+  useEffect(() => {
+    setMainImageLoaded(false);
+  }, [activeImageIndex]);
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -152,32 +159,40 @@ export function ProductGallery({ product }: ProductGalleryProps) {
   );
 
   const renderSingleImage = (image = product.images[0]) => (
-    <Image
-      src={image.src}
-      alt={image.alt}
-      fill
-      className="object-cover"
-      sizes="(max-width: 768px) 100vw, 50vw"
-      priority
-      quality={85}
-      unoptimized={shouldSkipImageOptimization(image.src)}
-    />
+    <>
+      {!mainImageLoaded && <Shimmer className="absolute inset-0 rounded-none" />}
+      <Image
+        src={image.src}
+        alt={image.alt}
+        fill
+        className="object-cover"
+        sizes="(max-width: 768px) 100vw, 50vw"
+        priority
+        quality={85}
+        unoptimized={shouldSkipImageOptimization(image.src)}
+        onLoad={() => setMainImageLoaded(true)}
+      />
+    </>
   );
 
   const renderDesktopMain = () => {
     if (show3d) return renderModelViewer();
     if (activeImage) {
       return (
-        <Image
-          src={activeImage.src}
-          alt={activeImage.alt}
-          fill
-          className="object-cover"
-          sizes="45vw"
-          priority={activeImageIndex === 0}
-          quality={85}
-          unoptimized={shouldSkipImageOptimization(activeImage.src)}
-        />
+        <>
+          {!mainImageLoaded && <Shimmer className="absolute inset-0 rounded-none" />}
+          <Image
+            src={activeImage.src}
+            alt={activeImage.alt}
+            fill
+            className="object-cover"
+            sizes="45vw"
+            priority={activeImageIndex === 0}
+            quality={85}
+            unoptimized={shouldSkipImageOptimization(activeImage.src)}
+            onLoad={() => setMainImageLoaded(true)}
+          />
+        </>
       );
     }
     return null;

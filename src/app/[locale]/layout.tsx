@@ -14,6 +14,7 @@ import { SkipLink } from "@/components/a11y/skip-link";
 import { MobileLayoutShell } from "@/components/layout/mobile-layout-shell";
 import { routing } from "@/i18n/routing";
 import { publicEnv } from "@/lib/env";
+import { languageAlternates, openGraphLocale } from "@/lib/seo";
 
 type LocaleLayoutProps = {
   children: React.ReactNode;
@@ -34,8 +35,34 @@ export async function generateMetadata({
 
   return {
     metadataBase: new URL(publicEnv.appUrl),
-    title: t("title"),
+    title: {
+      default: t("title"),
+      template: "%s | Mbody",
+    },
     description: t("description"),
+    applicationName: "Mbody",
+    authors: [{ name: "Mbody" }],
+    creator: "Mbody",
+    publisher: "Mbody",
+    alternates: {
+      languages: languageAlternates(""),
+    },
+    openGraph: {
+      type: "website",
+      locale: openGraphLocale(locale),
+      siteName: "Mbody",
+      title: t("title"),
+      description: t("description"),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("title"),
+      description: t("description"),
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
   };
 }
 

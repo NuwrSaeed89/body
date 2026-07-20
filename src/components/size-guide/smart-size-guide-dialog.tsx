@@ -5,14 +5,15 @@ import { useTranslations } from "next-intl";
 import {
   BODY_TYPES,
   HEIGHT_CM_LIMITS,
-  MBODY_SIZE_CHART,
   WEIGHT_KG_LIMITS,
   feetInchesToCm,
+  getSizeChart,
   kgToLb,
   lbToKg,
   recommendSize,
   type BodyType,
   type MbodySize,
+  type SizeGuideProfile,
   type SizeRecommendation,
 } from "@/lib/size-guide";
 
@@ -22,6 +23,7 @@ type SmartSizeGuideDialogProps = {
   open: boolean;
   onClose: () => void;
   availableSizes?: readonly string[];
+  profile?: SizeGuideProfile;
   onApplySize?: (size: MbodySize) => void;
 };
 
@@ -29,6 +31,7 @@ export function SmartSizeGuideDialog({
   open,
   onClose,
   availableSizes,
+  profile = "default",
   onApplySize,
 }: SmartSizeGuideDialogProps) {
   const t = useTranslations("sizeGuide");
@@ -62,7 +65,7 @@ export function SmartSizeGuideDialog({
     };
   }, [open, onClose]);
 
-  const chartRows = useMemo(() => MBODY_SIZE_CHART, []);
+  const chartRows = useMemo(() => getSizeChart(profile), [profile]);
 
   if (!open) return null;
 
@@ -109,6 +112,7 @@ export function SmartSizeGuideDialog({
     const recommendation = recommendSize({
       ...metrics,
       bodyType,
+      profile,
       availableSizes,
     });
 

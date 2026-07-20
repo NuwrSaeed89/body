@@ -48,7 +48,7 @@ function renderAddress(data: OrderConfirmationEmailData) {
 export function renderOrderConfirmationEmail(
   data: OrderConfirmationEmailData,
 ): RenderedOrderConfirmationEmail {
-  const copy = getOrderConfirmationCopy(data.locale);
+  const copy = getOrderConfirmationCopy(data.locale, data.paymentMethod);
   const paymentLabel = copy.paymentMethods[data.paymentMethod];
 
   const html = `<!DOCTYPE html>

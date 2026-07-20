@@ -1,6 +1,16 @@
 import "server-only";
 
-import { calculateCartSummary } from "@/lib/currency";
+import {
+  calculateCartSummary,
+  formatPriceFromSek,
+  extractVatFromInclusive,
+} from "@/lib/currency";
+import { sendOrderConfirmationEmail } from "@/lib/emails/send-order-confirmation";
+import type {
+  OrderConfirmationEmailData,
+  OrderConfirmationLocale,
+} from "@/lib/emails/order-confirmation-types";
+import { publicEnv } from "@/lib/env";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type PlaceCodOrderInput = {
@@ -68,9 +78,16 @@ function generateOrderNumber() {
   return `MB-${y}${m}${d}-${rand}`;
 }
 
+function toEmailLocale(locale: string): OrderConfirmationLocale {
+  if (locale === "sv" || locale === "es" || locale === "de") return locale;
+  return "en";
+}
+
 export async function placeCodOrder(input: PlaceCodOrderInput): Promise<{
   orderId: string;
   orderNumber: string;
+  status: "cod_pending";
+  emailSent: boolean;
 }> {
   const supabase = createSupabaseAdminClient();
 
@@ -111,7 +128,8 @@ export async function placeCodOrder(input: PlaceCodOrderInput): Promise<{
   const cartItems = row.cart_items ?? [];
   if (cartItems.length === 0) throw new Error("Cart is empty");
 
-  const contentLocale = ["en", "sv", "de", "es"].includes(input.locale) ? input.locale : "en";
+  const contentLocale = toEmailLocale(input.locale);
+  const displayLocale = contentLocale === "sv" ? "sv-SE" : "en-US";
 
   const orderLines = cartItems.map((item) => {
     const variant = unwrap(item.product_variants);
@@ -151,16 +169,37 @@ export async function placeCodOrder(input: PlaceCodOrderInput): Promise<{
   });
 
   const subtotal = orderLines.reduce((sum, line) => sum + line.lineTotal, 0);
-  const summary = calculateCartSummary(subtotal, "SEK", contentLocale === "sv" ? "sv-SE" : "en-US");
+  const summary = calculateCartSummary(subtotal, "SEK", displayLocale);
+  const vatSek = extractVatFromInclusive(subtotal + summary.shippingSek);
 
   const orderNumber = generateOrderNumber();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("email, full_name")
+    .eq("id", input.userId)
+    .maybeSingle();
+
+  const profileRow = profile as { email?: string; full_name?: string | null } | null;
+  let customerEmail = profileRow?.email?.trim() || "";
+  if (!customerEmail) {
+    try {
+      const { data } = await supabase.auth.admin.getUserById(input.userId);
+      customerEmail = data.user?.email?.trim() ?? "";
+    } catch {
+      customerEmail = "";
+    }
+  }
+  const customerName =
+    profileRow?.full_name?.trim() ||
+    input.shippingAddress.fullName.trim() ||
+    "Customer";
 
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .insert({
       order_number: orderNumber,
       user_id: input.userId,
-      status: "processing",
+      status: "cod_pending",
       currency: "SEK",
       subtotal,
       discount_total: 0,
@@ -228,8 +267,60 @@ export async function placeCodOrder(input: PlaceCodOrderInput): Promise<{
     .update({ updated_at: new Date().toISOString() })
     .eq("id", row.id);
 
+  const emailData: OrderConfirmationEmailData = {
+    locale: contentLocale,
+    orderNumber: (order as { id: string; order_number: string }).order_number,
+    orderDate: new Intl.DateTimeFormat(contentLocale, {
+      dateStyle: "long",
+      timeStyle: "short",
+    }).format(new Date()),
+    customerEmail,
+    customerName,
+    paymentMethod: "cod",
+    shippingMethod:
+      contentLocale === "sv"
+        ? "Standardfrakt · Betala vid leverans"
+        : contentLocale === "es"
+          ? "Envío estándar · Pago a la entrega"
+          : contentLocale === "de"
+            ? "Standardversand · Zahlung bei Lieferung"
+            : "Standard Shipping · Pay on delivery",
+    shippingAddress: {
+      name: input.shippingAddress.fullName,
+      line1: input.shippingAddress.line1,
+      city: input.shippingAddress.city,
+      postalCode: input.shippingAddress.postalCode,
+      country: input.shippingAddress.country,
+    },
+    items: orderLines.map((line) => ({
+      name: line.productName,
+      size: line.sizeCode,
+      color: line.colorCode !== "DEFAULT" ? line.colorCode : undefined,
+      quantity: line.quantity,
+      lineTotalFormatted: formatPriceFromSek(line.lineTotal, "SEK", contentLocale),
+    })),
+    subtotalFormatted: summary.subtotal,
+    shippingFormatted: summary.freeShipping ? "Free" : summary.shipping,
+    vatFormatted: formatPriceFromSek(vatSek, "SEK", contentLocale),
+    totalFormatted: summary.grandTotal,
+    accountOrderUrl: `${publicEnv.appUrl}/${contentLocale}/account/orders`,
+  };
+
+  let emailSent = false;
+  try {
+    const emailResult = await sendOrderConfirmationEmail(emailData);
+    emailSent = emailResult.ok;
+    if (!emailResult.ok) {
+      console.warn("[checkout] COD confirmation email failed:", emailResult.error);
+    }
+  } catch (error) {
+    console.error("[checkout] COD confirmation email threw:", error);
+  }
+
   return {
     orderId,
     orderNumber: (order as { id: string; order_number: string }).order_number,
+    status: "cod_pending",
+    emailSent,
   };
 }

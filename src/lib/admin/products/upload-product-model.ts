@@ -1,7 +1,7 @@
 import {
-  formatProductModelFormatsLabel,
-  isAllowedProductModelFile,
-  PRODUCT_MODEL_MAX_BYTES,
+  checkProductModelFile,
+  getProductModelExtension,
+  rejectReasonLabel,
 } from "@/lib/admin/products/model-formats";
 import { isUploadAbortError, uploadWithProgress } from "@/lib/admin/products/upload-with-progress";
 
@@ -38,28 +38,62 @@ function throwIfAborted(signal?: AbortSignal) {
   }
 }
 
+async function prepareGlbForUpload(
+  file: File,
+  onProgress?: (percent: number) => void,
+  signal?: AbortSignal,
+): Promise<File> {
+  throwIfAborted(signal);
+  onProgress?.(1);
+
+  const { optimizeGlbFile } = await import("./optimize-glb-client");
+  throwIfAborted(signal);
+
+  const result = await optimizeGlbFile(file, (optimizePercent) => {
+    // Reserve 0–45% of total progress for in-browser optimization.
+    onProgress?.(Math.max(1, Math.round(optimizePercent * 0.45)));
+  });
+
+  throwIfAborted(signal);
+
+  if (result.didOptimize) {
+    console.info(
+      `[admin] GLB optimized in browser: ${result.originalBytes} → ${result.optimizedBytes} bytes`,
+    );
+  }
+
+  return result.file;
+}
+
 export async function uploadProductModel({
   productId,
   file,
   onProgress,
   signal,
 }: UploadProductModelOptions): Promise<ProductModelUploadResult> {
-  if (!isAllowedProductModelFile(file)) {
-    throw new Error(
-      `Invalid file. Use ${formatProductModelFormatsLabel()} up to ${Math.round(PRODUCT_MODEL_MAX_BYTES / 1024 / 1024)} MB.`,
-    );
+  const rejection = checkProductModelFile(file);
+  if (rejection) {
+    throw new Error(rejectReasonLabel(rejection));
+  }
+
+  let uploadFile = file;
+  let alreadyOptimized = false;
+
+  if (getProductModelExtension(file.name) === ".glb") {
+    uploadFile = await prepareGlbForUpload(file, onProgress, signal);
+    alreadyOptimized = true;
   }
 
   throwIfAborted(signal);
-  onProgress?.(0);
+  onProgress?.(alreadyOptimized ? 46 : 0);
 
   const sessionResponse = await fetch(`/api/admin/products/${productId}/model/upload-url`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      fileName: file.name,
-      fileSize: file.size,
-      contentType: file.type || undefined,
+      fileName: uploadFile.name,
+      fileSize: uploadFile.size,
+      contentType: uploadFile.type || undefined,
     }),
     signal,
   });
@@ -75,7 +109,7 @@ export async function uploadProductModel({
     await uploadWithProgress({
       url: session.signedUrl,
       method: "PUT",
-      file,
+      file: uploadFile,
       headers: {
         "Content-Type": session.contentType,
         Authorization: `Bearer ${session.token}`,
@@ -83,8 +117,9 @@ export async function uploadProductModel({
       },
       signal,
       onProgress: (percent) => {
-        const mapped = 5 + Math.round(percent * 0.9);
-        onProgress?.(mapped);
+        const base = alreadyOptimized ? 46 : 5;
+        const span = alreadyOptimized ? 49 : 90;
+        onProgress?.(base + Math.round(percent * (span / 100)));
       },
     });
   } catch (error) {
@@ -93,6 +128,7 @@ export async function uploadProductModel({
   }
 
   throwIfAborted(signal);
+  onProgress?.(alreadyOptimized ? 96 : 95);
 
   const registerResponse = await fetch(`/api/admin/products/${productId}/model`, {
     method: "POST",
@@ -100,6 +136,7 @@ export async function uploadProductModel({
     body: JSON.stringify({
       storagePath: session.storagePath,
       publicUrl: session.publicUrl,
+      alreadyOptimized,
     }),
     signal,
   });

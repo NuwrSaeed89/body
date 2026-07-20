@@ -16,12 +16,13 @@
         ↓
 Webhook → POST /api/webhooks/payment
         ↓
-onPaymentSucceeded() → تحديث حالة الطلب + إرسال البريد
-        ↓
-sendOrderConfirmationEmail() → Resend أو وضع log (تطوير)
+applyPaymentWebhook() حسب الحدث:
+  payment.succeeded → order=paid, payment=captured + بريد تأكيد
+  payment.failed    → payment=failed (الطلب يبقى pending_payment)
+  payment.refunded  → order=cancelled, payment=refunded
 ```
 
-**الحالة الحالية:** القالب والمحفّز جاهزان في الكود. الإرسال الفعلي يحتاج إعداد بريد (Resend) وربط مزود الدفع (بعد استلام مفاتيح العميل).
+**الحالة الحالية:** قالب البريد وWebhooks الثلاثة جاهزة في الكود. الإرسال الفعلي يحتاج Resend وربط مزود الدفع (بعد استلام المفاتيح).
 
 ---
 
@@ -35,8 +36,10 @@ sendOrderConfirmationEmail() → Resend أو وضع log (تطوير)
 | `src/lib/emails/order-confirmation-copy.ts` | نصوص EN / SV / ES / DE |
 | `src/lib/emails/order-confirmation-types.ts` | أنواع بيانات الطلب |
 | `src/lib/emails/send-order-confirmation.ts` | الإرسال عبر Resend أو log |
-| `src/lib/orders/on-payment-succeeded.ts` | نقطة الدخول بعد نجاح الدفع |
-| `src/app/api/webhooks/payment/route.ts` | Webhook الدفع |
+| `src/lib/orders/payment-webhook-types.ts` | أنواع أحداث الدفع الثلاثة |
+| `src/lib/orders/apply-payment-webhook.ts` | تحديث الطلب/الدفع حسب الحدث |
+| `src/lib/orders/on-payment-succeeded.ts` | واجهات succeeded / failed / refunded |
+| `src/app/api/webhooks/payment/route.ts` | Webhook الدفع + التحقق من التوقيع |
 | `src/app/api/dev/emails/order-confirmation/route.ts` | معاينة القالب محلياً |
 
 ---
@@ -276,10 +279,44 @@ curl http://localhost:3000/api/dev/payment-config
 
 ```
 دفع تجريبي → webhook المزود → POST /api/webhooks/payment
-→ onPaymentSucceeded() → sendOrderConfirmationEmail()
+→ applyPaymentWebhook() → (succeeded) sendOrderConfirmationEmail()
 ```
 
-حتى قبل p4-1 يمكنك محاكاة webhook يدوياً:
+حتى قبل p4-1 يمكنك محاكاة الأحداث يدوياً:
+
+```bash
+# نجاح الدفع
+curl -X POST http://localhost:3000/api/webhooks/payment \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": "payment.succeeded",
+    "providerPaymentId": "pi_test_123",
+    "orderId": "<uuid>",
+    "orderNumber": "MB-10042",
+    "paymentMethod": "card"
+  }'
+
+# فشل الدفع
+curl -X POST http://localhost:3000/api/webhooks/payment \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": "payment.failed",
+    "providerPaymentId": "pi_test_123",
+    "orderNumber": "MB-10042",
+    "reason": "card_declined"
+  }'
+
+# استرجاع
+curl -X POST http://localhost:3000/api/webhooks/payment \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": "payment.refunded",
+    "providerPaymentId": "pi_test_123",
+    "orderNumber": "MB-10042"
+  }'
+```
+
+أو مع بيانات بريد كاملة لـ succeeded (وضع mock بدون طلب في DB):
 
 ```bash
 curl -X POST http://localhost:3000/api/webhooks/payment \

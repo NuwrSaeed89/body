@@ -3,6 +3,7 @@ import type { AdminOrderRow } from "../list-types";
 
 export const ADMIN_ORDER_STATUS_FILTERS = [
   "pending_payment",
+  "cod_pending",
   "paid",
   "processing",
   "shipped",

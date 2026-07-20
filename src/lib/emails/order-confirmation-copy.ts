@@ -1,4 +1,7 @@
-import type { OrderConfirmationLocale, OrderPaymentMethod } from "./order-confirmation-types";
+import type {
+  OrderConfirmationLocale,
+  OrderPaymentMethod,
+} from "./order-confirmation-types";
 
 type OrderConfirmationCopy = {
   subject: (orderNumber: string) => string;
@@ -147,6 +150,54 @@ const COPY: Record<OrderConfirmationLocale, OrderConfirmationCopy> = {
   },
 };
 
-export function getOrderConfirmationCopy(locale: OrderConfirmationLocale) {
-  return COPY[locale] ?? COPY.en;
+const COD_OVERRIDES: Record<
+  OrderConfirmationLocale,
+  Pick<OrderConfirmationCopy, "subject" | "preview" | "title" | "intro" | "totalLabel">
+> = {
+  en: {
+    subject: (n) => `Your Mbody COD order ${n} is confirmed`,
+    preview: "Cash on delivery — pay when your order arrives.",
+    title: "COD order confirmed",
+    intro:
+      "Thank you for shopping with Mbody. Your cash-on-delivery order is confirmed. Please have the exact amount ready when your package is delivered within the EU. No card payment was taken online.",
+    totalLabel: "Total due on delivery",
+  },
+  sv: {
+    subject: (n) => `Din Mbody postförskottsorder ${n} är bekräftad`,
+    preview: "Postförskott — betala vid leverans.",
+    title: "Postförskottsorder bekräftad",
+    intro:
+      "Tack för att du handlar hos Mbody. Din postförskottsorder är bekräftad. Ha beloppet redo vid leverans inom EU. Ingen kortbetalning har dragits online.",
+    totalLabel: "Totalt att betala vid leverans",
+  },
+  es: {
+    subject: (n) => `Tu pedido COD Mbody ${n} está confirmado`,
+    preview: "Contra reembolso — paga al recibir el pedido.",
+    title: "Pedido COD confirmado",
+    intro:
+      "Gracias por comprar en Mbody. Tu pedido contra reembolso está confirmado. Ten el importe listo al recibir el paquete en la UE. No se ha cobrado ninguna tarjeta online.",
+    totalLabel: "Total a pagar a la entrega",
+  },
+  de: {
+    subject: (n) => `Deine Mbody-Nachnahmebestellung ${n} ist bestätigt`,
+    preview: "Nachnahme — Zahlung bei Lieferung.",
+    title: "Nachnahmebestellung bestätigt",
+    intro:
+      "Danke für deinen Einkauf bei Mbody. Deine Nachnahmebestellung ist bestätigt. Bitte halte den Betrag bei der Lieferung in der EU bereit. Es wurde online keine Kartenzahlung eingezogen.",
+    totalLabel: "Gesamtbetrag bei Lieferung",
+  },
+};
+
+export function getOrderConfirmationCopy(
+  locale: OrderConfirmationLocale,
+  paymentMethod?: OrderPaymentMethod,
+) {
+  const base = COPY[locale] ?? COPY.en;
+  if (paymentMethod !== "cod") return base;
+
+  const cod = COD_OVERRIDES[locale] ?? COD_OVERRIDES.en;
+  return {
+    ...base,
+    ...cod,
+  };
 }

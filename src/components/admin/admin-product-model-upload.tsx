@@ -2,10 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  checkProductModelFile,
   formatProductModelFormatsLabel,
-  isAllowedProductModelFile,
   PRODUCT_MODEL_ACCEPT,
   PRODUCT_MODEL_MAX_BYTES,
+  PRODUCT_MODEL_UPLOAD_MAX_BYTES,
+  rejectReasonLabel,
 } from "@/lib/admin/products/model-formats";
 import {
   deleteProductModel,
@@ -82,10 +84,9 @@ export function AdminProductModelUpload({
   const uploadFile = async (file: File) => {
     if (!productId || !canUpload || busy) return;
 
-    if (!isAllowedProductModelFile(file)) {
-      setError(
-        `Invalid file. Use ${formatProductModelFormatsLabel()} up to ${formatFileSize(PRODUCT_MODEL_MAX_BYTES)}.`,
-      );
+    const rejection = checkProductModelFile(file);
+    if (rejection) {
+      setError(rejectReasonLabel(rejection));
       return;
     }
 
@@ -225,7 +226,9 @@ export function AdminProductModelUpload({
     <div>
       <label className={adminLabelClassName}>3D Model</label>
       <p className="mb-3 text-xs text-on-surface-variant">
-        {formatProductModelFormatsLabel()} · max {formatFileSize(PRODUCT_MODEL_MAX_BYTES)}
+        {formatProductModelFormatsLabel()} · GLB up to {formatFileSize(PRODUCT_MODEL_UPLOAD_MAX_BYTES)}{" "}
+        (optimized in your browser before upload) · other formats max{" "}
+        {formatFileSize(PRODUCT_MODEL_MAX_BYTES)}
       </p>
 
       {!productId && (

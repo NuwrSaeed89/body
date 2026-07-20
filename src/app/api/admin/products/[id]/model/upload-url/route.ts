@@ -1,7 +1,7 @@
 import { requireAdminApiAccess } from "@/lib/admin/admin-api-guard";
 import {
   getProductModelExtension,
-  PRODUCT_MODEL_MAX_BYTES,
+  getProductModelUploadMaxBytes,
 } from "@/lib/admin/products/model-formats";
 import {
   createProductModelUploadSession,
@@ -37,8 +37,9 @@ export async function POST(request: Request, context: RouteContext) {
     return Response.json({ error: "Unsupported 3D format. Use GLB, GLTF, or USDZ." }, { status: 400 });
   }
 
-  if (!Number.isFinite(fileSize) || fileSize <= 0 || fileSize > PRODUCT_MODEL_MAX_BYTES) {
-    return Response.json({ error: "File exceeds the 50 MB upload limit" }, { status: 400 });
+  if (!Number.isFinite(fileSize) || fileSize <= 0 || fileSize > getProductModelUploadMaxBytes(fileName)) {
+    const uploadMaxMb = Math.round(getProductModelUploadMaxBytes(fileName) / 1024 / 1024);
+    return Response.json({ error: `File exceeds the ${uploadMaxMb} MB upload limit` }, { status: 400 });
   }
 
   try {

@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { MBODY_SIZE_CHART } from "@/lib/size-guide";
+import { getSizeChart, type SizeGuideProfile } from "@/lib/size-guide";
 import { SmartSizeGuideDialog } from "@/components/size-guide/smart-size-guide-dialog";
 
 export function SizeGuidePageContent() {
   const t = useTranslations("sizeGuide");
   const [open, setOpen] = useState(false);
+  const [profile, setProfile] = useState<SizeGuideProfile>("default");
+  const chartRows = getSizeChart(profile);
 
   return (
     <>
@@ -31,6 +33,26 @@ export function SizeGuidePageContent() {
           {t("banner.cta")}
         </button>
 
+        <div className="mt-6 inline-flex rounded-lg border border-outline-variant/50 p-1">
+          {([
+            ["default", "Default"],
+            ["bra", "Bra"],
+          ] as const).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setProfile(key)}
+              className={`rounded-md px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] transition-colors ${
+                profile === key
+                  ? "bg-primary text-on-primary"
+                  : "text-secondary hover:text-primary"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         <div className="mt-14 overflow-x-auto rounded-xl border border-outline-variant/40">
           <table className="w-full min-w-[480px] text-left text-sm">
             <thead className="bg-surface-container text-[10px] uppercase tracking-[0.1em] text-secondary">
@@ -44,7 +66,7 @@ export function SizeGuidePageContent() {
               </tr>
             </thead>
             <tbody>
-              {MBODY_SIZE_CHART.map((row) => (
+              {chartRows.map((row) => (
                 <tr key={row.size} className="border-t border-outline-variant/30">
                   <td className="px-4 py-3 font-semibold text-primary">{row.size}</td>
                   <td className="px-4 py-3 text-on-surface-variant">
@@ -77,7 +99,7 @@ export function SizeGuidePageContent() {
         </p>
       </div>
 
-      <SmartSizeGuideDialog open={open} onClose={() => setOpen(false)} />
+      <SmartSizeGuideDialog open={open} onClose={() => setOpen(false)} profile={profile} />
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { MBODY_SIZE_CHART } from "./chart";
+import { getSizeChart } from "./chart";
 import {
   MBODY_SIZES,
   type BodyType,
@@ -23,7 +23,7 @@ function distanceToRange(value: number, min: number, max: number): number {
   return 0;
 }
 
-function scoreRow(heightCm: number, weightKg: number, row: (typeof MBODY_SIZE_CHART)[number]): number {
+function scoreRow(heightCm: number, weightKg: number, row: { heightCm: readonly [number, number]; weightKg: readonly [number, number] }): number {
   const [hMin, hMax] = row.heightCm;
   const [wMin, wMax] = row.weightKg;
 
@@ -67,7 +67,8 @@ export function recommendSize(input: SizeRecommendationInput): SizeRecommendatio
   if (!Number.isFinite(heightCm) || !Number.isFinite(weightKg)) return null;
   if (heightCm <= 0 || weightKg <= 0) return null;
 
-  const scored = MBODY_SIZE_CHART.map((row) => ({
+  const sizeChart = getSizeChart(input.profile);
+  const scored = sizeChart.map((row) => ({
     size: row.size,
     score: scoreRow(heightCm, weightKg, row),
   })).sort((a, b) => b.score - a.score);

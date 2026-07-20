@@ -198,6 +198,7 @@
   },
   "shop": {
     "title": "Shop All",
+    "metaDescription": "Shop Mbody performance activewear — leggings, sports bras, tops, shorts, and matching sets.",
     "sortBy": "Sort By",
     "filterSort": "Filter & Sort",
     "itemCount": "{count} Items",

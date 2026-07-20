@@ -13,7 +13,7 @@ import { SmartSizeGuideDialog } from "@/components/size-guide/smart-size-guide-d
 import { WishlistToggleButton } from "@/components/wishlist/wishlist-toggle-button";
 import type { ProductDetail } from "@/lib/shop-data";
 import type { ProductRatingSummary } from "@/lib/product-ratings/types";
-import type { MbodySize } from "@/lib/size-guide";
+import type { MbodySize, SizeGuideProfile } from "@/lib/size-guide";
 import { useAuth } from "@/providers/auth-provider";
 import { useCart } from "@/providers/cart-provider";
 
@@ -173,6 +173,8 @@ export function ProductPurchasePanel({ product, initialRatingSummary }: ProductP
       setSelectedSize(size);
     }
   };
+  const sizeGuideProfile: SizeGuideProfile =
+    product.category === "sports-bras" ? "bra" : "default";
 
   const tabContent =
     tab === "fabric"
@@ -407,6 +409,7 @@ export function ProductPurchasePanel({ product, initialRatingSummary }: ProductP
         open={sizeGuideOpen}
         onClose={() => setSizeGuideOpen(false)}
         availableSizes={product.sizes}
+        profile={sizeGuideProfile}
         onApplySize={onApplyRecommendedSize}
       />
 

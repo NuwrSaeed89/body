@@ -46,6 +46,7 @@ export async function POST(request: Request, context: RouteContext) {
   const raw = body as Record<string, unknown>;
   const storagePath = typeof raw.storagePath === "string" ? raw.storagePath.trim() : "";
   const publicUrl = typeof raw.publicUrl === "string" ? raw.publicUrl.trim() : "";
+  const alreadyOptimized = raw.alreadyOptimized === true;
 
   if (!publicUrl) {
     return Response.json({ error: "publicUrl is required" }, { status: 400 });
@@ -53,7 +54,9 @@ export async function POST(request: Request, context: RouteContext) {
 
   try {
     const model = storagePath
-      ? await registerProductModelMedia(id, storagePath, publicUrl)
+      ? await registerProductModelMedia(id, storagePath, publicUrl, null, {
+          skipOptimize: alreadyOptimized || process.env.VERCEL === "1",
+        })
       : await registerExternalProductModelUrl(id, publicUrl);
     revalidatePath("/[locale]/admin/products", "page");
     revalidatePath("/[locale]/shop", "page");

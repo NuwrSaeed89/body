@@ -5,7 +5,11 @@ export const PRODUCT_MODEL_EXTENSIONS = [".glb", ".gltf", ".usdz"] as const;
 
 export type ProductModelExtension = (typeof PRODUCT_MODEL_EXTENSIONS)[number];
 
-export const PRODUCT_MODEL_MAX_BYTES = 52_428_800; // 50 MB — matches storage bucket limit
+/** Final stored model size (Supabase bucket limit). */
+export const PRODUCT_MODEL_MAX_BYTES = 52_428_800; // 50 MB
+
+/** Raw .glb upload limit — larger files are auto-optimized before storage. */
+export const PRODUCT_MODEL_UPLOAD_MAX_BYTES = 104_857_600; // 100 MB
 
 const EXTENSION_MIME: Record<ProductModelExtension, string> = {
   ".glb": "model/gltf-binary",
@@ -38,9 +42,31 @@ export function getProductModelMimeType(fileName: string): string {
   return "application/octet-stream";
 }
 
+export type ModelFileRejectionReason = "extension" | "too_large" | "empty";
+
+export function getProductModelUploadMaxBytes(fileName: string): number {
+  return getProductModelExtension(fileName) === ".glb"
+    ? PRODUCT_MODEL_UPLOAD_MAX_BYTES
+    : PRODUCT_MODEL_MAX_BYTES;
+}
+
+export function checkProductModelFile(file: File): ModelFileRejectionReason | null {
+  if (getProductModelExtension(file.name) === null) return "extension";
+  if (file.size > getProductModelUploadMaxBytes(file.name)) return "too_large";
+  if (file.size === 0) return "empty";
+  return null;
+}
+
 export function isAllowedProductModelFile(file: File): boolean {
-  if (file.size <= 0 || file.size > PRODUCT_MODEL_MAX_BYTES) return false;
-  return getProductModelExtension(file.name) !== null;
+  return checkProductModelFile(file) === null;
+}
+
+export function rejectReasonLabel(reason: ModelFileRejectionReason): string {
+  if (reason === "extension")
+    return `Unsupported format. Use ${formatProductModelFormatsLabel()} (e.g. product.glb).`;
+  if (reason === "too_large")
+    return `File is too large. GLB uploads up to ${Math.round(PRODUCT_MODEL_UPLOAD_MAX_BYTES / 1024 / 1024)} MB are auto-optimized; other formats max ${Math.round(PRODUCT_MODEL_MAX_BYTES / 1024 / 1024)} MB.`;
+  return "File appears to be empty. Try exporting the model again.";
 }
 
 export function buildProductModelStoragePath(productSlug: string, fileName: string): string {

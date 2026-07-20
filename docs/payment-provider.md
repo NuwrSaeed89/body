@@ -54,13 +54,35 @@ KLARNA_PASSWORD=
 KLARNA_API_URL=https://api.playground.klarna.com
 ```
 
-### Webhooks (already scaffolded)
+### Webhooks (Phase 4 — p4-6)
 
 ```env
-PAYMENT_WEBHOOK_SECRET=   # optional HMAC for POST /api/webhooks/payment
+PAYMENT_WEBHOOK_SECRET=   # required in production; header x-mbody-webhook-signature
 ```
 
-Route: `POST /api/webhooks/payment` — calls `onPaymentSucceeded()` → order confirmation email.
+Route: `POST /api/webhooks/payment`
+
+Supported events:
+
+| Event | Order status | Payment status | Side effects |
+|-------|--------------|----------------|--------------|
+| `payment.succeeded` | `paid` | `captured` | Confirmation email; `units_sold` trigger |
+| `payment.failed` | stays `pending_payment` | `failed` | — |
+| `payment.refunded` | `cancelled` | `refunded` | Reverses `units_sold` if was paid |
+
+Example body:
+
+```json
+{
+  "event": "payment.succeeded",
+  "providerPaymentId": "pi_123",
+  "orderId": "<uuid>",
+  "orderNumber": "MB-20260719-1234",
+  "paymentMethod": "card"
+}
+```
+
+Dev sample: `GET /api/webhooks/payment` or `?event=payment.failed`
 
 ---
 

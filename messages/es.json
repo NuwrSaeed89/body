@@ -198,6 +198,7 @@
   },
   "shop": {
     "title": "Ver todo",
+    "metaDescription": "Compra activewear de rendimiento Mbody: leggings, sujetadores deportivos, tops, shorts y conjuntos.",
     "sortBy": "Ordenar",
     "filterSort": "Filtrar y ordenar",
     "itemCount": "{count} artículos",

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -11,11 +12,28 @@ import {
   listCatalogCategories,
 } from "@/lib/catalog/catalog-api-service";
 import { getStorefrontProducts } from "@/lib/catalog/get-storefront-catalog";
+import { buildPageMetadata } from "@/lib/seo";
 
 type ShopPageProps = {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ q?: string }>;
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "shop" });
+
+  return buildPageMetadata({
+    locale,
+    path: "/shop",
+    title: `${t("title")} | Mbody`,
+    description: t("metaDescription"),
+  });
+}
 
 export default async function ShopPage({ params, searchParams }: ShopPageProps) {
   const { locale } = await params;

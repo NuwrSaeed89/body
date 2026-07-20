@@ -22,6 +22,7 @@ export function isCompletedOrderStatus(status: string): boolean {
 }
 
 export function formatOrderStatusLabel(status: string): string {
+  if (status === "cod_pending") return "COD Pending";
   return status
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))

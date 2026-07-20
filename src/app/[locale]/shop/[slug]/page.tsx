@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProductGallery } from "@/components/pdp/product-gallery";
 import { ProductPurchasePanel } from "@/components/pdp/product-purchase-panel";
+import { JsonLd } from "@/components/seo/json-ld";
 import { PageContainer } from "@/components/ui/page-container";
 import { Link } from "@/i18n/navigation";
 import {
@@ -13,6 +14,7 @@ import {
   getStorefrontProductSlugs,
 } from "@/lib/catalog/get-storefront-catalog";
 import { getProductRatingState } from "@/lib/product-ratings/get-product-rating-state";
+import { buildPageMetadata, buildProductJsonLd } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -30,23 +32,26 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = await getStorefrontProductBySlug(slug, locale);
 
   if (!product) {
-    return { title: "Product not found | Mbody" };
+    return buildPageMetadata({
+      locale,
+      path: `/shop/${slug}`,
+      title: "Product not found | Mbody",
+      description: "This product could not be found in the Mbody store.",
+      noIndex: true,
+    });
   }
 
-  const description =
-    product.description.length > 160
-      ? `${product.description.slice(0, 157)}…`
-      : product.description;
+  const primaryImage = product.images[0];
 
-  return {
+  return buildPageMetadata({
+    locale,
+    path: `/shop/${product.slug}`,
     title: `${product.name} | Mbody`,
-    description,
-    openGraph: {
-      title: product.name,
-      description,
-      images: product.images[0]?.src ? [{ url: product.images[0].src }] : undefined,
-    },
-  };
+    description: product.description,
+    images: primaryImage
+      ? [{ url: primaryImage.src, alt: primaryImage.alt || product.name }]
+      : undefined,
+  });
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
@@ -58,9 +63,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const t = await getTranslations("pdp");
   const ratingState = await getProductRatingState(slug, undefined, product.id);
   const initialRatingSummary = ratingState?.summary;
+  const productJsonLd = buildProductJsonLd({
+    product,
+    locale,
+    ratingSummary: initialRatingSummary,
+  });
 
   return (
     <>
+      <JsonLd data={productJsonLd} />
       <SiteHeader />
       <PageContainer as="main" className="pb-40 pt-28 md:pb-24 md:pt-32">
         <nav className="mb-6 hidden items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-on-surface-variant md:flex">

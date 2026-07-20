@@ -9,6 +9,7 @@ export type AdminFulfillmentStatus = (typeof ADMIN_FULFILLMENT_STATUSES)[number]
 
 /** Orders that can move through fulfillment status updates. */
 export const ADMIN_STATUS_UPDATABLE_FROM = new Set([
+  "cod_pending",
   "paid",
   "processing",
   "shipped",

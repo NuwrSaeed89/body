@@ -6,6 +6,7 @@ import { serverEnv } from "@/lib/env";
 type PreviewSearchParams = {
   locale?: string;
   format?: string;
+  method?: string;
 };
 
 function parseLocale(value: string | undefined) {
@@ -13,6 +14,19 @@ function parseLocale(value: string | undefined) {
     return value as (typeof routing.locales)[number];
   }
   return routing.defaultLocale;
+}
+
+function parsePaymentMethod(value: string | undefined) {
+  if (
+    value === "card" ||
+    value === "klarna" ||
+    value === "apple_pay" ||
+    value === "google_pay" ||
+    value === "cod"
+  ) {
+    return value;
+  }
+  return "card" as const;
 }
 
 /** HTML/text preview for the order confirmation template (development only). */
@@ -25,8 +39,9 @@ export async function GET(request: Request) {
   const params = Object.fromEntries(searchParams.entries()) as PreviewSearchParams;
   const locale = parseLocale(params.locale);
   const format = params.format ?? "html";
+  const method = parsePaymentMethod(params.method);
 
-  const data = buildSampleOrderConfirmationData(locale);
+  const data = buildSampleOrderConfirmationData(locale, method);
   const rendered = renderOrderConfirmationEmail(data);
 
   if (format === "json") {

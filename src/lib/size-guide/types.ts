@@ -6,6 +6,10 @@ export const BODY_TYPES = ["slim", "athletic", "curvy"] as const;
 
 export type BodyType = (typeof BODY_TYPES)[number];
 
+export const SIZE_GUIDE_PROFILES = ["default", "bra"] as const;
+
+export type SizeGuideProfile = (typeof SIZE_GUIDE_PROFILES)[number];
+
 export type SizeChartRow = {
   size: MbodySize;
   /** Inclusive height range in cm */
@@ -21,6 +25,7 @@ export type SizeRecommendationInput = {
   heightCm: number;
   weightKg: number;
   bodyType: BodyType;
+  profile?: SizeGuideProfile;
   /** Product sizes to clamp against; defaults to full chart */
   availableSizes?: readonly string[];
 };
