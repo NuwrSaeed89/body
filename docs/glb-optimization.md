@@ -5,13 +5,13 @@
 When you upload a **`.glb`** file from **Admin → Products → Edit**:
 
 1. Your browser accepts raw files up to **100 MB**
-2. **Draco compression** runs in the browser (`@gltf-transform` + Google Draco WASM from CDN)
+2. **Draco compression** runs in the browser (`@gltf-transform` + Draco WASM from `/public/draco/`)
 3. The optimized file is uploaded **directly to Supabase** (signed URL — no large request through Vercel)
 4. The product is linked for the storefront 3D viewer
 
 This avoids Vercel’s **~4.5 MB serverless body limit** and function timeouts. Progress shows **“Uploading and optimizing…”**.
 
-**First upload** may take longer while Draco scripts load from the CDN (~1–2 MB).
+**First upload** may take longer while Draco WASM loads from the app (`/draco/1.5.7/`).
 
 ## Manual (CLI)
 

@@ -6,7 +6,8 @@
 import { PRODUCT_MODEL_MAX_BYTES } from "./model-formats";
 
 const DRACO_VERSION = "1.5.7";
-const DRACO_CDN = `https://cdn.jsdelivr.net/npm/@google/draco@${DRACO_VERSION}`;
+/** Self-hosted under /public — avoids CDN 404s and works on Vercel. */
+const DRACO_BASE = `/draco/${DRACO_VERSION}`;
 
 type DracoWindow = Window & {
   DracoDecoderModule?: () => Promise<unknown>;
@@ -46,8 +47,8 @@ function loadScriptOnce(src: string, id: string): Promise<void> {
 }
 
 async function createDracoDependencies(): Promise<Record<string, unknown>> {
-  await loadScriptOnce(`${DRACO_CDN}/draco_decoder_gltf.js`, "mbody-draco-decoder");
-  await loadScriptOnce(`${DRACO_CDN}/draco_encoder_gltf.js`, "mbody-draco-encoder");
+  await loadScriptOnce(`${DRACO_BASE}/draco_decoder_gltf.js`, "mbody-draco-decoder");
+  await loadScriptOnce(`${DRACO_BASE}/draco_encoder.js`, "mbody-draco-encoder");
 
   const win = window as DracoWindow;
   if (!win.DracoDecoderModule || !win.DracoEncoderModule) {
