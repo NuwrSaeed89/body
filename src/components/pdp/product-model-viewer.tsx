@@ -8,6 +8,8 @@ type ProductModelViewerProps = {
   alt: string;
   poster?: string;
   className?: string;
+  /** Full-screen scan mode — free orbit gestures, no page scroll steal. */
+  fullscreen?: boolean;
 };
 
 /**
@@ -19,6 +21,7 @@ export function ProductModelViewer({
   alt,
   poster,
   className = "",
+  fullscreen = false,
 }: ProductModelViewerProps) {
   const t = useTranslations("pdp.viewer");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,6 +34,12 @@ export function ProductModelViewer({
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+
+    // Always treat fullscreen as in-view so the model mounts immediately.
+    if (fullscreen) {
+      setInView(true);
+      return;
+    }
 
     if (typeof IntersectionObserver === "undefined") {
       setInView(true);
@@ -49,7 +58,7 @@ export function ProductModelViewer({
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [fullscreen]);
 
   useEffect(() => {
     if (!inView) return;
@@ -143,17 +152,18 @@ export function ProductModelViewer({
           loading="lazy"
           reveal="auto"
           camera-controls
-          touch-action="pan-y"
+          // pan-y lets the page scroll in the inline gallery; none is required for free orbit in fullscreen.
+          touch-action={fullscreen ? "none" : "pan-y"}
           shadow-intensity="1"
           exposure="1"
           interaction-prompt="auto"
           ar
           ar-modes="webxr scene-viewer quick-look"
-          className="product-model-viewer"
+          className={`product-model-viewer ${fullscreen ? "product-model-viewer--fullscreen" : ""}`}
         />
       )}
 
-      {moduleReady && modelLoaded && (
+      {moduleReady && modelLoaded && !fullscreen && (
         <p className="pointer-events-none absolute bottom-4 left-1/2 z-10 hidden max-w-[90%] -translate-x-1/2 rounded-lg bg-primary/80 px-4 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-white md:block">
           {t("hint")}
         </p>

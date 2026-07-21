@@ -310,9 +310,10 @@
       "loading": "Cargando modelo 3D…",
       "error": "No se pudo cargar el modelo 3D",
       "hint": "Arrastra para rotar · Pellizca para zoom · Dos dedos para desplazar",
+      "scanHint": "Explora el modelo — arrastra para rotar, pellizca para zoom",
       "backToImages": "Imágenes",
       "fullscreen": "Pantalla completa",
-      "exitFullscreen": "Salir de pantalla completa"
+      "exitFullscreen": "Salir"
     }
   },
   "sizeGuide": {

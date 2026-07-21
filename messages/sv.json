@@ -310,9 +310,10 @@
       "loading": "Laddar 3D-modell…",
       "error": "Kunde inte ladda 3D-modellen",
       "hint": "Dra för att rotera · Nyp för att zooma · Två fingrar för att panorera",
+      "scanHint": "Utforska modellen — dra för att rotera, nyp för att zooma",
       "backToImages": "Bilder",
       "fullscreen": "Helskärm",
-      "exitFullscreen": "Avsluta helskärm"
+      "exitFullscreen": "Stäng"
     }
   },
   "sizeGuide": {

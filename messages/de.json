@@ -310,9 +310,10 @@
       "loading": "3D-Modell wird geladen…",
       "error": "3D-Modell konnte nicht geladen werden",
       "hint": "Ziehen zum Drehen · Kneifen zum Zoomen · Zwei Finger zum Verschieben",
+      "scanHint": "Modell scannen — ziehen zum Drehen, kneifen zum Zoomen",
       "backToImages": "Bilder",
       "fullscreen": "Vollbild",
-      "exitFullscreen": "Vollbild beenden"
+      "exitFullscreen": "Schließen"
     }
   },
   "sizeGuide": {

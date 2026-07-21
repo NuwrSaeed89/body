@@ -319,6 +319,11 @@ body {
   --poster-color: transparent;
 }
 
+.product-model-viewer--fullscreen {
+  min-height: 100%;
+  touch-action: none;
+}
+
 .product-model-viewer::part(default-progress-bar) {
   background-color: var(--color-primary);
 }

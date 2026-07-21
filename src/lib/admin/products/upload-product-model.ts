@@ -4,17 +4,30 @@ import {
   rejectReasonLabel,
 } from "@/lib/admin/products/model-formats";
 import { isUploadAbortError, uploadWithProgress } from "@/lib/admin/products/upload-with-progress";
+import type { GlbOptimizePhase } from "@/lib/admin/products/optimize-glb-client";
 
 export type ProductModelUploadResult = {
   storagePath: string;
   publicUrl: string;
   fileName: string;
+  originalBytes?: number;
+  optimizedBytes?: number;
+  savedPercent?: number;
+};
+
+export type ProductModelUploadProgress = {
+  percent: number;
+  phase: "compressing" | "uploading" | "saving" | "done";
+  label: string;
+  originalBytes?: number;
+  optimizedBytes?: number;
+  savedPercent?: number;
 };
 
 type UploadProductModelOptions = {
   productId: string;
   file: File;
-  onProgress?: (percent: number) => void;
+  onProgress?: (progress: ProductModelUploadProgress) => void;
   signal?: AbortSignal;
 };
 
@@ -38,31 +51,80 @@ function throwIfAborted(signal?: AbortSignal) {
   }
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function mapOptimizePhase(phase: GlbOptimizePhase): string {
+  switch (phase) {
+    case "loading":
+      return "Loading compression tools…";
+    case "reading":
+      return "Reading GLB…";
+    case "simplifying":
+      return "Simplifying mesh…";
+    case "textures":
+      return "Compressing textures…";
+    case "draco":
+      return "Compressing geometry…";
+    case "writing":
+      return "Writing optimized file…";
+    case "done":
+      return "Compression complete";
+  }
+}
+
 async function prepareGlbForUpload(
   file: File,
-  onProgress?: (percent: number) => void,
+  onProgress?: (progress: ProductModelUploadProgress) => void,
   signal?: AbortSignal,
-): Promise<File> {
+): Promise<{
+  file: File;
+  originalBytes: number;
+  optimizedBytes: number;
+  savedPercent: number;
+}> {
   throwIfAborted(signal);
-  onProgress?.(1);
+  onProgress?.({
+    percent: 1,
+    phase: "compressing",
+    label: "Starting compression…",
+    originalBytes: file.size,
+  });
 
   const { optimizeGlbFile } = await import("./optimize-glb-client");
   throwIfAborted(signal);
 
-  const result = await optimizeGlbFile(file, (optimizePercent) => {
-    // Reserve 0–45% of total progress for in-browser optimization.
-    onProgress?.(Math.max(1, Math.round(optimizePercent * 0.45)));
+  const result = await optimizeGlbFile(file, (optimizeProgress) => {
+    // Reserve 0–55% of total progress for in-browser optimization.
+    onProgress?.({
+      percent: Math.max(1, Math.round(optimizeProgress.percent * 0.55)),
+      phase: "compressing",
+      label: optimizeProgress.label || mapOptimizePhase(optimizeProgress.phase),
+      originalBytes: file.size,
+      optimizedBytes: undefined,
+    });
   });
 
   throwIfAborted(signal);
 
-  if (result.didOptimize) {
-    console.info(
-      `[admin] GLB optimized in browser: ${result.originalBytes} → ${result.optimizedBytes} bytes`,
-    );
-  }
+  onProgress?.({
+    percent: 55,
+    phase: "compressing",
+    label: `Compressed ${formatBytes(result.originalBytes)} → ${formatBytes(result.optimizedBytes)} (−${result.savedPercent}%)`,
+    originalBytes: result.originalBytes,
+    optimizedBytes: result.optimizedBytes,
+    savedPercent: result.savedPercent,
+  });
 
-  return result.file;
+  return {
+    file: result.file,
+    originalBytes: result.originalBytes,
+    optimizedBytes: result.optimizedBytes,
+    savedPercent: result.savedPercent,
+  };
 }
 
 export async function uploadProductModel({
@@ -78,14 +140,30 @@ export async function uploadProductModel({
 
   let uploadFile = file;
   let alreadyOptimized = false;
+  let originalBytes: number | undefined;
+  let optimizedBytes: number | undefined;
+  let savedPercent: number | undefined;
 
   if (getProductModelExtension(file.name) === ".glb") {
-    uploadFile = await prepareGlbForUpload(file, onProgress, signal);
+    const prepared = await prepareGlbForUpload(file, onProgress, signal);
+    uploadFile = prepared.file;
     alreadyOptimized = true;
+    originalBytes = prepared.originalBytes;
+    optimizedBytes = prepared.optimizedBytes;
+    savedPercent = prepared.savedPercent;
   }
 
   throwIfAborted(signal);
-  onProgress?.(alreadyOptimized ? 46 : 0);
+  onProgress?.({
+    percent: alreadyOptimized ? 56 : 0,
+    phase: "uploading",
+    label: alreadyOptimized
+      ? `Uploading optimized model (${formatBytes(uploadFile.size)})… Please wait — do not close this window.`
+      : "Uploading model… Please wait — do not close this window.",
+    originalBytes,
+    optimizedBytes,
+    savedPercent,
+  });
 
   const sessionResponse = await fetch(`/api/admin/products/${productId}/model/upload-url`, {
     method: "POST",
@@ -117,9 +195,18 @@ export async function uploadProductModel({
       },
       signal,
       onProgress: (percent) => {
-        const base = alreadyOptimized ? 46 : 5;
-        const span = alreadyOptimized ? 49 : 90;
-        onProgress?.(base + Math.round(percent * (span / 100)));
+        const base = alreadyOptimized ? 56 : 5;
+        const span = alreadyOptimized ? 39 : 90;
+        onProgress?.({
+          percent: base + Math.round(percent * (span / 100)),
+          phase: "uploading",
+          label: alreadyOptimized
+            ? `Uploading optimized model (${formatBytes(uploadFile.size)})… Please wait — do not close this window.`
+            : "Uploading model… Please wait — do not close this window.",
+          originalBytes,
+          optimizedBytes,
+          savedPercent,
+        });
       },
     });
   } catch (error) {
@@ -128,7 +215,14 @@ export async function uploadProductModel({
   }
 
   throwIfAborted(signal);
-  onProgress?.(alreadyOptimized ? 96 : 95);
+  onProgress?.({
+    percent: alreadyOptimized ? 96 : 95,
+    phase: "saving",
+    label: "Saving model to product…",
+    originalBytes,
+    optimizedBytes,
+    savedPercent,
+  });
 
   const registerResponse = await fetch(`/api/admin/products/${productId}/model`, {
     method: "POST",
@@ -146,8 +240,24 @@ export async function uploadProductModel({
     throw new Error(registered.error ?? "Could not save model to product");
   }
 
-  onProgress?.(100);
-  return registered.model;
+  onProgress?.({
+    percent: 100,
+    phase: "done",
+    label:
+      originalBytes != null && optimizedBytes != null
+        ? `Done — ${formatBytes(originalBytes)} → ${formatBytes(optimizedBytes)} (−${savedPercent ?? 0}%)`
+        : "Done",
+    originalBytes,
+    optimizedBytes,
+    savedPercent,
+  });
+
+  return {
+    ...registered.model,
+    originalBytes,
+    optimizedBytes,
+    savedPercent,
+  };
 }
 
 export async function deleteProductModel(productId: string): Promise<void> {

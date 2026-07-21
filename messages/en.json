@@ -310,9 +310,10 @@
       "loading": "Loading 3D model…",
       "error": "Could not load 3D model",
       "hint": "Drag to rotate · Pinch to zoom · Two fingers to pan",
+      "scanHint": "Scan the model — drag to rotate, pinch to zoom",
       "backToImages": "Images",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit full screen"
+      "exitFullscreen": "Exit"
     }
   },
   "sizeGuide": {

@@ -1,10 +1,10 @@
 "use client";
 
 import { ImageWithShimmer as Image } from "@/components/ui/image-with-shimmer";
-import { Shimmer } from "@/components/ui/shimmer";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { shouldSkipImageOptimization } from "@/lib/performance/image-src";
 import type { ProductDetail } from "@/lib/shop-data";
 
@@ -37,19 +37,14 @@ export function ProductGallery({ product }: ProductGalleryProps) {
   const hasMultipleImages = product.images.length > 1;
   const [viewMode, setViewMode] = useState<ViewMode>("images");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [isMobileFullscreen3d, setIsMobileFullscreen3d] = useState(false);
+  const [isFullscreen3d, setIsFullscreen3d] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [mainImageLoaded, setMainImageLoaded] = useState(false);
+  const [portalReady, setPortalReady] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const activeImage = product.images[activeImageIndex] ?? product.images[0];
   const show3d = has3d && viewMode === "3d";
   const useDesktopRail = hasMultipleImages;
-
-  // Reset shimmer when the active image changes.
-  useEffect(() => {
-    setMainImageLoaded(false);
-  }, [activeImageIndex]);
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -68,18 +63,36 @@ export function ProductGallery({ product }: ProductGalleryProps) {
     setViewMode("3d");
   };
 
+  const openFullscreen = () => setIsFullscreen3d(true);
+  const closeFullscreen = () => setIsFullscreen3d(false);
+
   useEffect(() => {
-    if (!show3d) setIsMobileFullscreen3d(false);
+    setPortalReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!show3d) setIsFullscreen3d(false);
   }, [show3d]);
 
   useEffect(() => {
-    if (!isMobileFullscreen3d) return;
+    if (!isFullscreen3d) return;
+
     const previousOverflow = document.body.style.overflow;
+    const previousTouchAction = document.body.style.touchAction;
     document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeFullscreen();
+    };
+    window.addEventListener("keydown", onKeyDown);
+
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.body.style.touchAction = previousTouchAction;
+      window.removeEventListener("keydown", onKeyDown);
     };
-  }, [isMobileFullscreen3d]);
+  }, [isFullscreen3d]);
 
   const modeTabs = has3d && !useDesktopRail && (
     <div
@@ -117,19 +130,28 @@ export function ProductGallery({ product }: ProductGalleryProps) {
     </div>
   );
 
-  const stageClassName = `relative w-full overflow-hidden md:aspect-auto md:min-h-[600px] md:rounded-xl ${
-    show3d && isMobileFullscreen3d
-      ? "fixed inset-0 z-[70] bg-surface"
-      : "aspect-[4/5]"
-  }`;
+  const stageClassName =
+    "relative w-full overflow-hidden aspect-[4/5] md:aspect-auto md:min-h-[600px] md:rounded-xl";
 
-  const renderModelViewer = (className = "") => (
+  const renderModelViewer = (fullscreen = false, className = "") => (
     <ProductModelViewer
       src={product.modelGlbUrl!}
       alt={product.imageAlt}
       poster={product.images[0]?.src}
-      className={`h-full w-full ${isMobileFullscreen3d ? "" : "min-h-[inherit] md:min-h-[600px] md:rounded-xl"} ${className}`}
+      fullscreen={fullscreen}
+      className={`h-full w-full ${fullscreen ? "" : "min-h-[inherit] md:min-h-[600px] md:rounded-xl"} ${className}`}
     />
+  );
+
+  const renderFullscreenButton = () => (
+    <button
+      type="button"
+      onClick={openFullscreen}
+      className="absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] text-white shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aa-focus-ring sm:bottom-6 sm:right-6 sm:px-4"
+    >
+      <span className="material-symbols-outlined text-[18px]">fullscreen</span>
+      {t("fullscreen")}
+    </button>
   );
 
   const renderCarousel = () => (
@@ -159,54 +181,68 @@ export function ProductGallery({ product }: ProductGalleryProps) {
   );
 
   const renderSingleImage = (image = product.images[0]) => (
-    <>
-      {!mainImageLoaded && <Shimmer className="absolute inset-0 rounded-none" />}
-      <Image
-        src={image.src}
-        alt={image.alt}
-        fill
-        className="object-cover"
-        sizes="(max-width: 768px) 100vw, 50vw"
-        priority
-        quality={85}
-        unoptimized={shouldSkipImageOptimization(image.src)}
-        onLoad={() => setMainImageLoaded(true)}
-      />
-    </>
+    <Image
+      src={image.src}
+      alt={image.alt}
+      fill
+      className="object-cover"
+      sizes="(max-width: 768px) 100vw, 50vw"
+      priority
+      quality={85}
+      unoptimized={shouldSkipImageOptimization(image.src)}
+    />
   );
 
   const renderDesktopMain = () => {
-    if (show3d) return renderModelViewer();
-    if (activeImage) {
+    if (show3d) {
       return (
         <>
-          {!mainImageLoaded && <Shimmer className="absolute inset-0 rounded-none" />}
-          <Image
-            src={activeImage.src}
-            alt={activeImage.alt}
-            fill
-            className="object-cover"
-            sizes="45vw"
-            priority={activeImageIndex === 0}
-            quality={85}
-            unoptimized={shouldSkipImageOptimization(activeImage.src)}
-            onLoad={() => setMainImageLoaded(true)}
-          />
+          {renderModelViewer(false)}
+          {renderFullscreenButton()}
         </>
+      );
+    }
+    if (activeImage) {
+      return (
+        <Image
+          key={activeImage.src}
+          src={activeImage.src}
+          alt={activeImage.alt}
+          fill
+          className="object-cover"
+          sizes="45vw"
+          priority={activeImageIndex === 0}
+          quality={85}
+          unoptimized={shouldSkipImageOptimization(activeImage.src)}
+        />
       );
     }
     return null;
   };
 
   const renderMobileMain = () => {
-    if (show3d) return renderModelViewer();
+    if (show3d) {
+      return (
+        <>
+          {renderModelViewer(false)}
+          {renderFullscreenButton()}
+        </>
+      );
+    }
     if (hasMultipleImages) return renderCarousel();
     if (product.images[0]) return renderSingleImage(product.images[0]);
     return null;
   };
 
   const renderDesktopSingleMain = () => {
-    if (show3d) return renderModelViewer();
+    if (show3d) {
+      return (
+        <>
+          {renderModelViewer(false)}
+          {renderFullscreenButton()}
+        </>
+      );
+    }
     if (product.images.length === 1 && product.images[0]) {
       return renderSingleImage(product.images[0]);
     }
@@ -235,6 +271,50 @@ export function ProductGallery({ product }: ProductGalleryProps) {
     }
     return null;
   };
+
+  const fullscreenOverlay =
+    portalReady &&
+    show3d &&
+    isFullscreen3d &&
+    createPortal(
+      <div
+        className="fixed inset-0 z-[100] flex flex-col bg-surface"
+        style={{
+          height: "100dvh",
+          paddingTop: "env(safe-area-inset-top)",
+          paddingBottom: "env(safe-area-inset-bottom)",
+          paddingLeft: "env(safe-area-inset-left)",
+          paddingRight: "env(safe-area-inset-right)",
+        }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("fullscreen")}
+      >
+        <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-secondary">
+            {t("scanHint")}
+          </p>
+          <button
+            type="button"
+            onClick={closeFullscreen}
+            className="flex items-center gap-1.5 rounded-full bg-surface-container-high px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-primary shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aa-focus-ring"
+            aria-label={t("exitFullscreen")}
+          >
+            <span className="material-symbols-outlined text-[18px]">close</span>
+            {t("exitFullscreen")}
+          </button>
+        </div>
+
+        <div className="relative min-h-0 flex-1 touch-none">
+          {renderModelViewer(true, "min-h-0 rounded-none")}
+        </div>
+
+        <p className="shrink-0 px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-secondary">
+          {t("hint")}
+        </p>
+      </div>,
+      document.body,
+    );
 
   return (
     <div className="relative w-full md:sticky md:top-24 md:self-start">
@@ -358,36 +438,15 @@ export function ProductGallery({ product }: ProductGalleryProps) {
             ))}
           </div>
         )}
-
-        {show3d && !isMobileFullscreen3d && (
-          <button
-            type="button"
-            onClick={() => setIsMobileFullscreen3d(true)}
-            className="absolute bottom-6 right-6 flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-white shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aa-focus-ring md:hidden"
-          >
-            <span className="material-symbols-outlined text-[18px]">fullscreen</span>
-            {t("fullscreen")}
-          </button>
-        )}
-
-        {show3d && isMobileFullscreen3d && (
-          <button
-            type="button"
-            onClick={() => setIsMobileFullscreen3d(false)}
-            className="absolute right-4 top-4 z-20 flex items-center gap-1.5 rounded-full bg-surface-container-high px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-primary shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aa-focus-ring md:hidden"
-            aria-label={t("exitFullscreen")}
-          >
-            <span className="material-symbols-outlined text-[18px]">close</span>
-            {t("exitFullscreen")}
-          </button>
-        )}
       </div>
 
-      {show3d && (
+      {show3d && !isFullscreen3d && (
         <p className="mt-3 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-secondary md:hidden">
           {t("hint")}
         </p>
       )}
+
+      {fullscreenOverlay}
     </div>
   );
 }

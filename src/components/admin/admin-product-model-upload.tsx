@@ -56,11 +56,20 @@ export function AdminProductModelUpload({
   const [deleting, setDeleting] = useState(false);
   const [savingUrl, setSavingUrl] = useState(false);
   const [urlInput, setUrlInput] = useState(modelUrl ?? "");
+  const [urlSource, setUrlSource] = useState(modelUrl);
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState("Uploading…");
+  const [compressSummary, setCompressSummary] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const dragDepthRef = useRef(0);
+
+  // Sync the URL field when the parent model URL changes (no effect — avoids cascading renders).
+  if (modelUrl !== urlSource) {
+    setUrlSource(modelUrl);
+    setUrlInput(modelUrl ?? "");
+  }
 
   const canUpload = Boolean(productId) && !disabled;
 
@@ -74,10 +83,6 @@ export function AdminProductModelUpload({
   useEffect(() => {
     onUploadingChange?.(uploading || savingUrl);
   }, [uploading, savingUrl, onUploadingChange]);
-
-  useEffect(() => {
-    setUrlInput(modelUrl ?? "");
-  }, [modelUrl]);
 
   const busy = uploading || deleting || savingUrl;
 
@@ -97,18 +102,41 @@ export function AdminProductModelUpload({
     setUploading(true);
     setError(null);
     setProgress(0);
+    setProgressLabel("Starting…");
+    setCompressSummary(null);
 
     try {
       const result: ProductModelUploadResult = await uploadProductModel({
         productId,
         file,
         signal: controller.signal,
-        onProgress: setProgress,
+        onProgress: (state) => {
+          setProgress(state.percent);
+          setProgressLabel(state.label);
+          if (
+            state.originalBytes != null &&
+            state.optimizedBytes != null &&
+            state.savedPercent != null
+          ) {
+            setCompressSummary(
+              `${formatFileSize(state.originalBytes)} → ${formatFileSize(state.optimizedBytes)} (−${state.savedPercent}%)`,
+            );
+          }
+        },
       });
       onModelChange({
         publicUrl: result.publicUrl,
         fileName: result.fileName,
       });
+      if (
+        result.originalBytes != null &&
+        result.optimizedBytes != null &&
+        result.savedPercent != null
+      ) {
+        setCompressSummary(
+          `${formatFileSize(result.originalBytes)} → ${formatFileSize(result.optimizedBytes)} (−${result.savedPercent}%)`,
+        );
+      }
     } catch (uploadError) {
       if (isUploadAbortError(uploadError)) return;
       setError(uploadError instanceof Error ? uploadError.message : "Upload failed");
@@ -118,6 +146,7 @@ export function AdminProductModelUpload({
       }
       setUploading(false);
       setProgress(0);
+      setProgressLabel("Uploading…");
     }
   };
 
@@ -385,24 +414,39 @@ export function AdminProductModelUpload({
       </p>
 
       {uploading && (
-        <div className="mt-4">
-          <div className="mb-1 flex items-center justify-between text-xs text-on-surface-variant">
-            <span>Uploading and optimizing…</span>
-            <span>{progress}%</span>
+        <div className="mt-4 rounded-lg border border-outline-variant bg-surface-container-high px-4 py-3">
+          <div className="mb-2 flex items-center justify-between gap-3 text-xs text-on-surface-variant">
+            <span className="min-w-0 font-medium text-primary">{progressLabel}</span>
+            <span className="shrink-0 tabular-nums">{progress}%</span>
           </div>
           <div
-            className="h-2 overflow-hidden rounded-full bg-surface-container-high"
+            className="h-2 overflow-hidden rounded-full bg-surface"
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={progress}
+            aria-label={progressLabel}
           >
             <div
               className="h-full rounded-full bg-primary transition-[width] duration-200"
               style={{ width: `${progress}%` }}
             />
           </div>
+          {compressSummary && (
+            <p className="mt-2 text-[11px] font-medium text-on-surface-variant">
+              Size: {compressSummary}
+            </p>
+          )}
+          <p className="mt-2 text-[11px] leading-relaxed text-on-surface-variant">
+            Large 3D files can take 1–2 minutes. Please stay on this page until the upload finishes.
+          </p>
         </div>
+      )}
+
+      {!uploading && compressSummary && (
+        <p className="mt-3 rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3 text-xs text-on-surface-variant">
+          Last compression: <span className="font-semibold text-primary">{compressSummary}</span>
+        </p>
       )}
 
       {error && (
