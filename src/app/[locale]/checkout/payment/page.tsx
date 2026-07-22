@@ -3,8 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { CheckoutLayout } from "@/components/checkout/checkout-layout";
+import { CheckoutPaymentForm } from "@/components/checkout/checkout-payment-form";
 import { OrderSummary } from "@/components/checkout/order-summary";
-import { PaymentCodForm } from "@/components/checkout/payment-cod-form";
+import { getCheckoutPaymentAvailability } from "@/lib/payment/payment-methods";
+import { getPaymentConfigStatus } from "@/lib/payment/provider-env";
 import { requireUser } from "@/lib/auth/require-user";
 
 type PaymentPageProps = {
@@ -16,12 +18,13 @@ export default async function PaymentPage({ params }: PaymentPageProps) {
   setRequestLocale(locale);
   await requireUser(locale, `/${locale}/checkout/payment`);
   const t = await getTranslations("checkout.payment");
+  const availability = getCheckoutPaymentAvailability(getPaymentConfigStatus());
 
   return (
     <>
       <SiteHeader />
       <CheckoutLayout step={2} title={t("title")} summary={<OrderSummary />}>
-        <PaymentCodForm locale={locale} />
+        <CheckoutPaymentForm locale={locale} availability={availability} />
       </CheckoutLayout>
       <SiteFooter />
     </>

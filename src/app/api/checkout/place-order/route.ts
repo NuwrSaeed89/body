@@ -1,8 +1,15 @@
 import { requireCartUser } from "@/lib/cart/cart-api-guard";
-import { placePendingPaymentOrder } from "@/lib/orders/place-pending-payment-order";
+import { placeCheckoutOrder } from "@/lib/orders/place-checkout-order";
+import {
+  getCheckoutPaymentAvailability,
+  isOrderPaymentMethod,
+  normalizeOrderPaymentMethod,
+} from "@/lib/payment/payment-methods";
+import { getPaymentConfigStatus } from "@/lib/payment/provider-env";
 
 type PlaceOrderBody = {
   locale?: string;
+  paymentMethod?: string;
   shippingAddress?: {
     fullName?: string;
     line1?: string;
@@ -26,6 +33,20 @@ export async function POST(request: Request) {
 
   const locale = (body.locale ?? "en").trim() || "en";
   const shipping = body.shippingAddress;
+  const rawPaymentMethod = body.paymentMethod?.trim();
+  const paymentMethod = normalizeOrderPaymentMethod(
+    rawPaymentMethod,
+    rawPaymentMethod === "cod",
+  );
+
+  if (rawPaymentMethod && !isOrderPaymentMethod(rawPaymentMethod)) {
+    return Response.json({ error: "Invalid payment method" }, { status: 400 });
+  }
+
+  const availability = getCheckoutPaymentAvailability(getPaymentConfigStatus());
+  if (!availability[paymentMethod]) {
+    return Response.json({ error: "Payment method is not available" }, { status: 400 });
+  }
 
   if (!shipping?.fullName?.trim()) {
     return Response.json({ error: "fullName is required" }, { status: 400 });
@@ -44,9 +65,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await placePendingPaymentOrder({
+    const result = await placeCheckoutOrder({
       userId: auth.userId,
       locale,
+      paymentMethod,
       shippingAddress: {
         fullName: shipping.fullName.trim(),
         line1: shipping.line1.trim(),
@@ -57,11 +79,17 @@ export async function POST(request: Request) {
       },
     });
 
-    return Response.json({ ok: true, ...result, status: "pending_payment" });
+    return Response.json({ ok: true, ...result });
   } catch (error) {
-    console.error("[checkout] place pending payment order failed:", error);
+    console.error("[checkout] place order failed:", error);
     const message = error instanceof Error ? error.message : "Could not place order";
-    const status = message.includes("empty") || message.includes("required") ? 400 : 409;
+    const status =
+      message.includes("empty") ||
+      message.includes("required") ||
+      message.includes("not available") ||
+      message.includes("Invalid payment")
+        ? 400
+        : 409;
     return Response.json({ ok: false, error: message }, { status });
   }
 }

@@ -313,7 +313,10 @@
       "scanHint": "Explora el modelo — arrastra para rotar, pellizca para zoom",
       "backToImages": "Imágenes",
       "fullscreen": "Pantalla completa",
-      "exitFullscreen": "Salir"
+      "exitFullscreen": "Salir",
+      "brightness": "Brillo 3D",
+      "environmentLight": "Luz de fondo",
+      "shadowAngle": "Ángulo de sombra"
     }
   },
   "sizeGuide": {
@@ -460,6 +463,15 @@
     "payment": {
       "title": "Pago",
       "method": "Método de pago",
+      "comingSoon": "Próximamente",
+      "shippingDetails": "Datos de envío",
+      "fullName": "Nombre completo",
+      "address": "Dirección",
+      "city": "Ciudad",
+      "postalCode": "Código postal",
+      "country": "País",
+      "phoneOptional": "Teléfono (opcional)",
+      "placingOrder": "Realizando pedido…",
       "cod": "Contra reembolso",
       "codDescription": "Paga al recibir el pedido",
       "card": "Tarjeta",
@@ -467,7 +479,29 @@
       "cardSoon": "Próximamente",
       "billing": "Facturación",
       "sameAsShipping": "Igual que la dirección de envío",
-      "placeOrder": "Realizar pedido"
+      "placeOrder": "Realizar pedido",
+      "methods": {
+        "card": {
+          "label": "Tarjeta de crédito/débito",
+          "description": "Visa, Mastercard — el pedido se guarda como pago pendiente hasta conectar la pasarela."
+        },
+        "apple_pay": {
+          "label": "Apple Pay",
+          "description": "Paga con Apple Pay cuando la pasarela de billetera esté conectada."
+        },
+        "google_pay": {
+          "label": "Google Pay",
+          "description": "Paga con Google Pay cuando la pasarela de billetera esté conectada."
+        },
+        "klarna": {
+          "label": "Klarna",
+          "description": "Paga ahora o en 30 días cuando Klarna esté conectado."
+        },
+        "cod": {
+          "label": "Contra reembolso",
+          "description": "Paga al recibir el pedido."
+        }
+      }
     }
   },
   "cart": {

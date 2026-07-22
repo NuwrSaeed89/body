@@ -313,7 +313,10 @@
       "scanHint": "Scan the model — drag to rotate, pinch to zoom",
       "backToImages": "Images",
       "fullscreen": "Fullscreen",
-      "exitFullscreen": "Exit"
+      "exitFullscreen": "Exit",
+      "brightness": "3D brightness",
+      "environmentLight": "Background light intensity",
+      "shadowAngle": "Shadow angle"
     }
   },
   "sizeGuide": {
@@ -460,6 +463,15 @@
     "payment": {
       "title": "Payment",
       "method": "Payment Method",
+      "comingSoon": "Coming soon",
+      "shippingDetails": "Shipping details",
+      "fullName": "Full name",
+      "address": "Address",
+      "city": "City",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "phoneOptional": "Phone (optional)",
+      "placingOrder": "Placing order…",
       "cod": "Cash on Delivery",
       "codDescription": "Pay when your order arrives",
       "card": "Credit Card",
@@ -467,7 +479,29 @@
       "cardSoon": "Coming soon",
       "billing": "Billing",
       "sameAsShipping": "Same as shipping address",
-      "placeOrder": "Place Order"
+      "placeOrder": "Place Order",
+      "methods": {
+        "card": {
+          "label": "Credit / Debit Card",
+          "description": "Visa, Mastercard — order saved as pending payment until the gateway is connected."
+        },
+        "apple_pay": {
+          "label": "Apple Pay",
+          "description": "Pay with Apple Pay when the wallet gateway is connected."
+        },
+        "google_pay": {
+          "label": "Google Pay",
+          "description": "Pay with Google Pay when the wallet gateway is connected."
+        },
+        "klarna": {
+          "label": "Klarna",
+          "description": "Pay now or within 30 days when Klarna is connected."
+        },
+        "cod": {
+          "label": "Cash on Delivery",
+          "description": "Pay when your order arrives."
+        }
+      }
     }
   },
   "cart": {

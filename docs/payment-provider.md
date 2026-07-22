@@ -86,6 +86,55 @@ Dev sample: `GET /api/webhooks/payment` or `?event=payment.failed`
 
 ---
 
+## p4-7 — `units_sold` webhook test
+
+DB trigger `trg_order_units_sold` increments `products.units_sold` when `orders.status` becomes `paid`, and reverses on `cancelled` / `returned` after `paid`.
+
+### Prerequisites
+
+- `NEXT_PUBLIC_USE_MOCK_DATA=false`
+- Supabase env vars + `SUPABASE_SERVICE_ROLE_KEY`
+- A real order in `pending_payment` (place via checkout → card → pending gateway)
+
+### Local (CLI)
+
+```bash
+cd mbody
+pnpm test:units-sold -- --orderNumber MB-YYYYMMDD-1234 --preview
+pnpm test:units-sold -- --orderNumber MB-YYYYMMDD-1234
+pnpm test:units-sold -- --orderNumber MB-YYYYMMDD-1234 --action refund
+```
+
+### Local / staging (HTTP)
+
+```bash
+# Preview current units_sold for order line items
+curl "http://localhost:3000/api/dev/test-units-sold?orderNumber=MB-..."
+
+# Run pay test (pending_payment → paid + units_sold++)
+curl -X POST http://localhost:3000/api/dev/test-units-sold \
+  -H "Content-Type: application/json" \
+  -d '{"orderNumber":"MB-...","action":"pay"}'
+
+# Run refund test (paid → cancelled + units_sold--)
+curl -X POST http://localhost:3000/api/dev/test-units-sold \
+  -H "Content-Type: application/json" \
+  -d '{"orderNumber":"MB-...","action":"refund"}'
+```
+
+On **staging** (`NEXT_PUBLIC_APP_ENV=staging`), add header when `PAYMENT_WEBHOOK_SECRET` is set:
+
+```bash
+curl -X POST "https://<staging>/api/dev/test-units-sold" \
+  -H "Content-Type: application/json" \
+  -H "x-mbody-webhook-signature: $PAYMENT_WEBHOOK_SECRET" \
+  -d '{"orderNumber":"MB-...","action":"pay"}'
+```
+
+Response includes per-product `unitsSoldBefore`, `unitsSoldAfter`, `expectedDelta`, `actualDelta`, and `passed`.
+
+---
+
 ## Staging checklist (after credentials received)
 
 1. Add **test** keys to Vercel staging environment variables.

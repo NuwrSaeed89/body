@@ -1,5 +1,5 @@
 import { requireCartUser } from "@/lib/cart/cart-api-guard";
-import { placeCodOrder } from "@/lib/orders/place-cod-order";
+import { placeCheckoutOrder } from "@/lib/orders/place-checkout-order";
 
 type PlaceCodBody = {
   locale?: string;
@@ -13,6 +13,7 @@ type PlaceCodBody = {
   };
 };
 
+/** @deprecated Use POST /api/checkout/place-order with paymentMethod: "cod". */
 export async function POST(request: Request) {
   const auth = await requireCartUser();
   if (auth instanceof Response) return auth;
@@ -44,9 +45,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await placeCodOrder({
+    const result = await placeCheckoutOrder({
       userId: auth.userId,
       locale,
+      paymentMethod: "cod",
       shippingAddress: {
         fullName: shipping.fullName.trim(),
         line1: shipping.line1.trim(),

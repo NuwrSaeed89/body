@@ -1,13 +1,8 @@
 import type { Locale } from "@/i18n/routing";
+import type { OrderPaymentMethod } from "@/lib/payment/payment-methods";
 
+export type { OrderPaymentMethod };
 export type OrderConfirmationLocale = Locale;
-
-export type OrderPaymentMethod =
-  | "card"
-  | "klarna"
-  | "apple_pay"
-  | "google_pay"
-  | "cod";
 
 export type OrderConfirmationLineItem = {
   name: string;

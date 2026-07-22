@@ -313,7 +313,10 @@
       "scanHint": "Utforska modellen — dra för att rotera, nyp för att zooma",
       "backToImages": "Bilder",
       "fullscreen": "Helskärm",
-      "exitFullscreen": "Stäng"
+      "exitFullscreen": "Stäng",
+      "brightness": "3D-ljusstyrka",
+      "environmentLight": "Bakgrundsljus",
+      "shadowAngle": "Skuggvinkel"
     }
   },
   "sizeGuide": {
@@ -460,6 +463,15 @@
     "payment": {
       "title": "Betalning",
       "method": "Betalningsmetod",
+      "comingSoon": "Kommer snart",
+      "shippingDetails": "Leveransuppgifter",
+      "fullName": "Fullständigt namn",
+      "address": "Adress",
+      "city": "Stad",
+      "postalCode": "Postnummer",
+      "country": "Land",
+      "phoneOptional": "Telefon (valfritt)",
+      "placingOrder": "Lägger beställning…",
       "cod": "Postförskott",
       "codDescription": "Betala vid leverans",
       "card": "Kort",
@@ -467,7 +479,29 @@
       "cardSoon": "Kommer snart",
       "billing": "Fakturering",
       "sameAsShipping": "Samma som leveransadress",
-      "placeOrder": "Lägg beställning"
+      "placeOrder": "Lägg beställning",
+      "methods": {
+        "card": {
+          "label": "Kredit-/betalkort",
+          "description": "Visa, Mastercard — ordern sparas som väntande betalning tills gatewayen är ansluten."
+        },
+        "apple_pay": {
+          "label": "Apple Pay",
+          "description": "Betala med Apple Pay när plånboksgatewayen är ansluten."
+        },
+        "google_pay": {
+          "label": "Google Pay",
+          "description": "Betala med Google Pay när plånboksgatewayen är ansluten."
+        },
+        "klarna": {
+          "label": "Klarna",
+          "description": "Betala nu eller inom 30 dagar när Klarna är anslutet."
+        },
+        "cod": {
+          "label": "Postförskott",
+          "description": "Betala vid leverans."
+        }
+      }
     }
   },
   "cart": {

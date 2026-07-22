@@ -1,11 +1,13 @@
 import "server-only";
 
+import type { OrderPaymentMethod } from "@/lib/payment/payment-methods";
 import { calculateCartSummary } from "@/lib/currency";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type PlacePendingPaymentOrderInput = {
   userId: string;
   locale: string;
+  paymentMethod: Exclude<OrderPaymentMethod, "cod">;
   shippingAddress: {
     fullName: string;
     line1: string;
@@ -200,12 +202,15 @@ export async function placePendingPaymentOrder(input: PlacePendingPaymentOrderIn
 
   const { error: paymentError } = await supabase.from("order_payments").insert({
     order_id: orderId,
-    method: "card",
+    method: input.paymentMethod,
     status: "pending",
     provider: "tbd",
     amount: summary.grandTotalSek,
     currency: "SEK",
-    metadata: { source: "checkout_pending_gateway" },
+    metadata: {
+      source: "checkout_pending_gateway",
+      paymentMethod: input.paymentMethod,
+    },
   });
   if (paymentError) throw paymentError;
 

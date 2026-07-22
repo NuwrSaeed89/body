@@ -1,4 +1,4 @@
-import type { OrderPaymentMethod } from "@/lib/emails/order-confirmation-types";
+import type { OrderPaymentMethod } from "@/lib/payment/payment-methods";
 import type { OrderConfirmationEmailData } from "@/lib/emails/order-confirmation-types";
 
 export const PAYMENT_WEBHOOK_EVENTS = [

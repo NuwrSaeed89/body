@@ -139,19 +139,9 @@ export function ProductGallery({ product }: ProductGalleryProps) {
       alt={product.imageAlt}
       poster={product.images[0]?.src}
       fullscreen={fullscreen}
+      onFullscreen={fullscreen ? undefined : openFullscreen}
       className={`h-full w-full ${fullscreen ? "" : "min-h-[inherit] md:min-h-[600px] md:rounded-xl"} ${className}`}
     />
-  );
-
-  const renderFullscreenButton = () => (
-    <button
-      type="button"
-      onClick={openFullscreen}
-      className="absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] text-white shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aa-focus-ring sm:bottom-6 sm:right-6 sm:px-4"
-    >
-      <span className="material-symbols-outlined text-[18px]">fullscreen</span>
-      {t("fullscreen")}
-    </button>
   );
 
   const renderCarousel = () => (
@@ -195,12 +185,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
 
   const renderDesktopMain = () => {
     if (show3d) {
-      return (
-        <>
-          {renderModelViewer(false)}
-          {renderFullscreenButton()}
-        </>
-      );
+      return renderModelViewer(false);
     }
     if (activeImage) {
       return (
@@ -222,12 +207,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
 
   const renderMobileMain = () => {
     if (show3d) {
-      return (
-        <>
-          {renderModelViewer(false)}
-          {renderFullscreenButton()}
-        </>
-      );
+      return renderModelViewer(false);
     }
     if (hasMultipleImages) return renderCarousel();
     if (product.images[0]) return renderSingleImage(product.images[0]);
@@ -236,12 +216,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
 
   const renderDesktopSingleMain = () => {
     if (show3d) {
-      return (
-        <>
-          {renderModelViewer(false)}
-          {renderFullscreenButton()}
-        </>
-      );
+      return renderModelViewer(false);
     }
     if (product.images.length === 1 && product.images[0]) {
       return renderSingleImage(product.images[0]);
@@ -308,10 +283,6 @@ export function ProductGallery({ product }: ProductGalleryProps) {
         <div className="relative min-h-0 flex-1 touch-none">
           {renderModelViewer(true, "min-h-0 rounded-none")}
         </div>
-
-        <p className="shrink-0 px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-secondary">
-          {t("hint")}
-        </p>
       </div>,
       document.body,
     );

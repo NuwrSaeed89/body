@@ -4,8 +4,9 @@ import { sendOrderConfirmationEmail } from "@/lib/emails/send-order-confirmation
 import type {
   OrderConfirmationEmailData,
   OrderConfirmationLocale,
-  OrderPaymentMethod,
 } from "@/lib/emails/order-confirmation-types";
+import type { OrderPaymentMethod } from "@/lib/payment/payment-methods";
+import { normalizeOrderPaymentMethod } from "@/lib/payment/payment-methods";
 import {
   calculateCartSummary,
   extractVatFromInclusive,
@@ -72,17 +73,7 @@ function mapPaymentMethod(
   method: string | undefined,
   isCod: boolean,
 ): OrderPaymentMethod {
-  if (isCod) return "cod";
-  if (
-    method === "card" ||
-    method === "klarna" ||
-    method === "apple_pay" ||
-    method === "google_pay" ||
-    method === "cod"
-  ) {
-    return method;
-  }
-  return "card";
+  return normalizeOrderPaymentMethod(method, isCod);
 }
 
 async function findOrder(

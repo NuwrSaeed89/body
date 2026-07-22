@@ -313,7 +313,10 @@
       "scanHint": "Modell scannen — ziehen zum Drehen, kneifen zum Zoomen",
       "backToImages": "Bilder",
       "fullscreen": "Vollbild",
-      "exitFullscreen": "Schließen"
+      "exitFullscreen": "Schließen",
+      "brightness": "3D-Helligkeit",
+      "environmentLight": "Hintergrundlicht",
+      "shadowAngle": "Schattenwinkel"
     }
   },
   "sizeGuide": {
@@ -460,6 +463,15 @@
     "payment": {
       "title": "Zahlung",
       "method": "Zahlungsmethode",
+      "comingSoon": "Demnächst",
+      "shippingDetails": "Lieferdetails",
+      "fullName": "Vollständiger Name",
+      "address": "Adresse",
+      "city": "Stadt",
+      "postalCode": "Postleitzahl",
+      "country": "Land",
+      "phoneOptional": "Telefon (optional)",
+      "placingOrder": "Bestellung wird aufgegeben…",
       "cod": "Nachnahme",
       "codDescription": "Bezahle bei Lieferung",
       "card": "Kreditkarte",
@@ -467,7 +479,29 @@
       "cardSoon": "Demnächst",
       "billing": "Rechnung",
       "sameAsShipping": "Wie Lieferadresse",
-      "placeOrder": "Bestellung aufgeben"
+      "placeOrder": "Bestellung aufgeben",
+      "methods": {
+        "card": {
+          "label": "Kredit-/Debitkarte",
+          "description": "Visa, Mastercard — Bestellung wird als ausstehende Zahlung gespeichert, bis die Gateway verbunden ist."
+        },
+        "apple_pay": {
+          "label": "Apple Pay",
+          "description": "Mit Apple Pay bezahlen, sobald die Wallet-Gateway verbunden ist."
+        },
+        "google_pay": {
+          "label": "Google Pay",
+          "description": "Mit Google Pay bezahlen, sobald die Wallet-Gateway verbunden ist."
+        },
+        "klarna": {
+          "label": "Klarna",
+          "description": "Jetzt oder innerhalb von 30 Tagen bezahlen, sobald Klarna verbunden ist."
+        },
+        "cod": {
+          "label": "Nachnahme",
+          "description": "Bezahle bei Lieferung."
+        }
+      }
     }
   },
   "cart": {

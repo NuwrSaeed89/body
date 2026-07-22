@@ -3,18 +3,11 @@
 import { AccountDesktopSidebar } from "@/components/account/account-desktop-sidebar";
 import { getProfileFirstName } from "@/lib/account/format-profile";
 import type { AccountPaymentRecord, AccountProfileData } from "@/lib/account/types";
+import { formatPaymentMethodLabel } from "@/lib/payment/payment-methods";
 
 type AccountPaymentPageContentProps = {
   profile: AccountProfileData | null;
   payments: AccountPaymentRecord[];
-};
-
-const METHOD_LABELS: Record<string, string> = {
-  card: "Card",
-  apple_pay: "Apple Pay",
-  google_pay: "Google Pay",
-  klarna: "Klarna",
-  cod: "Cash on Delivery",
 };
 
 function formatMoney(amount: number, currency: string, locale: string): string {
@@ -34,7 +27,7 @@ function formatPaymentDate(date: string, locale: string): string {
 }
 
 function getMethodLabel(method: string): string {
-  return METHOD_LABELS[method] ?? method.replaceAll("_", " ");
+  return formatPaymentMethodLabel(method);
 }
 
 export function AccountPaymentPageContent({ profile, payments }: AccountPaymentPageContentProps) {

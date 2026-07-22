@@ -11,6 +11,7 @@ import {
 } from "./orders/shipping/format";
 import { EMPTY_ORDER_SHIPPING } from "./orders/shipping/types";
 import { shouldUseAdminMock } from "./should-use-mock";
+import { formatPaymentMethodLabel } from "@/lib/payment/payment-methods";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type DbOrder = {
@@ -127,14 +128,6 @@ export function formatShippingAddressLines(shippingAddress: unknown): string[] {
   }
 
   return lines.length > 0 ? lines : ["—"];
-}
-
-function formatPaymentMethodLabel(method: string, isCod: boolean): string {
-  if (isCod) return "Cash on delivery";
-  return method
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
 }
 
 function formatPaymentStatusLabel(status: string): string {
@@ -256,7 +249,7 @@ async function fetchOrderDetail(
     paymentMethod: payment
       ? formatPaymentMethodLabel(payment.method, row.is_cod)
       : row.is_cod
-        ? "Cash on delivery"
+        ? formatPaymentMethodLabel("cod", true)
         : null,
     paymentStatus: payment ? formatPaymentStatusLabel(payment.status) : null,
     shippingAddressLines: formatShippingAddressLines(row.shipping_address),

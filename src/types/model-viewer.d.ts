@@ -10,13 +10,16 @@ type ModelViewerProps = DetailedHTMLProps<
     "camera-controls"?: boolean | "";
     "touch-action"?: string;
     "auto-rotate"?: boolean | "";
-    "shadow-intensity"?: string;
-    exposure?: string;
+    "shadow-intensity"?: string | number;
+    "shadow-softness"?: string | number;
+    exposure?: string | number;
     "interaction-prompt"?: "auto" | "when-focused" | "none";
     ar?: boolean | "";
     "ar-modes"?: string;
     "camera-orbit"?: string;
     "environment-image"?: string;
+    "skybox-image"?: string;
+    "tone-mapping"?: string;
   },
   HTMLElement
 >;

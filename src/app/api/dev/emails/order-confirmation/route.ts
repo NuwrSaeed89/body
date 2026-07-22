@@ -2,6 +2,10 @@ import { buildSampleOrderConfirmationData } from "@/lib/emails/sample-order-conf
 import { renderOrderConfirmationEmail } from "@/lib/emails/send-order-confirmation";
 import { routing } from "@/i18n/routing";
 import { serverEnv } from "@/lib/env";
+import {
+  isOrderPaymentMethod,
+  normalizeOrderPaymentMethod,
+} from "@/lib/payment/payment-methods";
 
 type PreviewSearchParams = {
   locale?: string;
@@ -17,16 +21,8 @@ function parseLocale(value: string | undefined) {
 }
 
 function parsePaymentMethod(value: string | undefined) {
-  if (
-    value === "card" ||
-    value === "klarna" ||
-    value === "apple_pay" ||
-    value === "google_pay" ||
-    value === "cod"
-  ) {
-    return value;
-  }
-  return "card" as const;
+  if (value && isOrderPaymentMethod(value)) return value;
+  return normalizeOrderPaymentMethod(value);
 }
 
 /** HTML/text preview for the order confirmation template (development only). */

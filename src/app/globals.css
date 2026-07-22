@@ -311,6 +311,16 @@ body {
   }
 }
 
+.product-model-viewer-host,
+.product-model-viewer {
+  /* Lighting / shadows — override anytime without code changes */
+  --mv-environment-intensity: 1.15; /* IBL / background light strength */
+  --mv-shadow-intensity: 1; /* 0–2 · contact shadow strength (full mapping feel) */
+  --mv-shadow-softness: 0.35; /* 0 = hard, 1 = soft */
+  --mv-shadow-angle-deg: 45; /* key-light azimuth */
+  --mv-shadow-elevation-deg: 55; /* key-light elevation (90 = overhead) */
+}
+
 .product-model-viewer {
   width: 100%;
   height: 100%;
